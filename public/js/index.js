@@ -1,3 +1,6 @@
+let roomid = "";
+let uid = "";
+
 function initializeMap() {
     var mapelements = document.getElementsByClassName("map-region");
     for(let i=0; i<mapelements.length; i++) {
@@ -33,11 +36,42 @@ async function connectToServer() {
     });
 }
 
-connectToServer().then(function(ws) {
-    ws.send("userlogin");
-    ws.send("downloadmap");
+function downloadMap() {
+    return new Promise((resolve, reject) => {
+        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmap"})}).then(response => {
+            response.json().then(function(text) {
+                makemap(text.mapdata);
+                resolve("ok");
+            });
+        });
+    });
+}
 
-    ws.onmessage = (message) => {
-        console.log(message.data)
-    }
+function joinGame() {
+    return new Promise((resolve, reject) => {
+        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "joingame"})}).then(response => {
+            response.json().then(function(text) {
+                roomid = text.room;
+                uid = text.uid;
+                resolve("ok");
+            });
+        });
+    });
+}
+
+joinGame().then(function() {
+    connectToServer().then(function(ws) {
+        ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid}));
+
+        downloadMap().then(function() {
+            ws.send(JSON.stringify({"action":"mapready"}));
+        });
+
+        ws.onmessage = (message) => {
+            let response = JSON.parse(message.data);
+            if(response.mapdata) {
+                
+            }
+        }
+    });
 });
