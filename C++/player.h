@@ -7,13 +7,15 @@
 class player
 {
 public:
-	void setName(std::string input);
-	std::string getName();
-	void setColor(std::string input);
-	std::string getColor();
+	void set_player_ID(std::string input);
+	std::string get_player_ID();
+	void set_name(std::string input);
+	std::string get_name();
+	void set_color(std::string input);
+	std::string get_color();
 private:
-	std::string name = "null";
-	std::string color = "null";
-	std::string user_ID;
+	std::string player_ID = "";
+	std::string name = "";
+	std::string color = "";
 };
 #endif
