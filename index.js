@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 6969;
+const host = "0.0.0.0";
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({port: 3069});
 const fs = require("fs");
@@ -29,7 +30,7 @@ app.get("/", (req, res) => {
     res.sendFile("./public/index.html", {root: __dirname});
 });
 
-app.listen(port, () => {
+app.listen(port, host, () => {
     console.log("Server started at port " + port + ".")
 });
 
