@@ -37,6 +37,7 @@ std::string attack(std::string attacker_ID, int& attacker_army_size, std::string
 int main() {
 	std::string input;
 	player playerObject;
+	//note from Alex: be sure to remove this once you're done testing
 	std::cout << "Emba Risk Clone Alpha 1.0.0 Server\n";
 	std::cout << "Enter a player name: ";
 	std::cin >> input;
