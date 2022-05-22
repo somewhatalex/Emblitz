@@ -1,12 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans');
 
+:root {
+    --light: #ffffff;
+    --light-darker: #e4e4e4;
+    --medium: #b8b8b8;
+    --dark: #303030;
+    --night: #121212;
+
+    --green: #00b00f;
+    --green-darker: #00790a;
+}
+
 body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
     overflow-x: hidden;
 }
 
+button { /*override default styles*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
+input { /*override default styles*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
 .svg-map-bg {
     position: relative;
@@ -24,4 +45,60 @@ body {
     height: 100%;
     display: block;
     margin-left: 0px auto;
+}
+
+.gamescreen {
+    display: none;
+}
+
+.header {
+    text-align: center;
+    font-size: 50px;
+    font-weight: bold;
+    margin: 20px;
+}
+
+.join_input  {
+    text-align: center;
+}
+
+.name_input {
+    width: 80%;
+    max-width: 350px;
+    padding: 5px;
+    font-size: 18px;
+    border: 1px solid var(--dark);
+}
+
+.h_button_options {
+    margin: 20px;
+}
+
+.joinbutton {
+    width: 120px;
+    font-size: 18px;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.jb_green {
+    background-color: var(--green);
+    color: var(--light);
+}
+
+.jb_green:hover {
+    background-color: var(--green-darker);
+}
+
+.jb_gray {
+    background-color: var(--light-darker);
+    color: var(--night);
+}
+
+.jb_gray:hover {
+    background-color: var(--medium);
 }

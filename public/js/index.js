@@ -59,19 +59,23 @@ function joinGame() {
     });
 }
 
-joinGame().then(function() {
-    connectToServer().then(function(ws) {
-        ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid}));
+function gameConnect(name) {
+    document.getElementById("lobbyscreen").style.display = "none";
+    document.getElementById("gamescreen").style.display = "block";
+    joinGame().then(function() {
+        connectToServer().then(function(ws) {
+            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name}));
 
-        downloadMap().then(function() {
-            ws.send(JSON.stringify({"action":"mapready"}));
-        });
+            downloadMap().then(function() {
+                ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid}));
+            });
 
-        ws.onmessage = (message) => {
-            let response = JSON.parse(message.data);
-            if(response.mapdata) {
-                
+            ws.onmessage = (message) => {
+                let response = JSON.parse(message.data);
+                if(response.mapdata) {
+                    
+                }
             }
-        }
+        });
     });
-});
+}

@@ -7,8 +7,20 @@
         <SCRIPT TYPE="text/javascript" SRC="./js/mapper.js"></SCRIPT>
     </HEAD>
     <BODY>
-        <DIV CLASS="mapcontainer">
-            <DIV ID="map">Loading...</DIV>
+        <DIV CLASS="lobbyscreen" ID="lobbyscreen">
+            <DIV CLASS="header">Game Name</DIV>
+            <DIV CLASS="join_input">
+                <INPUT ID="p_name" CLASS="name_input" TYPE="text" PLACEHOLDER="Name here...">
+                <DIV CLASS="h_button_options">
+                    <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value)">Play</BUTTON>
+                    <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate">Join Game</BUTTON>
+                </DIV>
+            </DIV>
+        </DIV>
+        <DIV CLASS="gamescreen" ID="gamescreen">
+            <DIV CLASS="mapcontainer">
+                <DIV ID="map">Loading...</DIV>
+            </DIV>
         </DIV>
     </BODY>
 </HTML>

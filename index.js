@@ -114,6 +114,7 @@ wss.on("connection", (ws) => {
             let userinfo = JSON.parse(message);
             let uid = userinfo.uid;
             let room = userinfo.roomid;
+            let pname = userinfo.pname;
             var metadata = {uid, room};
             clients.set(ws, metadata);
         }
@@ -122,7 +123,7 @@ wss.on("connection", (ws) => {
             let clientdata = clients.get(client);
 
             //FINISHED ROOM IDS, NOW WORK ON ROOM ISOLATION
-            if(1==1 || clientdata["roomid"] === response.json[0].toString()) {
+            if(clientdata["room"] === JSON.parse(message).roomid) {
                 //to simplify things a little
                 function sendmsg(message) {
                     client.send(JSON.stringify(message));
@@ -131,6 +132,8 @@ wss.on("connection", (ws) => {
                 //begin possible imbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": 1});
+                } else if(action === "userlogin") {
+                    sendmsg({"status": "ok"});
                 } else {
                     sendmsg({"error": "invalid command"});
                 }
