@@ -1,5 +1,6 @@
 let roomid = "";
 let uid = "";
+let pnames = [];
 
 function initializeMap() {
     var mapelements = document.getElementsByClassName("map-region");
@@ -74,6 +75,25 @@ function gameConnect(name) {
                 let response = JSON.parse(message.data);
                 if(response.mapdata) {
                     
+                }
+
+                if(response.users) {
+                    document.getElementById("players_container").innerHTML = "";
+                    for(let i=0; i<response.users.length; i++) {
+                        document.getElementById("players_container").innerHTML += `
+                        <DIV CLASS="lb_player">
+                            <DIV CLASS="lb_avatar-frame"></DIV>
+                            <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">` + response.users[i] + `</DIV></DIV>
+                        </DIV>`;
+                    }
+                    pnames = response.users;
+                } else if(response.playerleft) {
+                    for(let i=0; i<document.getElementsByClassName("lb_player").length; i++) {
+                        let p_displayed = document.getElementsByClassName("lb_player")[i];
+                        if(p_displayed.getElementsByClassName("lb_p_name")[0].innerText === response.playerleft) {
+                            p_displayed.remove();
+                        }
+                    }
                 }
             }
         });

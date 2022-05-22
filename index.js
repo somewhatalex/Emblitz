@@ -70,6 +70,12 @@ function userid() {
     return id;
 }
 
+//if no username is specified, generate a random username
+function genPname() {
+    return "Player " + randomnumber(1, 999);
+    //TODO: check and prevent duplicate names
+}
+
 function joinroom() {
     if(rooms.length < 1) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
@@ -80,7 +86,7 @@ function joinroom() {
                 id += "-"
             }
         }
-        rooms.push({"id": id, "players": 1});
+        rooms.push({"id": id, "players": 1, "playersready": 0, "playerslist": []});
         return id;
     } else {
         for(let i=0; i<rooms.length; i++) {
@@ -101,13 +107,14 @@ function joinroom() {
                 id += "-"
             }
         }
-        rooms.push({"id": id, "players": 1});
+        rooms.push({"id": id, "players": 1, "playersready": 0, "playerslist": []});
         return id;
     }
 }
 
 wss.on("connection", (ws) => {
     ws.on("message", (response) => {
+        //RESPONDS TO A SINGULAR PLAYER REQUEST
         let message = response.toString();
         let action = JSON.parse(message).action;
         if(action === "userlogin") {
@@ -115,14 +122,35 @@ wss.on("connection", (ws) => {
             let uid = userinfo.uid;
             let room = userinfo.roomid;
             let pname = userinfo.pname;
-            var metadata = {uid, room};
+            //player name not set, assign a random one
+            if(pname === "") {
+                pname = genPname();
+            }
+            var metadata = {uid, room, pname};
             clients.set(ws, metadata);
+
+            //add pname to room list
+            let tclient = clients.get(ws);
+            for (var i=0; i < rooms.length; i++) {
+                if (rooms[i].id === tclient.room) {
+                    rooms[i]["playerslist"].push(pname);
+                    break;
+                }
+            }
+        } else if (action === "mapready") {
+            let tclient = clients.get(ws);
+            for (var i=0; i < rooms.length; i++) {
+                if (rooms[i].id === tclient.room) {
+                    rooms[i]["playersready"]++;
+                    break;
+                }
+            }
         }
     
+        //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM
         [...clients.keys()].forEach((client) => {
             let clientdata = clients.get(client);
 
-            //FINISHED ROOM IDS, NOW WORK ON ROOM ISOLATION
             if(clientdata["room"] === JSON.parse(message).roomid) {
                 //to simplify things a little
                 function sendmsg(message) {
@@ -131,11 +159,13 @@ wss.on("connection", (ws) => {
 
                 //begin possible imbound commands
                 if(action === "mapready") {
-                    sendmsg({"usersready": 1});
-                } else if(action === "userlogin") {
-                    sendmsg({"status": "ok"});
+                    sendmsg({"usersready": rooms[i]["playersready"]});
+                } if(action === "userlogin") {
+                    sendmsg({"users": rooms[i]["playerslist"]});
                 } else {
-                    sendmsg({"error": "invalid command"});
+                    if(action !== "mapready") { //idk why this works, but it just does
+                        sendmsg({"error": "invalid command", "root": action});
+                    }
                 }
             }
         });
@@ -143,14 +173,35 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
         let removeclient = clients.get(ws);
+        let removeclientname = removeclient.pname;
         for (var i=0; i < rooms.length; i++) {
             if (rooms[i].id === removeclient.room) {
                 rooms[i]["players"]--;
+                rooms[i]["playersready"]--;
                 if(rooms[i]["players"] < 1) {
                     rooms.splice(i, 1);
                 }
+                break;
             }
         }
         clients.delete(ws);
+
+        //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM
+        [...clients.keys()].forEach((client) => {
+            let clientdata = clients.get(client);
+
+            if(clientdata["room"] === removeclient.room) {
+                //to simplify things a little
+                function sendmsg(message) {
+                    client.send(JSON.stringify(message));
+                }
+
+                rooms[i]["playerslist"] = rooms[i]["playerslist"].filter(function(item) {
+                    return item !== removeclientname;
+                })
+
+                sendmsg({"playerleft": removeclientname});
+            }
+        });
     });
 });
