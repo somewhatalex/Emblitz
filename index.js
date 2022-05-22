@@ -57,6 +57,11 @@ app.post("/api", (req, res) => {
 
 app.use(express.static(__dirname + "/public"));
 
+app.use(function(req, res, next) {
+    res.status(404);
+    res.sendFile("./public/errorpages/404.html", {root: __dirname});
+});
+
 //auth
 function userid() {
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
