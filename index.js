@@ -1,11 +1,14 @@
 const express = require("express");
 const app = express();
 const port = 6969;
-const host = "0.0.0.0";
+const httpserver = require("http").createServer();
 const WebSocket = require("ws");
-const wss = new WebSocket.Server({port: 3069});
+const wss = new WebSocket.Server({server: httpserver, path: "/ws"});
 const fs = require("fs");
 const bodyParser = require("body-parser");
+const path = require("path");
+
+const hostname = "localhost:" + port;
 
 const clients = new Map();
 const rooms = [];
@@ -20,6 +23,10 @@ function randomnumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+app.set("view engine", "html");
+app.engine("html", require("ejs").renderFile);
+app.set("views", path.join(__dirname, "./public"));
+
 //enable req.body to be used
 app.use(bodyParser.urlencoded({
     extended: true
@@ -27,12 +34,12 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
-    res.sendFile("./public/index.html", {root: __dirname});
+    res.render("index", {
+        host_name: hostname
+    });
 });
 
-app.listen(port, host, () => {
-    console.log("Server started at port " + port + ".")
-});
+httpserver.on("request", app);
 
 app.get("/api", (req, res) => {
     res.json({"error": "invalid form body"});
@@ -116,6 +123,10 @@ function joinroom() {
         return id;
     }
 }
+
+httpserver.listen(port, function() {
+    console.log("Server started on port " + port);
+});
 
 wss.on("connection", (ws) => {
     ws.on("message", (response) => {

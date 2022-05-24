@@ -1,5 +1,3 @@
-const hostname = "localhost";
-
 let roomid = "";
 let uid = "";
 let pnames = [];
@@ -27,7 +25,7 @@ function initializeMap() {
 }
 
 async function connectToServer() {
-    const ws = new WebSocket("ws://" + hostname + ":3069");
+    const ws = new WebSocket("ws://" + hostname + "/ws");
     return new Promise((resolve, reject) => {
         const timer = setInterval(() => {
             if(ws.readyState === 1) {
