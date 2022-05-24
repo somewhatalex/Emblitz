@@ -9,8 +9,12 @@
           "sources": [ "region.cpp" ]
       },
       {
-          "target_name": "Source",
+          "target_name": "source",
           "sources": [ "Source.cpp" ]
+      },
+      {
+          "target_name": "continent",
+          "sources": [ "continent.cpp" ]
       }
   ]
 }
