@@ -1,12 +1,18 @@
 const express = require("express");
 const app = express();
-const port = 6969;
 const httpserver = require("http").createServer();
 const WebSocket = require("ws");
 const wss = new WebSocket.Server({server: httpserver, path: "/ws"});
 const fs = require("fs");
 const bodyParser = require("body-parser");
 const path = require("path");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+
+//-- configs --
+const authsecret = "average-balls-enjoyer-69";
+const port = 6969;
+//-- end configs --
 
 const hostname = "localhost:" + port;
 
@@ -32,8 +38,38 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
+    let gettoken = req.cookies.auth;
+
+    //-- USER AUTH (work in progress) --
+    //does user have a token?
+
+    //TODO: ADD USER REGISTRATION
+    let u_info = [{user: "bobux"}]; //user info
+    if(!gettoken) {
+        //no token found... generate one
+        let token = jwt.sign({
+            data: u_info
+        }, authsecret);
+
+        res.cookie("auth", token);
+    } else {
+        jwt.verify(gettoken, authsecret, function(err, decoded) {
+            //invalid token, generate new one
+            if(err) {
+                let token = jwt.sign({
+                    data: u_info
+                }, authsecret);
+
+                res.cookie("auth", token);
+            } else {
+                console.log(decoded);
+            }
+        });
+    }
+
     res.render("index", {
         host_name: hostname
     });
@@ -52,7 +88,7 @@ app.post("/api", (req, res) => {
                 res.json({"mapdata": data});
             });
         } else if(req.body.action === "joingame") {
-            res.json({"uid": userid(), "room": joinroom()})
+            res.json({"uid": userid(), "room": joinroom()});
         } else {
             res.json({"error": "invalid form body"});
             res.end();
