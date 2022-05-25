@@ -65,6 +65,7 @@ app.get("/", (req, res) => {
 
                 res.cookie("auth", token);
             } else {
+                //do something with a valid token
                 console.log(decoded);
             }
         });
