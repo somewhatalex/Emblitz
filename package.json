@@ -27,8 +27,9 @@
     "express-ws": "^5.0.2",
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
     "path": "^0.12.7",
     "websocket": "^1.0.34",
-    "ws": "^8.6.0"
+    "ws": "^8.7.0"
   }
 }

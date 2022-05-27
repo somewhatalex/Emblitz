@@ -8,6 +8,9 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const mysql = require("mysql");
+const credentials = require("./auth.json");
+const auth = require("./scripts/auth.js");
 
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
@@ -15,6 +18,27 @@ const port = 6969;
 //-- end configs --
 
 const hostname = "localhost:" + port;
+
+//edit this in auth.json
+const db = mysql.createConnection({
+    host: credentials.host,
+    user: credentials.user,
+    password: credentials.password,
+    port: credentials.port,
+    database: credentials.database
+});
+
+db.connect(function(err) {
+    if (err) throw err; //literally just give up by this point
+
+    //export db configs
+    module.exports.db = db;
+
+    console.log("Connected to database!");
+    auth.getUserInfo("bobux");
+
+
+});
 
 const clients = new Map();
 const rooms = [];
@@ -32,6 +56,7 @@ function randomnumber(min, max) {
 app.set("view engine", "html");
 app.engine("html", require("ejs").renderFile);
 app.set("views", path.join(__dirname, "./public"));
+app.disable("x-powered-by");
 
 //enable req.body to be used
 app.use(bodyParser.urlencoded({
@@ -48,19 +73,25 @@ app.get("/", (req, res) => {
 
     //TODO: ADD USER REGISTRATION
     let u_info = [{user: "bobux"}]; //user info
+    let userid = "69420666"; //user id
+    let issuer = "bobux man" //issuer of token
     if(!gettoken) {
         //no token found... generate one
         let token = jwt.sign({
-            data: u_info
+            data: u_info,
+            sub: userid,
+            iss: issuer
         }, authsecret);
 
         res.cookie("auth", token);
     } else {
         jwt.verify(gettoken, authsecret, function(err, decoded) {
             //invalid token, generate new one
-            if(err) {
+            if(err || decoded.iss != issuer) {
                 let token = jwt.sign({
-                    data: u_info
+                    data: u_info,
+                    sub: userid,
+                    iss: issuer
                 }, authsecret);
 
                 res.cookie("auth", token);
@@ -82,6 +113,12 @@ app.get("/api", (req, res) => {
     res.json({"error": "invalid form body"});
 });
 
+app.get("/login", (req, res) => {
+    res.render("login", {
+        host_name: hostname
+    });
+});
+
 app.post("/api", (req, res) => {
     try {
         if(req.body.action === "getmap") {
@@ -90,6 +127,11 @@ app.post("/api", (req, res) => {
             });
         } else if(req.body.action === "joingame") {
             res.json({"uid": userid(), "room": joinroom()});
+        } else if(req.body.action === "login") {
+            // -- WORK ON PROGRESS --
+            auth.getUserInfo("bobux").then(function(result) {
+                res.json({"response": result})
+            })
         } else {
             res.json({"error": "invalid form body"});
             res.end();
