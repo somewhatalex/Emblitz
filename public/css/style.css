@@ -49,6 +49,9 @@ input { /*override default styles*/
 
 .gamescreen {
     display: none;
+    background: #4794ff;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .header {
@@ -104,7 +107,7 @@ input { /*override default styles*/
 }
 
 .leaderboard {
-    position: absolute;
+    position: fixed;
     z-index: 69420;
     top: 10px;
     right: 0px;

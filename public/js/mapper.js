@@ -1,4 +1,4 @@
 function makemap(data) {
-    document.getElementById("map").innerHTML = data;
+    document.getElementById("svg-map-bg").innerHTML = data;
 initializeMap();
 }
