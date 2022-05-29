@@ -2,12 +2,35 @@ let roomid = "";
 let uid = "";
 let pnames = [];
 
+var mapdict = "";
+var mapmoves = "";
+
+function getOffset(el) {
+    var rect = el.getBoundingClientRect();
+    var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
+    var zoomlevel = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+    return {
+        left: rect.left/zoomlevel - boundingmap.left/zoomlevel,
+        top: rect.top/zoomlevel - boundingmap.top/zoomlevel,
+        width: rect.width/(zoomlevel),
+        height: rect.height/(zoomlevel)
+    };
+}
+
+
 function initializeMap() {
+    let isDragging = false;
     var mapelements = document.getElementsByClassName("map-region");
     var selectedRegion = "";
     for(let i=0; i<mapelements.length; i++) {
         mapelements[i].setAttribute("fill", "#ffe2bf");
         mapelements[i].style.cursor = "pointer";
+        let labelpos = getOffset(mapelements[i]);
+        document.getElementById("mapl2").innerHTML += `
+        <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
+            <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
+            <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV ID="t_troops" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
+        </DIV>`
 
         //show outline
         mapelements[i].addEventListener("mouseover", function(d) {
@@ -33,20 +56,40 @@ function initializeMap() {
 
         //when clicked...
         mapelements[i].addEventListener("click", function(d) {
-            let area = d.currentTarget;
-            let d2 = document.getElementsByClassName("map-region")[1]
-connect(area, d2, 'green', 5)
-            if(selectedRegion != area) {
-                selectedRegion = area;
-                area.style.stroke = "#004ab3";
-                area.style.strokeWidth = "5px";
-                area.style.strokeLinejoin = "round";
-                attackTerritory(area);
-            } else {
-                selectedRegion = "";
-                area.style.stroke = "#ffffff";
-                area.style.strokeWidth = "5px";
-                area.style.strokeLinejoin = "round";
+            if(isDragging == false) {
+                let possibleMoves = [];
+                let currentAttackLines = document.getElementsByClassName("attack-line");
+                while(currentAttackLines[0]) {
+                    currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
+                }
+                for(let i=0; i<mapmoves.length; i++) {
+                    if(mapmoves[i].includes(d.currentTarget.getAttribute("data-code"))) {
+                        let dest = mapmoves[i].split(" ").filter(function(item) {
+                            return item !== d.currentTarget.getAttribute("data-code");
+                        });
+                        possibleMoves.push(dest);
+                    }
+                }
+                console.log(possibleMoves)
+                let territory = d.currentTarget;
+                for(let i=0; i<possibleMoves.length; i++) {
+                    let d2 = document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase());
+                    let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase())
+                    connect(area, d2, "#e69420", 10);
+                }
+
+                if(selectedRegion != territory) {
+                    selectedRegion = territory;
+                    territory.style.stroke = "#004ab3";
+                    territory.style.strokeWidth = "5px";
+                    territory.style.strokeLinejoin = "round";
+                    attackTerritory(territory);
+                } else {
+                    selectedRegion = "";
+                    area.style.stroke = "#ffffff";
+                    area.style.strokeWidth = "5px";
+                    area.style.strokeLinejoin = "round";
+                }
             }
         });
     }
@@ -57,13 +100,13 @@ connect(area, d2, 'green', 5)
         if(zoomElement.contains(e.target)) {
             let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
             var zoomdelta = (e.deltaY)/500;
-            if(elementTransform >= 3) {
-                zoomElement.style.transform = "scale(3)";
+            if(elementTransform >= 2) {
+                zoomElement.style.transform = "scale(2)";
                 if(zoomdelta > 0) {
                     zoomdelta = 0;
                 }
-            } else if(elementTransform <= 0.7) {
-                zoomElement.style.transform = "scale(0.7)";
+            } else if(elementTransform <= 0.5) {
+                zoomElement.style.transform = "scale(0.5)";
                 if(zoomdelta < 0) {
                     zoomdelta = 0;
                 }
@@ -82,13 +125,21 @@ connect(area, d2, 'green', 5)
     });
     document.addEventListener("mouseup", function(e) {
         isMouseDown = 0;
+        //delay 1ms to prevent immediate cancelation
+        if(isDragging == true) {
+            setTimeout(function() {
+                isDragging = false;
+            }, 1)
+        }
     });
     document.addEventListener("mousemove", function(e) {
         if(isMouseDown && mapElement.contains(e.target)) {
+            isDragging = true;
             let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
+            let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
 
-            let deltaX = e.movementX/1.5;
-            let deltaY = e.movementY/1.5;
+            let deltaX = e.movementX/1.3;
+            let deltaY = e.movementY/1.3;
 
             //must check both x and y coords for scrolling
             if(mapTranslate[0] > 400 && deltaX > 0) {
@@ -102,35 +153,23 @@ connect(area, d2, 'green', 5)
             } else if(mapTranslate[1] < -200 && deltaY < 0) {
                 deltaY = 0;
             }
-            mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX}px, ${Number(mapTranslate[1]) + deltaY}px)`;
+            mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
         }
     });
 }
 
-function getOffset(el) {
-    var rect = el.getBoundingClientRect();
-    var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
-    var zoomlevel = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
-    return {
-        left: rect.left/zoomlevel - boundingmap.left/zoomlevel,
-        top: rect.top/zoomlevel - boundingmap.top/zoomlevel,
-        width: rect.width/(zoomlevel),
-        height: rect.height/(zoomlevel)
-    };
-}
-  
 function connect(div1, div2, color, thickness) {
     var off1 = getOffset(div1);
     var off2 = getOffset(div2);
-    var x1 = off1.left + off1.width;
-    var y1 = off1.top + off1.height;
-    var x2 = off2.left + off2.width;
-    var y2 = off2.top + off2.height;
+    var x1 = off1.left + off1.width+20;
+    var y1 = off1.top + off1.height+20;
+    var x2 = off2.left + off2.width+20;
+    var y2 = off2.top + off2.height+20;
     var length = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
     var cx = ((x1 + x2) / 2) - (length / 2);
     var cy = ((y1 + y2) / 2) - (thickness / 2);
     var angle = Math.atan2((y1 - y2), (x1 - x2)) * (180 / Math.PI);
-    var htmlLine = "<div style='padding:0px; margin:0px; height:" + thickness + "px; background-color:" + color + "; line-height: 1px; position: absolute; left:" + cx + "px; top:" + cy + "px; width:" + length + "px; -moz-transform:rotate(" + angle + "deg); -webkit-transform:rotate(" + angle + "deg); -o-transform:rotate(" + angle + "deg); -ms-transform:rotate(" + angle + "deg); transform:rotate(" + angle + "deg);' />";
+    var htmlLine = "<div class='attack-line' style='background: linear-gradient(" + angle + "deg, #ffc000 0%, #ff0000 100%); pointer-events: none; z-index: -1; padding:0px; margin:0px; height:" + thickness + "px; background-color:" + color + "; line-height: 1px; position: absolute; left:" + cx + "px; top:" + cy + "px; width:" + length + "px; -moz-transform:rotate(" + angle + "deg); -webkit-transform:rotate(" + angle + "deg); -o-transform:rotate(" + angle + "deg); -ms-transform:rotate(" + angle + "deg); transform:rotate(" + angle + "deg);' />";
     document.getElementById("mapl2").innerHTML += htmlLine;
 }
 
@@ -155,6 +194,8 @@ function downloadMap() {
     return new Promise((resolve, reject) => {
         fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmap"})}).then(response => {
             response.json().then(function(text) {
+                mapdict = JSON.parse(text.mapdict);
+                mapmoves = JSON.parse(text.moves);
                 makemap(text.mapdata);
                 resolve("ok");
             });

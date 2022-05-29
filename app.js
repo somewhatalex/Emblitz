@@ -122,8 +122,12 @@ app.get("/login", (req, res) => {
 app.post("/api", (req, res) => {
     try {
         if(req.body.action === "getmap") {
-            fs.readFile("./mapdata/miniworld.txt", "utf8", function(err, data) {
-                res.json({"mapdata": data});
+            fs.readFile("./mapdata/miniworld/miniworld.txt", "utf8", function(err, data) {
+                fs.readFile("./mapdata/miniworld/mapdict.json", "utf8", function(err, mapdict) {
+                    fs.readFile("./mapdata/miniworld/moves.json", "utf8", function(err, moves) {
+                        res.json({"mapdata": data, "mapdict": mapdict, "moves": moves});
+                    });
+                });
             });
         } else if(req.body.action === "joingame") {
             res.json({"uid": userid(), "room": joinroom()});
