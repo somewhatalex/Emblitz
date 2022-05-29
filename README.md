@@ -1,5 +1,5 @@
-# Risk-Game-Online
-Risk game that's playable online in a browser. We still need a name. Buh.
+# Emblitz
+Real-time strategy game that's playable online in a browser. We now have a name! 😎
 
 You need to set up an sql server and create the `auth.json` file for the database in the top directory using this format:
 Host should be `127.0.0.1` if testing locally.
