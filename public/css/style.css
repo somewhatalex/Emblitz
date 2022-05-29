@@ -29,22 +29,42 @@ input { /*override default styles*/
     appearance: none;
 }
 
+#map {
+    display: grid;
+    text-align: center;
+}
+
 .svg-map-bg {
     position: relative;
     background: #4794ff;
     margin: 0;
-    text-align: center;
     padding-top: 40px;
     padding-left: 40px;
     padding-right: 40px;
+    display: grid;
+    width: 900px;
+    height: 500px;
+    margin: auto;
 }
 
 #mapsvg {
-    position: relative;
     width: 100%;
     height: 100%;
     display: block;
     margin-left: 0px auto;
+}
+
+#mapsvgbox {
+    grid-area: 1/1;
+}
+
+#mapl2 {
+    float: left;
+    grid-area: 1/1;
+    z-index: 100;
+    margin: 0;
+    width: 900px;
+    height: 0px;
 }
 
 .gamescreen {
