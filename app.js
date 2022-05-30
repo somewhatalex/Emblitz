@@ -178,7 +178,7 @@ function joinroom() {
         for(let i=1; i<10; i++) {
             id += chars.charAt(randomnumber(0, chars.length));
             if(i % 5 == 0) {
-                id += "-"
+                id += "-";
             }
         }
         rooms.push({"id": id, "players": 1, "playersready": 0, "playerslist": []});
@@ -221,18 +221,19 @@ wss.on("connection", (ws) => {
             let uid = userinfo.uid;
             let room = userinfo.roomid;
             let pname = userinfo.pname;
+            let framecolor = userinfo.framecolor;
             //player name not set, assign a random one
             if(pname === "") {
                 pname = genPname();
             }
-            var metadata = {uid, room, pname};
+            var metadata = {uid, room, pname, framecolor};
             clients.set(ws, metadata);
 
             //add pname to room list
             let tclient = clients.get(ws);
             for (var i=0; i < rooms.length; i++) {
                 if (rooms[i].id === tclient.room) {
-                    rooms[i]["playerslist"].push(pname);
+                    rooms[i]["playerslist"].push({"name": pname, "framecolor": framecolor});
                     break;
                 }
             }

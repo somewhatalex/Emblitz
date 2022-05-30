@@ -4,6 +4,7 @@ let pnames = [];
 
 var mapdict = "";
 var mapmoves = "";
+var possibleMoves = [];
 
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
@@ -49,15 +50,18 @@ function initializeMap() {
         mapelements[i].addEventListener("mouseleave", function(d) {
             mapelements[i].setAttribute("fill", "#ffe2bf");
             let area = d.currentTarget;
-            if(selectedRegion != area) {
+            if(selectedRegion != area && !possibleMoves.includes(area.getAttribute("data-code"))) {
                 area.style.stroke = "none";
+            } else if(possibleMoves.includes(area.getAttribute("data-code"))) {
+                area.style.strokeWidth = "2px";
             }
         });
 
         //when clicked...
         mapelements[i].addEventListener("click", function(d) {
+            //isDragging --> is the mouse moving? handled by "mousemove" event listener
             if(isDragging == false) {
-                let possibleMoves = [];
+                possibleMoves = [];
                 let currentAttackLines = document.getElementsByClassName("attack-line");
                 while(currentAttackLines[0]) {
                     currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
@@ -67,15 +71,25 @@ function initializeMap() {
                         let dest = mapmoves[i].split(" ").filter(function(item) {
                             return item !== d.currentTarget.getAttribute("data-code");
                         });
-                        possibleMoves.push(dest);
+                        possibleMoves.push(dest.toString());
                     }
                 }
-                console.log(possibleMoves)
+
+                //reset regions
+                let allregions = document.getElementsByClassName("map-region");
+                for(let i=0; i<allregions.length; i++) {
+                    allregions[i].style.stroke = "none";
+                }
+
                 let territory = d.currentTarget;
                 for(let i=0; i<possibleMoves.length; i++) {
                     let d2 = document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase());
                     let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase())
-                    connect(area, d2, "#e69420", 10);
+                    connect(area, d2, "#e69420", 7);
+                    let t_targeted = document.querySelector("[data-code='" + possibleMoves[i].toString() + "']");
+                    t_targeted.style.stroke = "#ffffff";
+                    t_targeted.style.strokeWidth = "2px";
+                    t_targeted.style.strokeLinejoin = "round";
                 }
 
                 if(selectedRegion != territory) {
@@ -85,6 +99,13 @@ function initializeMap() {
                     territory.style.strokeLinejoin = "round";
                     attackTerritory(territory);
                 } else {
+                    while(currentAttackLines[0]) {
+                        currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
+                    }
+                    let allregions = document.getElementsByClassName("map-region");
+                    for(let i=0; i<allregions.length; i++) {
+                        allregions[i].style.stroke = "none";
+                    }
                     selectedRegion = "";
                     area.style.stroke = "#ffffff";
                     area.style.strokeWidth = "5px";
@@ -215,12 +236,12 @@ function joinGame() {
     });
 }
 
-function gameConnect(name) {
+function gameConnect(name, framecolor) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "block";
     joinGame().then(function() {
         connectToServer().then(function(ws) {
-            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name}));
+            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "framecolor": framecolor}));
 
             downloadMap().then(function() {
                 ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid}));
@@ -232,13 +253,14 @@ function gameConnect(name) {
                     
                 }
 
+                //TODO: Make this ID-based rather than name-based
                 if(response.users) {
                     document.getElementById("players_container").innerHTML = "";
                     for(let i=0; i<response.users.length; i++) {
                         document.getElementById("players_container").innerHTML += `
                         <DIV CLASS="lb_player">
-                            <DIV CLASS="lb_avatar-frame"></DIV>
-                            <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">` + response.users[i] + `</DIV></DIV>
+                            <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].framecolor}"></DIV>
+                            <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                         </DIV>`;
                     }
                     pnames = response.users;

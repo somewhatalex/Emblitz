@@ -18,8 +18,19 @@
             <DIV CLASS="join_input">
                 <INPUT ID="p_name" CLASS="name_input" TYPE="text" PLACEHOLDER="Name here...">
                 <DIV CLASS="h_button_options">
-                    <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value)">Play</BUTTON>
+                    <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, document.getElementById('framecolor').value)">Play</BUTTON>
                     <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate">Join Game</BUTTON>
+                    <BR><BR>
+                    <!-- REMOVE THIS WHEN DONE, MAKE BETTER LOOKING FRAME SELECT MENU -->
+                    (frame color select; this is only for testing and is temporary)<BR>
+                    <SELECT ID="framecolor" STYLE="padding: 5px; font-size: 17px">
+                        <OPTION VALUE="red">red</OPTION>
+                        <OPTION VALUE="orange">orange</OPTION>
+                        <OPTION VALUE="yellow">yellow</OPTION>
+                        <OPTION VALUE="green">green</OPTION>
+                        <OPTION VALUE="blue">blue</OPTION>
+                        <OPTION VALUE="purple">purple</OPTION>
+                    </SELECT>
                 </DIV>
             </DIV>
         </DIV>
@@ -33,6 +44,12 @@
                     
                     
                 </TABLE>
+            </DIV>
+            <DIV CLASS="troopscontrol">
+                <DIV CLASS="t_avatar-frame"></DIV>
+                <DIV STYLE="margin-top: -80px; margin-left: 60px;">
+                    <INPUT TYPE="range" MIN="1" MAX="100" VALUE="75" CLASS="troopslider" ID="troopslider">
+                </DIV>
             </DIV>
             <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">
                 <DIV ID="map"><DIV ID="svg-map-bg" class="svg-map-bg"><DIV ID="mapl2"></DIV><DIV ID="maploading">Loading...</DIV></DIV></DIV>

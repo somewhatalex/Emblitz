@@ -137,7 +137,7 @@ input { /*override default styles*/
     border-bottom-left-radius: 10px;
     text-align: left;
     padding: 10px;
-    width: 200px;
+    width: 220px;
 }
 
 .lb_header {
@@ -233,4 +233,67 @@ input { /*override default styles*/
     100% {
         left: 100%;
     }
+}
+
+.troopscontrol {
+    position: fixed;
+    z-index: 69420;
+    bottom: 20px;
+    height: 70px;
+    background: var(--light);
+    width: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.t_avatar-frame {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 5px solid #fc0320;
+    display: inline-block;
+    margin-top: -10px;
+    margin-left: -40px;
+}
+
+.t_p_info {
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.t_p_name {
+    font-size: 20px;
+    font-weight: bold;
+    float: left !important;
+    position: absolute;
+}
+
+.troopslider {
+    width: 300px;
+    background: var(--medium) !important;
+    height: 25px;
+    accent-color: var(--green)
+}
+
+.troopslider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 35px;
+    background-color: var(--green);
+    overflow: visible;
+    cursor: pointer;
+}
+  
+.troopslider::-moz-range-thumb { 
+    -moz-appearance: none;
+    width: 15px;
+    height: 35px;
+    background-color: var(--green);
+    overflow: visible;
+    cursor: pointer;
 }
