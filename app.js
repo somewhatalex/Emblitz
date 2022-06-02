@@ -42,6 +42,7 @@ db.connect(function(err) {
 
 const clients = new Map();
 const rooms = [];
+var userids = [];
 
 function escapestring(str) {
     return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
@@ -52,6 +53,12 @@ function randomnumber(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+function removeFromArray(arr, item) {
+    for (var i = arr.length; i--;) {
+      if (arr[i] === item) arr.splice(i, 1);
+    }
+ }
 
 app.set("view engine", "html");
 app.engine("html", require("ejs").renderFile);
@@ -152,16 +159,20 @@ app.use(function(req, res, next) {
     res.sendFile("./public/errorpages/404.html", {root: __dirname});
 });
 
-//auth
+//public id generator
 function userid() {
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
     let id = "u-";
     for(let i=0; i<20; i++) {
         id += chars.charAt(randomnumber(0, chars.length));
-        if(i % 5 == 0) {
-            id += "-"
+    }
+    while(userids.includes(id)) {
+        let id = "u-"
+        for(let i=0; i<20; i++) {
+            id += chars.charAt(randomnumber(0, chars.length));
         }
     }
+    userids.push(id);
     return id;
 }
 
@@ -233,7 +244,7 @@ wss.on("connection", (ws) => {
             let tclient = clients.get(ws);
             for (var i=0; i < rooms.length; i++) {
                 if (rooms[i].id === tclient.room) {
-                    rooms[i]["playerslist"].push({"name": pname, "framecolor": framecolor});
+                    rooms[i]["playerslist"].push({"id": uid, "name": pname, "framecolor": framecolor});
                     break;
                 }
             }
@@ -273,11 +284,13 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
         let removeclient = clients.get(ws);
-        let removeclientname = removeclient.pname;
+        let removeclientid = removeclient.uid;
+        removeFromArray(userids, removeclientid);
         for (var i=0; i < rooms.length; i++) {
             if (rooms[i].id === removeclient.room) {
                 rooms[i]["players"]--;
                 rooms[i]["playersready"]--;
+                //splice client id as well
                 if(rooms[i]["players"] < 1) {
                     rooms.splice(i, 1);
                 }
@@ -297,10 +310,10 @@ wss.on("connection", (ws) => {
                 }
 
                 rooms[i]["playerslist"] = rooms[i]["playerslist"].filter(function(item) {
-                    return item !== removeclientname;
+                    return item.id !== removeclientid;
                 })
 
-                sendmsg({"playerleft": removeclientname});
+                sendmsg({"playerleft": removeclientid});
             }
         });
     });
