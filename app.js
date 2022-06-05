@@ -195,6 +195,7 @@ function genPname() {
 
 function joinroom() {
     let roommap = "miniworld";
+    let maxplayers = 6;
     if(rooms.length < 1) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
@@ -204,14 +205,17 @@ function joinroom() {
                 id += "-";
             }
         }
-        rooms.push({"id": id, "map": roommap, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         return id;
     } else {
         for(let i=0; i<rooms.length; i++) {
+            //remove rooms with 0 users
             if(rooms[i]["players"] < 1) {
                 rooms.splice(i, 1);
             }
-            if(rooms[i]["players"] < 6) {
+
+            //join room if available (and NOT in active game)
+            if(rooms[i]["players"] < rooms[i]["maxplayers"] && rooms[i]["ingame"] == false) {
                 rooms[i]["players"]++;
                 return rooms[i]["id"];
             }
@@ -225,7 +229,7 @@ function joinroom() {
                 id += "-"
             }
         }
-        rooms.push({"id": id, "map": roommap, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         return id;
     }
 }
@@ -299,6 +303,11 @@ wss.on("connection", (ws) => {
                     sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
+                    //once all players have confirmed in lobby...
+                    if(rooms[i]["playersconfirmed"].length == rooms[i]["players"] && rooms[i]["players"] > 1) {
+                        rooms[i]["ingame"] = true;
+                        sendmsg({"startgame": true});
+                    }
                 } else {
                     if(action !== "mapready") { //idk why this works, but it just does
                         sendmsg({"error": "invalid command", "root": action});

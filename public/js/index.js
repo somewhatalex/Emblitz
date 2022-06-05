@@ -252,6 +252,17 @@ function confirmJoinGame() {
     });
 }
 
+function initLB() {
+    document.getElementById("players_container").innerHTML = "";
+    for(let i=0; i<pnames.length; i++) {
+        document.getElementById("players_container").innerHTML += `
+        <DIV CLASS="lb_player" ID="l-${pnames[i].id}">
+            <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${pnames[i].framecolor}"></DIV>
+            <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${pnames[i].name}</DIV></DIV>
+        </DIV>`;
+    }
+}
+
 function gameConnect(name, framecolor) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
@@ -299,11 +310,17 @@ function gameConnect(name, framecolor) {
                     }
                     pnames = response.users;
                 } else if(response.playerleft) {
-                    let p_displayed = document.getElementById("l-" + response.playerleft)
+                    let p_displayed = document.getElementById("l-" + response.playerleft);
                     p_displayed.remove();
                 //start game
-                } else if(response.startgame) {
+                } else if(response.startgame) { //now load in map...
+                    document.getElementById("lobbyscreen").style.display = "none";
+                    document.getElementById("gamescreen").style.display = "block";
+                    document.getElementById("gamelobby").style.display = "none";
+                    document.getElementById("lobbyptable").innerHTML = "";
                     downloadMap().then(function() {
+                        inGame = true;
+                        initLB();
                         ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid}));
                     });
                 } else if(response.confirmedusers) {
