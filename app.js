@@ -48,6 +48,10 @@ function escapestring(str) {
     return (str + '').replace(/[\\"']/g, '\\$&').replace(/\u0000/g, '\\0');
 }
 
+function escapeHTML(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+ }
+
 function randomnumber(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -193,18 +197,32 @@ function genPname() {
     //TODO: check and prevent duplicate names
 }
 
+//returns true if duplicate room ids exist
+function checkDupeRoom(id) {
+    for(let i=0; i<rooms.length; i++) {
+        if(rooms[i].id === id) {
+            return true;
+        }
+    }
+}
+
 function joinroom() {
     let roommap = "miniworld";
     let maxplayers = 6;
     if(rooms.length < 1) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
-        for(let i=1; i<10; i++) {
+        for(let i=1; i<7; i++) {
             id += chars.charAt(randomnumber(0, chars.length));
-            if(i % 5 == 0) {
-                id += "-";
+        }
+
+        while(checkDupeRoom(id)) {
+            id = "r-";
+            for(let i=1; i<7; i++) {
+                id += chars.charAt(randomnumber(0, chars.length));
             }
         }
+        
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         return id;
     } else {
@@ -223,12 +241,17 @@ function joinroom() {
 
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
-        for(let i=1; i<10; i++) {
+        for(let i=1; i<7; i++) {
             id += chars.charAt(randomnumber(0, chars.length));
-            if(i % 5 == 0) {
-                id += "-"
+        }
+
+        while(checkDupeRoom(id)) {
+            id = "r-";
+            for(let i=1; i<7; i++) {
+                id += chars.charAt(randomnumber(0, chars.length));
             }
         }
+
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         return id;
     }
@@ -245,10 +268,21 @@ wss.on("connection", (ws) => {
         let action = JSON.parse(message).action;
         if(action === "userlogin") {
             let userinfo = JSON.parse(message);
-            let uid = userinfo.uid;
-            let room = userinfo.roomid;
-            let pname = userinfo.pname;
-            let framecolor = userinfo.framecolor;
+            let uid = escapeHTML(userinfo.uid);
+            let room = escapeHTML(userinfo.roomid);
+
+            //is room full? as a double check measure
+            let roomplayercount = rooms.filter(function(item) {
+                return item.id !== room;
+            });
+            let maxroomplayers = roomplayercount.maxplayers;
+            roomplayercount = roomplayercount.players;
+            if(roomplayercount == maxroomplayers) {
+                ws.send(JSON.stringify({"error": "roomfull"}));
+            }
+
+            let pname = escapeHTML(userinfo.pname).substring(0, 18);
+            let framecolor = escapeHTML(userinfo.framecolor);
             //player name not set, assign a random one
             if(pname === "") {
                 pname = genPname();
@@ -354,4 +388,8 @@ wss.on("connection", (ws) => {
             }
         });
     });
+});
+
+process.on("uncaughtException", function(error) {
+    console.log(error.stack);
 });
