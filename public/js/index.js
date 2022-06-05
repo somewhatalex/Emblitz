@@ -6,6 +6,8 @@ var mapdict = "";
 var mapmoves = "";
 var possibleMoves = [];
 
+var inGame = false;
+
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
     var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
@@ -121,16 +123,21 @@ function initializeMap() {
         if(zoomElement.contains(e.target)) {
             let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
             var zoomdelta = (e.deltaY)/500;
+            if(zoomdelta > 0.3) {
+                zoomdelta = 0.3;
+            } else if (zoomdelta < -0.3) {
+                zoomdelta = -0.3;
+            }
             if(elementTransform >= 2) {
-                zoomElement.style.transform = "scale(2)";
                 if(zoomdelta > 0) {
                     zoomdelta = 0;
                 }
+                zoomElement.style.transform = "scale(2)";
             } else if(elementTransform <= 0.5) {
-                zoomElement.style.transform = "scale(0.5)";
                 if(zoomdelta < 0) {
                     zoomdelta = 0;
                 }
+                zoomElement.style.transform = "scale(0.5)";
             }
 
             zoomElement.style.transform = `scale(${elementTransform += zoomdelta})`;
@@ -213,7 +220,7 @@ async function connectToServer() {
 
 function downloadMap() {
     return new Promise((resolve, reject) => {
-        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmap"})}).then(response => {
+        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmap", roomid: roomid})}).then(response => {
             response.json().then(function(text) {
                 mapdict = JSON.parse(text.mapdict);
                 mapmoves = JSON.parse(text.moves);
@@ -236,37 +243,73 @@ function joinGame() {
     });
 }
 
+function confirmJoinGame() {
+    return new Promise((resolve, reject) => {
+        document.getElementById("startvote").addEventListener("click", function sendvote(d) {
+            document.getElementById("startvote").removeEventListener("click", sendvote);
+            resolve("ok");
+        });
+    });
+}
+
 function gameConnect(name, framecolor) {
     document.getElementById("lobbyscreen").style.display = "none";
-    document.getElementById("gamescreen").style.display = "block";
+    document.getElementById("gamescreen").style.display = "none";
+    document.getElementById("gamelobby").style.display = "block";
     joinGame().then(function() {
         connectToServer().then(function(ws) {
             ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "framecolor": framecolor}));
-
-            downloadMap().then(function() {
-                ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid}));
+            confirmJoinGame().then(function() {
+                ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid}));
             });
 
             ws.onmessage = (message) => {
                 let response = JSON.parse(message.data);
                 if(response.mapdata) {
                     
-                }
+                } else if(response.mapname) {
+                    document.getElementById("mapname").innerText = mapnames[response.mapname];
+                } else if(response.users) {
+                    if(inGame) {
+                        document.getElementById("players_container").innerHTML = "";
+                        for(let i=0; i<response.users.length; i++) {
+                            document.getElementById("players_container").innerHTML += `
+                            <DIV CLASS="lb_player" ID="l-${response.users[i].id}">
+                                <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].framecolor}"></DIV>
+                                <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
+                            </DIV>`;
+                        }
+                    } else {
+                        //in lobby
+                        document.getElementById("lobbyptable").innerHTML = "";
+                        for(let i=0; i<response.users.length; i++) {
+                            document.getElementById("lobbyptable").innerHTML += `
+                            <DIV CLASS="glb_player" ID="l-${response.users[i].id}">
+                                <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].framecolor}"></DIV>
+                                <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
+                            </DIV>`;
+                        }
 
-                //TODO: Make this ID-based rather than name-based
-                if(response.users) {
-                    document.getElementById("players_container").innerHTML = "";
-                    for(let i=0; i<response.users.length; i++) {
-                        document.getElementById("players_container").innerHTML += `
-                        <DIV CLASS="lb_player" ID="${response.users[i].id}">
-                            <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].framecolor}"></DIV>
-                            <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
-                        </DIV>`;
+                        //add green outline for confirmed users
+                        if(response.playersconfirmed) {
+                            for(let i=0; i<response.playersconfirmed.length; i++) {
+                                document.getElementById("l-" + response.playersconfirmed[i]).style.border = "2px solid green";
+                            }
+                        }
                     }
                     pnames = response.users;
                 } else if(response.playerleft) {
-                    let p_displayed = document.getElementById(response.playerleft)
+                    let p_displayed = document.getElementById("l-" + response.playerleft)
                     p_displayed.remove();
+                //start game
+                } else if(response.startgame) {
+                    downloadMap().then(function() {
+                        ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid}));
+                    });
+                } else if(response.confirmedusers) {
+                    for(let i=0; i<response.confirmedusers.length; i++) {
+                        document.getElementById("l-" + response.confirmedusers[i]).style.border = "2px solid green";
+                    }
                 }
             }
         });

@@ -9,6 +9,7 @@
             const hostname = "<%= host_name %>";
         </SCRIPT>
 
+        <SCRIPT TYPE="text/javascript" SRC="./js/mapnames.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/index.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/mapper.js"></SCRIPT>
     </HEAD>
@@ -32,6 +33,15 @@
                         <OPTION VALUE="purple">purple</OPTION>
                     </SELECT>
                 </DIV>
+            </DIV>
+        </DIV>
+        <DIV CLASS="gamelobby" ID="gamelobby">
+            <DIV CLASS="globby_container">
+                <DIV ID="mapname" CLASS="lobby_mapname">---</DIV>
+                <DIV CLASS="lobbyptable" ID="lobbyptable">
+
+                </DIV>
+                <BUTTON ID="startvote" CLASS="joinbutton jb_green" STYLE="margin-top: 10px;">Ready</BUTTON>
             </DIV>
         </DIV>
         <DIV CLASS="gamescreen" ID="gamescreen">

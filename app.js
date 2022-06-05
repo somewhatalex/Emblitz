@@ -126,12 +126,23 @@ app.get("/login", (req, res) => {
     });
 });
 
+//id = roomid
+function getroommap(id) {
+    for(let i=0; i<rooms.length; i++) {
+        if(rooms[i].id === id) {
+            return rooms[i].map.toString();
+        }
+    }
+}
+
+
 app.post("/api", (req, res) => {
     try {
         if(req.body.action === "getmap") {
-            fs.readFile("./mapdata/miniworld/miniworld.txt", "utf8", function(err, data) {
-                fs.readFile("./mapdata/miniworld/mapdict.json", "utf8", function(err, mapdict) {
-                    fs.readFile("./mapdata/miniworld/moves.json", "utf8", function(err, moves) {
+            var roommap = getroommap(req.body.roomid);
+            fs.readFile("./mapdata/" + roommap + "/miniworld.txt", "utf8", function(err, data) {
+                fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapdict) {
+                    fs.readFile("./mapdata/" + roommap + "/moves.json", "utf8", function(err, moves) {
                         res.json({"mapdata": data, "mapdict": mapdict, "moves": moves});
                     });
                 });
@@ -183,6 +194,7 @@ function genPname() {
 }
 
 function joinroom() {
+    let roommap = "miniworld";
     if(rooms.length < 1) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
@@ -192,7 +204,7 @@ function joinroom() {
                 id += "-";
             }
         }
-        rooms.push({"id": id, "players": 1, "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "map": roommap, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         return id;
     } else {
         for(let i=0; i<rooms.length; i++) {
@@ -213,7 +225,7 @@ function joinroom() {
                 id += "-"
             }
         }
-        rooms.push({"id": id, "players": 1, "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "map": roommap, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         return id;
     }
 }
@@ -248,11 +260,23 @@ wss.on("connection", (ws) => {
                     break;
                 }
             }
+
+            ws.send(JSON.stringify({"mapname": getroommap(tclient.room)}));
         } else if (action === "mapready") {
             let tclient = clients.get(ws);
             for (var i=0; i < rooms.length; i++) {
                 if (rooms[i].id === tclient.room) {
                     rooms[i]["playersready"]++;
+                    break;
+                }
+            }
+        } else if (action === "userconfirm") {
+            let tclient = clients.get(ws);
+            for (var i=0; i < rooms.length; i++) {
+                if (rooms[i].id === tclient.room) {
+                    if(!rooms[i]["playersconfirmed"].includes(JSON.parse(message).uid)) {
+                        rooms[i]["playersconfirmed"].push(JSON.parse(message).uid);
+                    }
                     break;
                 }
             }
@@ -271,8 +295,10 @@ wss.on("connection", (ws) => {
                 //begin possible imbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": rooms[i]["playersready"]});
-                } if(action === "userlogin") {
-                    sendmsg({"users": rooms[i]["playerslist"]});
+                } else if(action === "userlogin") {
+                    sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
+                } else if(action === "userconfirm") {
+                    sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 } else {
                     if(action !== "mapready") { //idk why this works, but it just does
                         sendmsg({"error": "invalid command", "root": action});
@@ -312,6 +338,8 @@ wss.on("connection", (ws) => {
                 rooms[i]["playerslist"] = rooms[i]["playerslist"].filter(function(item) {
                     return item.id !== removeclientid;
                 })
+
+                rooms[i]["playersconfirmed"] = rooms[i]["playersconfirmed"].filter(e => e !== removeclientid);
 
                 sendmsg({"playerleft": removeclientid});
             }
