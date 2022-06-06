@@ -60,7 +60,7 @@ input { /*override default styles*/
 }
 
 .region-shadow-container {
-    animation: boxshadowone 8s ease infinite;
+    animation: boxshadowone 6s ease infinite;
     filter:
         drop-shadow(1px 0px 1px hsla(0, 0%, 90%, 1))
         drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1))
