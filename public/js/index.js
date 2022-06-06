@@ -27,6 +27,9 @@ function initializeMap() {
     var selectedRegion = "";
     for(let i=0; i<mapelements.length; i++) {
         mapelements[i].setAttribute("fill", "#ffe2bf");
+        mapelements[i].style.stroke = "#171717";
+        mapelements[i].style.strokeWidth = "2px";
+        mapelements[i].style.strokeLinejoin = "round";
         mapelements[i].style.cursor = "pointer";
         let labelpos = getOffset(mapelements[i]);
         document.getElementById("mapl2").innerHTML += `
@@ -53,7 +56,9 @@ function initializeMap() {
             mapelements[i].setAttribute("fill", "#ffe2bf");
             let area = d.currentTarget;
             if(selectedRegion != area && !possibleMoves.includes(area.getAttribute("data-code"))) {
-                area.style.stroke = "none";
+                mapelements[i].style.stroke = "#171717";
+                mapelements[i].style.strokeWidth = "2px";
+                mapelements[i].style.strokeLinejoin = "round";
             } else if(possibleMoves.includes(area.getAttribute("data-code"))) {
                 area.style.strokeWidth = "2px";
             }
@@ -80,7 +85,9 @@ function initializeMap() {
                 //reset regions
                 let allregions = document.getElementsByClassName("map-region");
                 for(let i=0; i<allregions.length; i++) {
-                    allregions[i].style.stroke = "none";
+                    allregions[i].style.stroke = "#171717";
+                    allregions[i].style.strokeWidth = "2px";
+                    allregions[i].style.strokeLinejoin = "round";
                 }
 
                 let territory = d.currentTarget;
@@ -106,7 +113,9 @@ function initializeMap() {
                     }
                     let allregions = document.getElementsByClassName("map-region");
                     for(let i=0; i<allregions.length; i++) {
-                        allregions[i].style.stroke = "none";
+                        allregions[i].style.stroke = "#171717";
+                        allregions[i].style.strokeWidth = "2px";
+                        allregions[i].style.strokeLinejoin = "round";
                     }
                     selectedRegion = "";
                     area.style.stroke = "#ffffff";

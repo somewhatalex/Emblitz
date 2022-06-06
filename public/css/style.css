@@ -36,14 +36,14 @@ input { /*override default styles*/
 
 .svg-map-bg {
     position: relative;
-    background: #4794ff;
+    background: #268cbb;
     margin: 0;
     padding-top: 40px;
     padding-left: 40px;
     padding-right: 40px;
     display: grid;
-    width: 900px;
-    height: 500px;
+    width: 1170px;
+    height: 650px;
     margin: auto;
     top: 20px;
 }
@@ -59,6 +59,33 @@ input { /*override default styles*/
     grid-area: 1/1;
 }
 
+.region-shadow-container {
+    animation: boxshadowone 8s ease infinite;
+    filter:
+        drop-shadow(1px 0px 1px hsla(0, 0%, 90%, 1))
+        drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1))
+}
+
+@keyframes boxshadowone {
+    0% {
+        filter:
+            drop-shadow(1px 0px 1px hsla(0, 0%, 90%, 1))
+            drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1))
+    }
+
+    50% {
+        filter:
+            drop-shadow(1px 0px 4px hsla(0, 0%, 90%, 1))
+            drop-shadow(-1px 0px 4px hsla(0, 0%, 90%, 1))
+    }
+
+    100% {
+        filter:
+            drop-shadow(1px 0px 1px hsla(0, 0%, 90%, 1))
+            drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1))
+    }
+}
+
 #mapl2 {
     float: left;
     grid-area: 1/1;
@@ -70,7 +97,7 @@ input { /*override default styles*/
 
 .gamescreen {
     display: none;
-    background: #4794ff;
+    background: #268cbb;
     height: 100vh;
     overflow: hidden;
 }
