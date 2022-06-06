@@ -190,6 +190,9 @@ function initializeMap() {
             } else if(mapTranslate[1] < -200 && deltaY < 0) {
                 deltaY = 0;
             }
+            if(!mapTranslate[1]) {
+                mapTranslate[1] = 0;
+            }
             mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
         }
     });
