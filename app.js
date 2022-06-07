@@ -11,7 +11,7 @@ const cookieParser = require("cookie-parser");
 const mysql = require("mysql");
 const credentials = require("./auth.json");
 const auth = require("./scripts/auth.js");
-const game = require("./scripts/game.js");
+const gamehandler = require("./scripts/game.js");
 
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
@@ -19,6 +19,7 @@ const port = 6969;
 //-- end configs --
 
 const hostname = "192.168.1.58:" + port;
+const game = new gamehandler();
 
 //edit this in auth.json
 const db = mysql.createConnection({
@@ -332,6 +333,10 @@ wss.on("connection", (ws) => {
                 }
 
 
+                game.removePlayer(JSON.parse(message).roomid, JSON.parse(message).roomid)
+                game.on("removePlayer", function(result) {
+                    console.log(result);
+                });
 
                 //begin possible imbound commands
                 if(action === "mapready") {
