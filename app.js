@@ -12,6 +12,7 @@ const mysql = require("mysql");
 const credentials = require("./auth.json");
 const auth = require("./scripts/auth.js");
 const gamehandler = require("./scripts/game.js");
+const emitter = require("events").EventEmitter;
 
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
@@ -20,6 +21,7 @@ const port = 6969;
 
 const hostname = "192.168.1.58:" + port;
 const game = new gamehandler();
+const gameevents = gamehandler.gameevents;
 
 //edit this in auth.json
 const db = mysql.createConnection({
@@ -226,11 +228,15 @@ function joinroom() {
         }
         
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        game.newGame(id, roommap).then(function(result) {
+            console.log(result)
+        });
         return id;
     } else {
         for(let i=0; i<rooms.length; i++) {
-            //remove rooms with 0 users
+            //remove rooms with 0 users -- futureproof, also see line 375
             if(rooms[i]["players"] < 1) {
+                game.removeGame(rooms[i].id);
                 rooms.splice(i, 1);
             }
 
@@ -255,6 +261,9 @@ function joinroom() {
         }
 
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        game.newGame(id, roommap).then(function(result) {
+            console.log(result)
+        });
         return id;
     }
 }
@@ -332,12 +341,6 @@ wss.on("connection", (ws) => {
                     client.send(JSON.stringify(message));
                 }
 
-
-                game.removePlayer(JSON.parse(message).roomid, JSON.parse(message).roomid)
-                game.on("removePlayer", function(result) {
-                    console.log(result);
-                });
-
                 //begin possible imbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": rooms[i]["playersready"]});
@@ -369,12 +372,20 @@ wss.on("connection", (ws) => {
                 rooms[i]["playersready"]--;
                 //splice client id as well
                 if(rooms[i]["players"] < 1) {
+                    game.removeGame(rooms[i].id);
                     rooms.splice(i, 1);
                 }
                 break;
             }
         }
         clients.delete(ws);
+
+        /*
+        game.removePlayer(JSON.parse(message).roomid, "fard")
+        gameevents.once("removePlayer" + JSON.parse(message).roomid, function(result) {
+            console.log(result);
+        });
+        */
 
         //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM
         [...clients.keys()].forEach((client) => {
@@ -388,7 +399,7 @@ wss.on("connection", (ws) => {
 
                 rooms[i]["playerslist"] = rooms[i]["playerslist"].filter(function(item) {
                     return item.id !== removeclientid;
-                })
+                });
 
                 rooms[i]["playersconfirmed"] = rooms[i]["playersconfirmed"].filter(e => e !== removeclientid);
 
