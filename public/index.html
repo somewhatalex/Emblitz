@@ -45,20 +45,22 @@
             </DIV>
         </DIV>
         <DIV CLASS="gamescreen" ID="gamescreen">
-            <DIV CLASS="leaderboard">
-                <TABLE CLASS="lb_table" ID="leaderboard">
-                    <DIV CLASS="lb_header">Players</DIV>
-                    <DIV ID="players_container">
-                        <!-- player leaderboard goes here -->
+            <DIV ID="player_gui">
+                <DIV CLASS="leaderboard">
+                    <TABLE CLASS="lb_table" ID="leaderboard">
+                        <DIV CLASS="lb_header">Players</DIV>
+                        <DIV ID="players_container">
+                            <!-- player leaderboard goes here -->
+                        </DIV>
+                        
+                        
+                    </TABLE>
+                </DIV>
+                <DIV CLASS="troopscontrol">
+                    <DIV CLASS="t_avatar-frame"></DIV>
+                    <DIV STYLE="margin-top: -80px; margin-left: 60px;">
+                        <INPUT TYPE="range" MIN="1" MAX="100" VALUE="75" CLASS="troopslider" ID="troopslider">
                     </DIV>
-                    
-                    
-                </TABLE>
-            </DIV>
-            <DIV CLASS="troopscontrol">
-                <DIV CLASS="t_avatar-frame"></DIV>
-                <DIV STYLE="margin-top: -80px; margin-left: 60px;">
-                    <INPUT TYPE="range" MIN="1" MAX="100" VALUE="75" CLASS="troopslider" ID="troopslider">
                 </DIV>
             </DIV>
             <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">

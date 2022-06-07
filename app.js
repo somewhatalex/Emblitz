@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser");
 const mysql = require("mysql");
 const credentials = require("./auth.json");
 const auth = require("./scripts/auth.js");
+const game = require("./scripts/game.js");
 
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
@@ -329,6 +330,8 @@ wss.on("connection", (ws) => {
                 function sendmsg(message) {
                     client.send(JSON.stringify(message));
                 }
+
+
 
                 //begin possible imbound commands
                 if(action === "mapready") {

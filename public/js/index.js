@@ -59,8 +59,12 @@ function initializeMap() {
                 mapelements[i].style.stroke = "#171717";
                 mapelements[i].style.strokeWidth = "2px";
                 mapelements[i].style.strokeLinejoin = "round";
-            } else if(possibleMoves.includes(area.getAttribute("data-code"))) {
+            } else if(possibleMoves.includes(area.getAttribute("data-code") && selectedRegion)) {
                 area.style.strokeWidth = "2px";
+            } else {
+                mapelements[i].style.stroke = "#171717";
+                mapelements[i].style.strokeWidth = "2px";
+                mapelements[i].style.strokeLinejoin = "round";
             }
         });
 
@@ -117,10 +121,10 @@ function initializeMap() {
                         allregions[i].style.strokeWidth = "2px";
                         allregions[i].style.strokeLinejoin = "round";
                     }
+                    selectedRegion.style.stroke = "#ffffff";
+                    selectedRegion.style.strokeWidth = "5px";
+                    selectedRegion.style.strokeLinejoin = "round";
                     selectedRegion = "";
-                    area.style.stroke = "#ffffff";
-                    area.style.strokeWidth = "5px";
-                    area.style.strokeLinejoin = "round";
                 }
             }
         });
@@ -129,7 +133,8 @@ function initializeMap() {
     let zoomElement = document.getElementById("mapcontainer");
     zoomElement.style.transform = "scale(1)";
     document.addEventListener("wheel", function(e) {
-        if(zoomElement.contains(e.target)) {
+        if(zoomElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+            if(document.getElementById("player_gui").contains(e.target)) return;
             let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
             var zoomdelta = (e.deltaY)/500;
             if(zoomdelta > 0.3) {
@@ -137,11 +142,11 @@ function initializeMap() {
             } else if (zoomdelta < -0.3) {
                 zoomdelta = -0.3;
             }
-            if(elementTransform >= 2) {
+            if(elementTransform >= 1.7) {
                 if(zoomdelta > 0) {
                     zoomdelta = 0;
                 }
-                zoomElement.style.transform = "scale(2)";
+                zoomElement.style.transform = "scale(1.7)";
             } else if(elementTransform <= 0.5) {
                 if(zoomdelta < 0) {
                     zoomdelta = 0;
@@ -158,7 +163,7 @@ function initializeMap() {
     var isMouseDown = 0;
     mapElement.style.transform = "translate(0px, 0px)";
     document.addEventListener("mousedown", function(e) {
-        if(mapElement.contains(e.target)) isMouseDown = 1;
+        isMouseDown = 1;
     });
     document.addEventListener("mouseup", function(e) {
         isMouseDown = 0;
@@ -170,30 +175,33 @@ function initializeMap() {
         }
     });
     document.addEventListener("mousemove", function(e) {
-        if(isMouseDown && mapElement.contains(e.target)) {
-            isDragging = true;
-            let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
-            let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+        if(isMouseDown) {
+            if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                if(document.getElementById("player_gui").contains(e.target)) return;
+                isDragging = true;
+                let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
+                let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
 
-            let deltaX = e.movementX/1.3;
-            let deltaY = e.movementY/1.3;
+                let deltaX = e.movementX/1.3;
+                let deltaY = e.movementY/1.3;
 
-            //must check both x and y coords for scrolling
-            if(mapTranslate[0] > 400 && deltaX > 0) {
-                deltaX = 0;
-            } else if(mapTranslate[0] < -350 && deltaX < 0) {
-                deltaX = 0;
-            }
+                //must check both x and y coords for scrolling
+                if(mapTranslate[0] > 400 && deltaX > 0) {
+                    deltaX = 0;
+                } else if(mapTranslate[0] < -350 && deltaX < 0) {
+                    deltaX = 0;
+                }
 
-            if(mapTranslate[1] > 180 && deltaY > 0) {
-                deltaY = 0;
-            } else if(mapTranslate[1] < -200 && deltaY < 0) {
-                deltaY = 0;
+                if(mapTranslate[1] > 180 && deltaY > 0) {
+                    deltaY = 0;
+                } else if(mapTranslate[1] < -200 && deltaY < 0) {
+                    deltaY = 0;
+                }
+                if(!mapTranslate[1]) {
+                    mapTranslate[1] = 0;
+                }
+                mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
             }
-            if(!mapTranslate[1]) {
-                mapTranslate[1] = 0;
-            }
-            mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
         }
     });
 }
