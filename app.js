@@ -19,6 +19,10 @@ const authsecret = "average-balls-enjoyer-69";
 const port = credentials.serverport;
 //-- end configs --
 
+//-- version --
+console.log("Using server version 6.7.2022");
+//-- end version --
+
 const hostname = credentials.hostname + ":" + port;
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
@@ -304,8 +308,9 @@ wss.on("connection", (ws) => {
 
             //is room full? as a double check measure
             let roomplayercount = rooms.filter(function(item) {
-                return item.id !== room;
+                return item.id === room;
             });
+            roomplayercount = roomplayercount[0];
             let maxroomplayers = roomplayercount.maxplayers;
             roomplayercount = roomplayercount.players;
             if(roomplayercount == maxroomplayers) {
