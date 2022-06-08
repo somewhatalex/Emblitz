@@ -157,7 +157,7 @@ input { /*override default styles*/
 .leaderboard {
     position: fixed;
     z-index: 69420;
-    top: 10px;
+    top: 20px;
     right: 0px;
     background: var(--light);
     border-top-left-radius: 10px;
@@ -375,5 +375,16 @@ input { /*override default styles*/
 
 .glb_p_name {
     font-size: 20px;
+    font-weight: bold;
+}
+
+.playermessage {
+    position: fixed;
+    z-index: 69420;
+    top: 20px;
+    font-size: 21px;
+    color: var(--light);
+    left: 50%;
+    transform: translateX(-50%);
     font-weight: bold;
 }

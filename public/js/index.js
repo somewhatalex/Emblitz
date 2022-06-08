@@ -8,6 +8,9 @@ var possibleMoves = [];
 
 var inGame = false;
 
+var myColor = "";
+var playerColors = [];
+
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
     var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
@@ -20,13 +23,22 @@ function getOffset(el) {
     };
 }
 
+//element = element (ex. mapelements[i]) and darken = true/false
+function getColor(element, darken) {
+    let colortype = element.getAttribute("data-color");
+    if(darken) {
+        return colorData[colortype].darken;
+    } else {
+        return colorData[colortype].normal;
+    }
+}
 
 function initializeMap() {
     let isDragging = false;
     var mapelements = document.getElementsByClassName("map-region");
     var selectedRegion = "";
     for(let i=0; i<mapelements.length; i++) {
-        mapelements[i].setAttribute("fill", "#ffe2bf");
+        mapelements[i].setAttribute("fill", getColor(mapelements[i], false));
         mapelements[i].style.stroke = "#171717";
         mapelements[i].style.strokeWidth = "2px";
         mapelements[i].style.strokeLinejoin = "round";
@@ -42,7 +54,7 @@ function initializeMap() {
         mapelements[i].addEventListener("mouseover", function(d) {
             let countryCode = mapelements[i].getAttribute("data-code");
             console.log(countryCode);
-            mapelements[i].setAttribute("fill", "#ffc580");
+            mapelements[i].setAttribute("fill", getColor(mapelements[i], true));
             let area = d.currentTarget;
             if(selectedRegion != area) {
                 area.style.stroke = "#ffffff";
@@ -53,16 +65,15 @@ function initializeMap() {
         //hide outline
 
         mapelements[i].addEventListener("mouseleave", function(d) {
-            mapelements[i].setAttribute("fill", "#ffe2bf");
+            mapelements[i].setAttribute("fill", getColor(mapelements[i], false));
             let area = d.currentTarget;
             if(selectedRegion != area && !possibleMoves.includes(area.getAttribute("data-code"))) {
                 mapelements[i].style.stroke = "#171717";
                 mapelements[i].style.strokeWidth = "2px";
                 mapelements[i].style.strokeLinejoin = "round";
             } else if(possibleMoves.includes(area.getAttribute("data-code") && selectedRegion)) {
-                area.style.strokeWidth = "2px";
-            } else {
-                mapelements[i].style.stroke = "#171717";
+                mapelements[i].style.strokeWidth = "2px";
+            } else if(area != selectedRegion) {
                 mapelements[i].style.strokeWidth = "2px";
                 mapelements[i].style.strokeLinejoin = "round";
             }
@@ -96,9 +107,9 @@ function initializeMap() {
 
                 let territory = d.currentTarget;
                 for(let i=0; i<possibleMoves.length; i++) {
+                    let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase());
                     let d2 = document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase());
-                    let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase())
-                    connect(area, d2, "#e69420", 7);
+                    connect(area, d2, "#e69420", 4);
                     let t_targeted = document.querySelector("[data-code='" + possibleMoves[i].toString() + "']");
                     t_targeted.style.stroke = "#ffffff";
                     t_targeted.style.strokeWidth = "2px";
@@ -110,6 +121,7 @@ function initializeMap() {
                     territory.style.stroke = "#004ab3";
                     territory.style.strokeWidth = "5px";
                     territory.style.strokeLinejoin = "round";
+                    
                     attackTerritory(territory);
                 } else {
                     while(currentAttackLines[0]) {
@@ -125,6 +137,7 @@ function initializeMap() {
                     selectedRegion.style.strokeWidth = "5px";
                     selectedRegion.style.strokeLinejoin = "round";
                     selectedRegion = "";
+                    possibleMoves = [];
                 }
             }
         });

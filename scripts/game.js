@@ -10,10 +10,11 @@ function game() {
                 let mapdict = JSON.parse(mapterritorynames);
                 let mapstate = [];
                 let playerstate = [];
-                for(let i=0; i<mapdict.length; i++) {
-                    mapstate.push({"territory": mapdict[i], "player": null, "troopcount": 1});
+                console.log(mapdict.GR)
+                for (let [key, value] of Object.entries(mapdict)) {
+                    mapstate.push({"territory": key, "player": null, "troopcount": 1});
                 }
-                games.push({"id": roomid, "mapstate": mapstate});
+                games.push({"id": roomid, "mapstate": mapstate, "playerstate": playerstate});
                 resolve(games);
             });
         });

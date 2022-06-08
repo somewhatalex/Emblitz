@@ -19,7 +19,7 @@ const authsecret = "average-balls-enjoyer-69";
 const port = 6969;
 //-- end configs --
 
-const hostname = "192.168.1.58:" + port;
+const hostname = credentials.hostname + ":" + port;
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
