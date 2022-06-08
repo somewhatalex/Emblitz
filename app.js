@@ -296,7 +296,45 @@ httpserver.listen(port, function() {
     console.log("Server started on port " + port);
 });
 
+/* test:
+setTimeout(function() {
+    [...clients.keys()].forEach((client) => {
+        client.send(JSON.stringify({"fard": "success"}));
+    });
+}, 10000);
+*/
+
+//send json message to all members in a room w/o request
+function sendRoomMsg(roomid, message) {
+    [...clients.keys()].forEach((client) => {
+        let clientdata = clients.get(client);
+        if(clientdata["room"] === roomid) {
+            client.send(JSON.stringify(message));
+        }
+    });
+}
+
+//passively send messages to all users in room w/o request
+//format: sendRoomMsg("room69", {"bobux": "momento"});
+
 wss.on("connection", (ws) => {
+    //passively send message to single player w/o request
+    ws.send(JSON.stringify({"connection": "success"}));
+
+    //send json message to all members in a room w/o request
+    function sendRoomMsg(roomid, message) {
+        [...clients.keys()].forEach((client) => {
+            let clientdata = clients.get(client);
+            if(clientdata["room"] === roomid) {
+                //do everything in here
+                client.send(JSON.stringify(message));
+            }
+        });
+    }
+
+    //passively send messages to all users in room w/o request
+    //format: sendRoomMsg("room69", {"bobux": "momento"});
+
     ws.on("message", (response) => {
         //RESPONDS TO A SINGULAR PLAYER REQUEST
         let message = response.toString();
@@ -369,6 +407,9 @@ wss.on("connection", (ws) => {
                 //begin possible imbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": rooms[i]["playersready"]});
+                    if(rooms[i]["playersready"] == rooms[i]["players"]) {
+                        sendmsg({"message": "all users loaded"});
+                    }
                 } else if(action === "userlogin") {
                     sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
                 } else if(action === "userconfirm") {
