@@ -16,7 +16,7 @@ const emitter = require("events").EventEmitter;
 
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
-const port = 6969;
+const port = credentials.serverport;
 //-- end configs --
 
 const hostname = credentials.hostname + ":" + port;

@@ -9,7 +9,10 @@ Host should be `127.0.0.1` if testing locally.
     "user": "[USERNAME]",
     "password": "[PASSWORD]",
     "port": [PORT NUMBER],
-    "database": "[DATABASE NAME]"
+    "database": "[DATABASE NAME]",
+    
+    "hostname": "[HOSTNAME]",
+    "serverport": [SERVER PORT NUMBER]
 }
 ```
 
@@ -26,4 +29,5 @@ npm i path
 npm i websocket
 npm i ws
 npm i mysql
+npm i events
 ```
