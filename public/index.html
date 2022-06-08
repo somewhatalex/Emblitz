@@ -20,8 +20,9 @@
             <DIV CLASS="join_input">
                 <INPUT ID="p_name" CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Name here...">
                 <DIV CLASS="h_button_options">
-                    <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, document.getElementById('framecolor').value)">Play</BUTTON>
-                    <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate">Join Game</BUTTON>
+                    <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value)">Play</BUTTON>
+                    <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
+                    <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;"><INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value)">Connect</BUTTON></DIV>
                     <BR><BR>
                     <!-- REMOVE THIS WHEN DONE, MAKE BETTER LOOKING FRAME SELECT MENU -->
                     (frame color select; this is only for testing and is temporary)<BR>

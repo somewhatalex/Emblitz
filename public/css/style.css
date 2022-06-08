@@ -388,3 +388,14 @@ input { /*override default styles*/
     transform: translateX(-50%);
     font-weight: bold;
 }
+
+.joinroom_area {
+    padding-top: 20px;
+}
+
+.room_input {
+    width: 100px;
+    padding: 5px;
+    font-size: 18px;
+    border: 1px solid var(--dark);
+}

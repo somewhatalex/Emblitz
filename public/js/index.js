@@ -23,6 +23,14 @@ function getOffset(el) {
     };
 }
 
+function showJoinRoom() {
+    if(document.getElementById("joinroom_area").style.display === "none") {
+        document.getElementById("joinroom_area").style.display = "block";
+    } else {
+        document.getElementById("joinroom_area").style.display = "none";
+    }
+}
+
 //element = element (ex. mapelements[i]) and darken = true/false
 function getColor(element, darken) {
     let colortype = element.getAttribute("data-color");
@@ -121,7 +129,7 @@ function initializeMap() {
                     territory.style.stroke = "#004ab3";
                     territory.style.strokeWidth = "5px";
                     territory.style.strokeLinejoin = "round";
-                    
+
                     attackTerritory(territory);
                 } else {
                     while(currentAttackLines[0]) {
@@ -264,9 +272,9 @@ function downloadMap() {
     });
 }
 
-function joinGame() {
+function joinGame(inputroomid) {
     return new Promise((resolve, reject) => {
-        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "joingame"})}).then(response => {
+        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "joingame", preset: inputroomid})}).then(response => {
             response.json().then(function(text) {
                 roomid = text.room;
                 uid = text.uid;
@@ -296,11 +304,11 @@ function initLB() {
     }
 }
 
-function gameConnect(name, framecolor) {
+function gameConnect(name, inputroomid, framecolor) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
     document.getElementById("gamelobby").style.display = "block";
-    joinGame().then(function() {
+    joinGame(inputroomid).then(function() {
         connectToServer().then(function(ws) {
             ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "framecolor": framecolor}));
             confirmJoinGame().then(function() {

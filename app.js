@@ -156,7 +156,27 @@ app.post("/api", (req, res) => {
                 });
             });
         } else if(req.body.action === "joingame") {
-            res.json({"uid": userid(), "room": joinroom()});
+            //did player request for specific room?
+            if(req.body.preset) {
+                //does room exist?
+                let preset = req.body.preset;
+                for(let i=0; i<rooms.length; i++) {
+                    if(rooms[i].id === preset) {
+                        //is room full?
+                        if(rooms[i]["players"] >= rooms[i]["maxplayers"]) {
+                            res.json({"error": "room " + preset + " is full"});
+                        } else {
+                            rooms[i]["players"]++;
+                            res.json({"uid": userid(), "room": preset});
+                        }
+                        return;
+                    } else {
+                        res.json({"error": "room " + preset + " does not exist"});
+                    }
+                }
+            } else {
+                res.json({"uid": userid(), "room": joinroom()});
+            }
         } else if(req.body.action === "login") {
             // -- WORK ON PROGRESS --
             auth.getUserInfo("bobux").then(function(result) {
