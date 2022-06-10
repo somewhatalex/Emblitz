@@ -356,7 +356,7 @@ wss.on("connection", (ws) => {
             roomplayercount = roomplayercount[0];
             let maxroomplayers = roomplayercount.maxplayers;
             roomplayercount = roomplayercount.players;
-            if(roomplayercount == maxroomplayers) {
+            if(roomplayercount > maxroomplayers) {
                 ws.send(JSON.stringify({"error": "roomfull"}));
             }
 
@@ -440,8 +440,10 @@ wss.on("connection", (ws) => {
                 //begin possible imbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": rooms[i]["playersready"]});
+                    //console.log(rooms[i]["playersready"] + " / " + rooms[i]["players"])
                     if(rooms[i]["playersready"] == rooms[i]["players"]) {
                         sendmsg({"message": "all users loaded"});
+                        sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
                     }
                 } else if(action === "userlogin") {
                     sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
@@ -470,7 +472,9 @@ wss.on("connection", (ws) => {
         for (var i=0; i < rooms.length; i++) {
             if (rooms[i].id === removeclient.room) {
                 rooms[i]["players"]--;
-                rooms[i]["playersready"]--;
+                if(rooms[i].ingame) {
+                    rooms[i]["playersready"]--;
+                }
                 //splice client id as well
                 if(rooms[i]["players"] < 1) {
                     game.removeGame(rooms[i].id);
