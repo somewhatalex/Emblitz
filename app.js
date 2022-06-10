@@ -23,6 +23,10 @@ const port = credentials.serverport;
 console.log("Using server version 6.7.2022");
 //-- end version --
 
+//-- player colors --
+const playercoloroptions = ["red", "orange", "yellow", "green", "blue", "purple"];
+//-- end player colors --
+
 const hostname = credentials.hostname + ":" + port;
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
@@ -357,19 +361,47 @@ wss.on("connection", (ws) => {
             }
 
             let pname = escapeHTML(userinfo.pname).substring(0, 18);
-            let framecolor = escapeHTML(userinfo.framecolor);
+            let pcolor = escapeHTML(userinfo.pcolor);
             //player name not set, assign a random one
             if(pname === "") {
                 pname = genPname();
             }
-            var metadata = {uid, room, pname, framecolor};
+
+            //no player color set? assign red
+            if(pcolor === "") {
+                pcolor = "red";
+            }
+
+            //give players their preferred color; if taken, assign a different random color
+            for(let i=0; i < rooms.length; i++) {
+                if (rooms[i].id === room) {
+                    let takencolors = [];
+                    let availablecolors = playercoloroptions;
+                    let playerliststring = rooms[i]["playerslist"];
+                    for(let i=0; i<playerliststring.length; i++) {
+                        takencolors.push(playerliststring[i]["pcolor"]);
+                    }
+                    
+                    if(takencolors.includes(pcolor)) {
+                        for(let i=0; i<takencolors.length; i++) {
+                            availablecolors = availablecolors.filter(function(item) {
+                                return item !== takencolors[i];
+                            });
+                        }
+                        pcolor = availablecolors[(Math.random() * availablecolors.length) | 0];
+                    }
+                    break;
+                }
+            }
+            
+            var metadata = {uid, room, pname, pcolor};
             clients.set(ws, metadata);
 
             //add pname to room list
             let tclient = clients.get(ws);
             for (var i=0; i < rooms.length; i++) {
                 if (rooms[i].id === tclient.room) {
-                    rooms[i]["playerslist"].push({"id": uid, "name": pname, "framecolor": framecolor});
+                    rooms[i]["playerslist"].push({"id": uid, "name": pname, "pcolor": pcolor});
                     break;
                 }
             }

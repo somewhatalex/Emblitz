@@ -311,20 +311,20 @@ function initLB() {
     for(let i=0; i<pnames.length; i++) {
         document.getElementById("players_container").innerHTML += `
         <DIV CLASS="lb_player" ID="l-${pnames[i].id}">
-            <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${pnames[i].framecolor}"></DIV>
+            <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${pnames[i].pcolor}"></DIV>
             <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${pnames[i].name}</DIV></DIV>
         </DIV>`;
     }
 }
 
-function gameConnect(name, inputroomid, framecolor) {
+function gameConnect(name, inputroomid, pcolor) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
     document.getElementById("gamelobby").style.display = "block";
     joinGame(inputroomid).then(function() {
         connectToServer().then(function(ws) {
             websocket = ws
-            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "framecolor": framecolor}));
+            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "pcolor": pcolor}));
             confirmJoinGame().then(function() {
                 ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid}));
             });
@@ -341,7 +341,7 @@ function gameConnect(name, inputroomid, framecolor) {
                         for(let i=0; i<response.users.length; i++) {
                             document.getElementById("players_container").innerHTML += `
                             <DIV CLASS="lb_player" ID="l-${response.users[i].id}">
-                                <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].framecolor}"></DIV>
+                                <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
                                 <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                             </DIV>`;
                         }
@@ -351,7 +351,7 @@ function gameConnect(name, inputroomid, framecolor) {
                         for(let i=0; i<response.users.length; i++) {
                             document.getElementById("lobbyptable").innerHTML += `
                             <DIV CLASS="glb_player" ID="l-${response.users[i].id}">
-                                <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].framecolor}"></DIV>
+                                <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
                                 <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                             </DIV>`;
                         }
