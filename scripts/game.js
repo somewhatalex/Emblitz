@@ -13,10 +13,16 @@ function game() {
                 for (let [key, value] of Object.entries(mapdict)) {
                     mapstate.push({"territory": key, "player": null, "troopcount": 1});
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate});
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "deploy"});
                 resolve(games.get(roomid));
             });
         });
+    }
+
+    this.deployTroops = function(roomid, player, location) {
+        if(games.get(roomid).phase === "deploy") {
+
+        }
     }
 
     this.removeGame = function(roomid) {
@@ -25,7 +31,19 @@ function game() {
     
     //players can't join once game starts, so remove players only
     this.removePlayer = function(roomid, id) {
+        try {
+            games.get(roomid).playerstate = games.get(roomid).playerstate.filter(function(item) {
+                return item.id !== id;
+            });
+        } catch {};
         self.emit("removePlayer" + roomid, id);
+    }
+
+    this.addPlayer = function(roomid, id) {
+        return new Promise(function(resolve, reject) {
+            games.get(roomid).playerstate.push({"id": id, "reservecount": 5});
+            resolve(games)
+        });
     }
 }
 

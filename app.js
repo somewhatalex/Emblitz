@@ -258,7 +258,6 @@ function joinroom() {
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap).then(function(result) {
             console.log(result)
-            console.log(result.mapstate)
         });
         return id;
     } else {
@@ -291,7 +290,7 @@ function joinroom() {
 
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap).then(function(result) {
-            console.log(result.mapstate)
+            console.log(result)
         });
         return id;
     }
@@ -402,6 +401,9 @@ wss.on("connection", (ws) => {
             for (var i=0; i < rooms.length; i++) {
                 if (rooms[i].id === tclient.room) {
                     rooms[i]["playerslist"].push({"id": uid, "name": pname, "pcolor": pcolor});
+                    game.addPlayer(tclient.room, uid).then(function(result) {
+                        console.log(result);
+                    })
                     break;
                 }
             }
@@ -484,13 +486,11 @@ wss.on("connection", (ws) => {
             }
         }
         clients.delete(ws);
-
-        /*
-        game.removePlayer(JSON.parse(message).roomid, "fard")
-        gameevents.once("removePlayer" + JSON.parse(message).roomid, function(result) {
+  
+        game.removePlayer(removeclient.room, removeclientid)
+        gameevents.once("removePlayer" + removeclient.room, function(result) {
             console.log(result);
         });
-        */
 
         //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM
         [...clients.keys()].forEach((client) => {
