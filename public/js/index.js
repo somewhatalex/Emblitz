@@ -11,6 +11,8 @@ var inGame = false;
 var myColor = "";
 var playerColors = [];
 
+var websocket = null;
+
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
     var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
@@ -91,18 +93,9 @@ function initializeMap() {
         mapelements[i].addEventListener("click", function(d) {
             //isDragging --> is the mouse moving? handled by "mousemove" event listener
             if(isDragging == false) {
-                possibleMoves = [];
                 let currentAttackLines = document.getElementsByClassName("attack-line");
                 while(currentAttackLines[0]) {
                     currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
-                }
-                for(let i=0; i<mapmoves.length; i++) {
-                    if(mapmoves[i].includes(d.currentTarget.getAttribute("data-code"))) {
-                        let dest = mapmoves[i].split(" ").filter(function(item) {
-                            return item !== d.currentTarget.getAttribute("data-code");
-                        });
-                        possibleMoves.push(dest.toString());
-                    }
                 }
 
                 //reset regions
@@ -114,6 +107,26 @@ function initializeMap() {
                 }
 
                 let territory = d.currentTarget;
+                if(selectedRegion !== territory) {
+                    if(possibleMoves.includes(territory.getAttribute("data-code"))) {
+                        possibleMoves = [];
+                        attackTerritory(selectedRegion, territory);
+                        selectedRegion = "";
+                        return;
+                    }
+                }
+
+                possibleMoves = [];
+
+                for(let i=0; i<mapmoves.length; i++) {
+                    if(mapmoves[i].includes(d.currentTarget.getAttribute("data-code"))) {
+                        let dest = mapmoves[i].split(" ").filter(function(item) {
+                            return item !== d.currentTarget.getAttribute("data-code");
+                        });
+                        possibleMoves.push(dest.toString());
+                    }
+                }
+
                 for(let i=0; i<possibleMoves.length; i++) {
                     let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase());
                     let d2 = document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase());
@@ -129,8 +142,6 @@ function initializeMap() {
                     territory.style.stroke = "#004ab3";
                     territory.style.strokeWidth = "5px";
                     territory.style.strokeLinejoin = "round";
-
-                    attackTerritory(territory);
                 } else {
                     while(currentAttackLines[0]) {
                         currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
@@ -242,8 +253,10 @@ function connect(div1, div2, color, thickness) {
     document.getElementById("mapl2").innerHTML += htmlLine;
 }
 
-function attackTerritory(area) {
-
+function attackTerritory(start, target) {
+    console.log("[DEBUG] Attacking from " + start.getAttribute("data-code") + " to " + target.getAttribute("data-code"));
+    let trooppercent = Math.round(document.getElementById("troopslider").value);
+    websocket.send(JSON.stringify({"action": "attack", "start": start.getAttribute("data-code"), "target": target.getAttribute("data-code"), "trooppercent": trooppercent, "uid": uid, "roomid": roomid,}));
 }
 
 async function connectToServer() {
@@ -310,6 +323,7 @@ function gameConnect(name, inputroomid, framecolor) {
     document.getElementById("gamelobby").style.display = "block";
     joinGame(inputroomid).then(function() {
         connectToServer().then(function(ws) {
+            websocket = ws
             ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "framecolor": framecolor}));
             confirmJoinGame().then(function() {
                 ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid}));

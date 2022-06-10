@@ -254,6 +254,7 @@ function joinroom() {
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap).then(function(result) {
             console.log(result)
+            console.log(result.mapstate)
         });
         return id;
     } else {
@@ -286,7 +287,7 @@ function joinroom() {
 
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap).then(function(result) {
-            console.log(result)
+            console.log(result.mapstate)
         });
         return id;
     }
@@ -419,6 +420,8 @@ wss.on("connection", (ws) => {
                         rooms[i]["ingame"] = true;
                         sendmsg({"startgame": true});
                     }
+                } else if(action === "attack") {
+                    sendmsg({"test": "attack ok"});
                 } else {
                     if(action !== "mapready") { //idk why this works, but it just does
                         sendmsg({"error": "invalid command", "root": action});

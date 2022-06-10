@@ -1,7 +1,7 @@
 const emitter = require("events").EventEmitter;
 const fs = require("fs")
-var self = new emitter();
-var games = [];
+const self = new emitter();
+const games = new Map();
 
 function game() {
     this.newGame = function(roomid, roommap) {
@@ -10,20 +10,17 @@ function game() {
                 let mapdict = JSON.parse(mapterritorynames);
                 let mapstate = [];
                 let playerstate = [];
-                console.log(mapdict.GR)
                 for (let [key, value] of Object.entries(mapdict)) {
                     mapstate.push({"territory": key, "player": null, "troopcount": 1});
                 }
-                games.push({"id": roomid, "mapstate": mapstate, "playerstate": playerstate});
-                resolve(games);
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate});
+                resolve(games.get(roomid));
             });
         });
     }
 
     this.removeGame = function(roomid) {
-        games = games.filter(function(item) {
-            return item.id !== roomid;
-        })
+        games.delete(roomid);
     }
     
     //players can't join once game starts, so remove players only
