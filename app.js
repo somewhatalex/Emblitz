@@ -241,6 +241,7 @@ function checkDupeRoom(id) {
 function joinroom() {
     let roommap = "miniworld";
     let maxplayers = 6;
+    let deploytime = 15;
     if(rooms.length < 1) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
@@ -255,8 +256,8 @@ function joinroom() {
             }
         }
         
-        rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
-        game.newGame(id, roommap).then(function(result) {
+        rooms.push({"id": id, "ingame": false, "map": roommap, "deploytime": deploytime, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        game.newGame(id, roommap, deploytime).then(function(result) {
             console.log(result)
         });
         return id;
@@ -289,7 +290,7 @@ function joinroom() {
         }
 
         rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
-        game.newGame(id, roommap).then(function(result) {
+        game.newGame(id, roommap, deploytime).then(function(result) {
             console.log(result)
         });
         return id;
@@ -320,6 +321,10 @@ function sendRoomMsg(roomid, message) {
 
 gameevents.on("updateMap", function(result) {
     sendRoomMsg(result[0], {"updatemap": result[1]})
+});
+
+gameevents.on("startAttackPhase", function(result) {
+    sendRoomMsg(result[0], {"startAttackPhase": "ok"})
 });
 
 //passively send messages to all users in room w/o request

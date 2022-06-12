@@ -1,22 +1,52 @@
 const emitter = require("events").EventEmitter;
-const fs = require("fs")
+const fs = require("fs");
 const self = new emitter();
 const games = new Map();
 
 function game() {
-    this.newGame = function(roomid, roommap) {
+    this.newGame = function(roomid, roommap, deploytime) {
+        gameTimingEvents(roomid, deploytime);
         return new Promise(function(resolve, reject) {
             fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapterritorynames) {
                 let mapdict = JSON.parse(mapterritorynames);
                 let mapstate = {};
                 let playerstate = [];
-                for (let [key, value] of Object.entries(mapdict)) {
+                for(let [key, value] of Object.entries(mapdict)) {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
                 games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "deploy"});
                 resolve(games.get(roomid));
             });
         });
+    }
+
+    function gameTimingEvents(roomid, deploytime) {
+        deploytime = deploytime*1000; //convert to seconds
+        setTimeout(function() {
+            let targetterritory = Object.keys(games.get(roomid).mapstate);
+            let targetlength = targetterritory.length;
+            let playersdeployed = [];
+            for(let i=0; i<targetlength; i++) {
+                if(games.get(roomid).mapstate[targetterritory[i]].player != null) {
+                    playersdeployed.push(games.get(roomid).mapstate[targetterritory[i]].player);
+                }
+            }
+
+            let playercount = games.get(roomid).playerstate.length;
+            let totalplayerids = [];
+            for(let i=0; i<playercount; i++) {
+                totalplayerids.push(games.get(roomid).playerstate[i].id);
+            }
+            
+            //get players who haven't deployed yet
+            let remainingplayers = totalplayerids.filter(x => !playersdeployed.includes(x));
+            console.log(remainingplayers)
+
+            //then assign them a random unclaimed territory
+            //code here...
+
+            self.emit("startAttackPhase", [roomid, "ok"])
+        }, deploytime);
     }
 
     this.deployTroops = function(roomid, playerid, location) {

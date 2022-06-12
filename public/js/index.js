@@ -418,6 +418,8 @@ function gameConnect(name, inputroomid, pcolor) {
                     }
                 } else if(response.setcolor) {
                     myColor = response.setcolor;
+                } else if(response.startAttackPhase) {
+                    attackPhase = "attack";
                 }
             }
         });
