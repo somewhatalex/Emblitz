@@ -20,7 +20,7 @@ const port = credentials.serverport;
 //-- end configs --
 
 //-- version --
-console.log("Using server version 6.7.2022");
+console.log("Using server version 6.10.2022");
 //-- end version --
 
 //-- player colors --
@@ -318,6 +318,10 @@ function sendRoomMsg(roomid, message) {
     });
 }
 
+gameevents.on("updateMap", function(result) {
+    sendRoomMsg(result[0], {"updatemap": result[1]})
+});
+
 //passively send messages to all users in room w/o request
 //format: sendRoomMsg("room69", {"bobux": "momento"});
 
@@ -427,6 +431,11 @@ wss.on("connection", (ws) => {
                     break;
                 }
             }
+        /* NOTE: also leave EVERY player move handler down here since message sending is done separately.
+           This is to stop a new event emitter from being created for every player */
+        } else if(action === "deploy") {
+            //see game.js, deployTroops
+            game.deployTroops(JSON.parse(message).roomid, JSON.parse(message).uid, JSON.parse(message).target);
         }
     
         //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM
@@ -439,7 +448,7 @@ wss.on("connection", (ws) => {
                     client.send(JSON.stringify(message));
                 }
 
-                //begin possible imbound commands
+                //begin possible inbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": rooms[i]["playersready"]});
                     //console.log(rooms[i]["playersready"] + " / " + rooms[i]["players"])
@@ -458,10 +467,6 @@ wss.on("connection", (ws) => {
                     }
                 } else if(action === "attack") {
                     sendmsg({"test": "attack ok"});
-                } else {
-                    if(action !== "mapready") { //idk why this works, but it just does
-                        sendmsg({"error": "invalid command", "root": action});
-                    }
                 }
             }
         });
@@ -489,7 +494,7 @@ wss.on("connection", (ws) => {
   
         game.removePlayer(removeclient.room, removeclientid)
         gameevents.once("removePlayer" + removeclient.room, function(result) {
-            console.log(result);
+            //console.log(result);
         });
 
         //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM

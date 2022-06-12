@@ -9,9 +9,11 @@ var possibleMoves = [];
 var inGame = false;
 
 var myColor = "";
-var playerColors = [];
+var playerColors = {};
 
 var websocket = null;
+
+var attackPhase = "";
 
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
@@ -57,7 +59,7 @@ function initializeMap() {
         document.getElementById("mapl2").innerHTML += `
         <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
             <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
-            <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV ID="t_troops" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
+            <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
         </DIV>`
 
         //show outline
@@ -93,70 +95,74 @@ function initializeMap() {
         mapelements[i].addEventListener("click", function(d) {
             //isDragging --> is the mouse moving? handled by "mousemove" event listener
             if(isDragging == false) {
-                let currentAttackLines = document.getElementsByClassName("attack-line");
-                while(currentAttackLines[0]) {
-                    currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
-                }
-
-                //reset regions
-                let allregions = document.getElementsByClassName("map-region");
-                for(let i=0; i<allregions.length; i++) {
-                    allregions[i].style.stroke = "#171717";
-                    allregions[i].style.strokeWidth = "2px";
-                    allregions[i].style.strokeLinejoin = "round";
-                }
-
-                let territory = d.currentTarget;
-                if(selectedRegion !== territory) {
-                    if(possibleMoves.includes(territory.getAttribute("data-code"))) {
-                        possibleMoves = [];
-                        attackTerritory(selectedRegion, territory);
-                        selectedRegion = "";
-                        return;
-                    }
-                }
-
-                possibleMoves = [];
-
-                for(let i=0; i<mapmoves.length; i++) {
-                    if(mapmoves[i].includes(d.currentTarget.getAttribute("data-code"))) {
-                        let dest = mapmoves[i].split(" ").filter(function(item) {
-                            return item !== d.currentTarget.getAttribute("data-code");
-                        });
-                        possibleMoves.push(dest.toString());
-                    }
-                }
-
-                for(let i=0; i<possibleMoves.length; i++) {
-                    let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase());
-                    let d2 = document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase());
-                    connect(area, d2, "#e69420", 4);
-                    let t_targeted = document.querySelector("[data-code='" + possibleMoves[i].toString() + "']");
-                    t_targeted.style.stroke = "#ffffff";
-                    t_targeted.style.strokeWidth = "2px";
-                    t_targeted.style.strokeLinejoin = "round";
-                }
-
-                if(selectedRegion != territory) {
-                    selectedRegion = territory;
-                    territory.style.stroke = "#004ab3";
-                    territory.style.strokeWidth = "5px";
-                    territory.style.strokeLinejoin = "round";
-                } else {
+                if(attackPhase === "deploy") {
+                    deployTroops(d.currentTarget);
+                } else if(attackPhase === "attack") {
+                    let currentAttackLines = document.getElementsByClassName("attack-line");
                     while(currentAttackLines[0]) {
                         currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
                     }
+
+                    //reset regions
                     let allregions = document.getElementsByClassName("map-region");
                     for(let i=0; i<allregions.length; i++) {
                         allregions[i].style.stroke = "#171717";
                         allregions[i].style.strokeWidth = "2px";
                         allregions[i].style.strokeLinejoin = "round";
                     }
-                    selectedRegion.style.stroke = "#ffffff";
-                    selectedRegion.style.strokeWidth = "5px";
-                    selectedRegion.style.strokeLinejoin = "round";
-                    selectedRegion = "";
+
+                    let territory = d.currentTarget;
+                    if(selectedRegion !== territory) {
+                        if(possibleMoves.includes(territory.getAttribute("data-code"))) {
+                            possibleMoves = [];
+                            attackTerritory(selectedRegion, territory);
+                            selectedRegion = "";
+                            return;
+                        }
+                    }
+
                     possibleMoves = [];
+
+                    for(let i=0; i<mapmoves.length; i++) {
+                        if(mapmoves[i].includes(d.currentTarget.getAttribute("data-code"))) {
+                            let dest = mapmoves[i].split(" ").filter(function(item) {
+                                return item !== d.currentTarget.getAttribute("data-code");
+                            });
+                            possibleMoves.push(dest.toString());
+                        }
+                    }
+
+                    for(let i=0; i<possibleMoves.length; i++) {
+                        let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase());
+                        let d2 = document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase());
+                        connect(area, d2, "#e69420", 4);
+                        let t_targeted = document.querySelector("[data-code='" + possibleMoves[i].toString() + "']");
+                        t_targeted.style.stroke = "#ffffff";
+                        t_targeted.style.strokeWidth = "2px";
+                        t_targeted.style.strokeLinejoin = "round";
+                    }
+
+                    if(selectedRegion != territory) {
+                        selectedRegion = territory;
+                        territory.style.stroke = "#004ab3";
+                        territory.style.strokeWidth = "5px";
+                        territory.style.strokeLinejoin = "round";
+                    } else {
+                        while(currentAttackLines[0]) {
+                            currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
+                        }
+                        let allregions = document.getElementsByClassName("map-region");
+                        for(let i=0; i<allregions.length; i++) {
+                            allregions[i].style.stroke = "#171717";
+                            allregions[i].style.strokeWidth = "2px";
+                            allregions[i].style.strokeLinejoin = "round";
+                        }
+                        selectedRegion.style.stroke = "#ffffff";
+                        selectedRegion.style.strokeWidth = "5px";
+                        selectedRegion.style.strokeLinejoin = "round";
+                        selectedRegion = "";
+                        possibleMoves = [];
+                    }
                 }
             }
         });
@@ -259,6 +265,11 @@ function attackTerritory(start, target) {
     websocket.send(JSON.stringify({"action": "attack", "start": start.getAttribute("data-code"), "target": target.getAttribute("data-code"), "trooppercent": trooppercent, "uid": uid, "roomid": roomid,}));
 }
 
+function deployTroops(target) {
+    console.log("[DEBUG] Deployed troops to " + target.getAttribute("data-code"));
+    websocket.send(JSON.stringify({"action": "deploy", "target": target.getAttribute("data-code"), "uid": uid, "roomid": roomid,}));
+}
+
 async function connectToServer() {
     const ws = new WebSocket("ws://" + hostname + "/ws");
     return new Promise((resolve, reject) => {
@@ -344,7 +355,9 @@ function gameConnect(name, inputroomid, pcolor) {
                                 <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
                                 <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                             </DIV>`;
+                            playerColors[response.users[i].id] = response.users[i].pcolor;
                         }
+                        
                     } else {
                         //in lobby
                         document.getElementById("lobbyptable").innerHTML = "";
@@ -381,6 +394,23 @@ function gameConnect(name, inputroomid, pcolor) {
                 } else if(response.confirmedusers) {
                     for(let i=0; i<response.confirmedusers.length; i++) {
                         document.getElementById("l-" + response.confirmedusers[i]).style.border = "2px solid green";
+                    }
+                } else if(response.message === "all users loaded") {
+                    attackPhase = "deploy";
+                } else if(response.updatemap) {
+                    let updatemapdata = response.updatemap;
+                    let reslength = Object.keys(updatemapdata).length;
+                    for(let i=0; i<reslength; i++) {
+                        let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
+                        let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
+                        document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
+                        if(c_update_map_info.player != null) {
+                            selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
+                            selectterritory.setAttribute("fill", getColor(selectterritory, false));
+                        } else {
+                            selectterritory.setAttribute("data-color", "default");
+                            selectterritory.setAttribute("fill", getColor(selectterritory, false));
+                        }
                     }
                 }
             }
