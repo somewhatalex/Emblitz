@@ -267,7 +267,11 @@ function attackTerritory(start, target) {
 
 function deployTroops(target) {
     console.log("[DEBUG] Deployed troops to " + target.getAttribute("data-code"));
-    websocket.send(JSON.stringify({"action": "deploy", "target": target.getAttribute("data-code"), "uid": uid, "roomid": roomid,}));
+    if(target.getAttribute("data-color") === "default") {
+        target.setAttribute("data-color", myColor);
+        target.setAttribute("fill", getColor(target, false));
+        websocket.send(JSON.stringify({"action": "deploy", "target": target.getAttribute("data-code"), "uid": uid, "roomid": roomid,}));
+    }
 }
 
 async function connectToServer() {
@@ -412,6 +416,8 @@ function gameConnect(name, inputroomid, pcolor) {
                             selectterritory.setAttribute("fill", getColor(selectterritory, false));
                         }
                     }
+                } else if(response.setcolor) {
+                    myColor = response.setcolor;
                 }
             }
         });

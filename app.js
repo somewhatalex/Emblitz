@@ -400,6 +400,8 @@ wss.on("connection", (ws) => {
             var metadata = {uid, room, pname, pcolor};
             clients.set(ws, metadata);
 
+            ws.send(JSON.stringify({"setcolor": pcolor}));
+
             //add pname to room list
             let tclient = clients.get(ws);
             for (var i=0; i < rooms.length; i++) {
