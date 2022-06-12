@@ -20,7 +20,7 @@ const port = credentials.serverport;
 //-- end configs --
 
 //-- version --
-console.log("Using server version 6.10.2022");
+console.log("Using server version 6.11.2022");
 //-- end version --
 
 //-- player colors --
