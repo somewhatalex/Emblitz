@@ -241,7 +241,7 @@ function checkDupeRoom(id) {
 function joinroom() {
     let roommap = "miniworld";
     let maxplayers = 6;
-    let deploytime = 15;
+    let deploytime = 10;
     if(rooms.length < 1) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
@@ -443,6 +443,8 @@ wss.on("connection", (ws) => {
         } else if(action === "deploy") {
             //see game.js, deployTroops
             game.deployTroops(JSON.parse(message).roomid, JSON.parse(message).uid, JSON.parse(message).target);
+        } else if(action === "attack") {
+            game.attackTerritory(JSON.parse(message).roomid, JSON.parse(message).uid, JSON.parse(message).start, JSON.parse(message).target, JSON.parse(message).trooppercent);
         }
     
         //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM
@@ -472,8 +474,6 @@ wss.on("connection", (ws) => {
                         rooms[i]["ingame"] = true;
                         sendmsg({"startgame": true});
                     }
-                } else if(action === "attack") {
-                    sendmsg({"test": "attack ok"});
                 }
             }
         });

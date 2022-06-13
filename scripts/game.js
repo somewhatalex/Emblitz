@@ -21,6 +21,8 @@ function game() {
     }
 
     function gameTimingEvents(roomid, deploytime) {
+        //-- ADD LOBBY CODE/LOGIC/TIMING HERE
+
         deploytime = deploytime*1000; //convert to seconds
         setTimeout(function() {
             let targetterritory = Object.keys(games.get(roomid).mapstate);
@@ -40,12 +42,25 @@ function game() {
             
             //get players who haven't deployed yet
             let remainingplayers = totalplayerids.filter(x => !playersdeployed.includes(x));
-            console.log(remainingplayers)
 
             //then assign them a random unclaimed territory
-            //code here...
+            let availableterritories = [];
+            for(let i=0; i<targetlength; i++) {
+                if(games.get(roomid).mapstate[targetterritory[i]].player == null) {
+                    availableterritories.push(targetterritory[i]);
+                }
+            }
+            
+            for(let i=0; i<remainingplayers.length; i++) {
+                let territoryindex = Math.floor(Math.random()*availableterritories.length);
+                games.get(roomid).mapstate[availableterritories[territoryindex]].player = remainingplayers[i];
+                games.get(roomid).mapstate[availableterritories[territoryindex]].troopcount = 5;
+                availableterritories.splice(territoryindex, 1)
+            }
 
-            self.emit("startAttackPhase", [roomid, "ok"])
+            games.get(roomid).phase = "attack";
+            self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+            self.emit("startAttackPhase", [roomid, "ok"]);
         }, deploytime);
     }
 
@@ -72,9 +87,53 @@ function game() {
                         games.get(roomid).mapstate[targetterritory[i]].troopcount = 5;
                     } else {
                         self.emit("gameError" + roomid, "cannot update");
+                        return;
                     }
                 }
             }
+            self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+        }
+    }
+
+    this.attackTerritory = function(roomid, playerid, start, target, trooppercent) {
+        if(games.get(roomid).phase === "attack") {
+            let starttroops = games.get(roomid).mapstate[start].troopcount;
+            let targettroops = games.get(roomid).mapstate[target].troopcount;
+
+            //anticheat
+            if(trooppercent > 100) {
+                trooppercent = 100;
+            } else if(trooppercent < 1) {
+                trooppercent = 1;
+            }
+
+            let moveAmount = Math.round(starttroops*trooppercent*0.01);
+            if(moveAmount < 1) {
+                if(starttroops >= 1) {
+                    moveAmount = 1;
+                } else {
+                    return;
+                }
+            }
+
+            //TODO - also check if move is valid through moves.json
+            if(games.get(roomid).mapstate[start].player === playerid) {
+                //"attacking" themselves? Add troops instead -- it's moving troops
+                if(games.get(roomid).mapstate[target].player === playerid) {
+                    games.get(roomid).mapstate[target].troopcount = targettroops + moveAmount;
+                    games.get(roomid).mapstate[start].troopcount = starttroops - moveAmount;
+                } else {
+                    games.get(roomid).mapstate[target].troopcount = targettroops - moveAmount;
+                    games.get(roomid).mapstate[start].troopcount = starttroops - moveAmount;
+
+                    //captured
+                    if(games.get(roomid).mapstate[target].troopcount < 0) {
+                        games.get(roomid).mapstate[target].player = playerid;
+                        games.get(roomid).mapstate[target].troopcount = Math.abs(targettroops - moveAmount);
+                    }
+                }
+            }
+
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
         }
     }
