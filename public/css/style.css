@@ -265,6 +265,7 @@ input { /*override default styles*/
     left: 50%;
     transform: translate(-50%, 0%);
     display: none;
+    transition: 0.3s;
 }
 
 .attack-line {

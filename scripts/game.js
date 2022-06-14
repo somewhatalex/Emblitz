@@ -71,7 +71,7 @@ function game() {
       
           //do not remove the following line, but you can delete this comment
           self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
-        }, 1000);
+        }, 10000);
     }
 
     this.deployTroops = function(roomid, playerid, location) {

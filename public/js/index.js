@@ -331,6 +331,19 @@ function confirmJoinGame() {
 function troopChangeAnimation(value, location) {
     let troopschangecounter = document.getElementById("t_troops_change_" + location);
     troopschangecounter.style.display = "block";
+    troopschangecounter.style.top = "-15px";
+    troopschangecounter.style.opacity = "0";
+    setTimeout(function() {
+        document.getElementById("t_troops_change_" + location).style.top = "-30px";
+        document.getElementById("t_troops_change_" + location).style.opacity = "1";
+        setTimeout(function() {
+            document.getElementById("t_troops_change_" + location).style.top = "-15px";
+            document.getElementById("t_troops_change_" + location).style.opacity = "0";
+            setTimeout(function() {
+                document.getElementById("t_troops_change_" + location).style.display = "none";
+            }, 200)
+        }, 1200);
+    }, 200);
     if(value > 0) {
         troopschangecounter.innerText = "+" + value;
         troopschangecounter.style.color = "#12c708";
@@ -338,9 +351,6 @@ function troopChangeAnimation(value, location) {
         troopschangecounter.innerText = value;
         troopschangecounter.style.color = "#d40d1a";
     }
-    setTimeout(function() {
-        document.getElementById("t_troops_change_" + location).style.display = "none";
-    }, 2000);
 }
 
 function initLB() {
