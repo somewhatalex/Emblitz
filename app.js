@@ -320,11 +320,12 @@ function sendRoomMsg(roomid, message) {
 }
 
 gameevents.on("updateMap", function(result) {
-    sendRoomMsg(result[0], {"updatemap": result[1]})
+    sendRoomMsg(result[0], {"updatemap": result[1]});
 });
 
 gameevents.on("startAttackPhase", function(result) {
-    sendRoomMsg(result[0], {"startAttackPhase": "ok"})
+    sendRoomMsg(result[0], {"startAttackPhase": "ok"});
+    game.addTroopsPassively(result[0])
 });
 
 //passively send messages to all users in room w/o request
