@@ -66,11 +66,11 @@ function game() {
 
     this.addTroopsPassively = function(roomid) {
         var attackInterval = setInterval(function() {
-          //your code here to add troops...
+            //your code here to add troops...
 
-      
-          //do not remove the following line, but you can delete this comment
-          self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+                
+            //do not remove the following line, but you can delete this comment
+            self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
         }, 10000);
     }
 
