@@ -58,6 +58,7 @@ function initializeMap() {
         let labelpos = getOffset(mapelements[i]);
         document.getElementById("mapl2").innerHTML += `
         <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
+            <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
             <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
             <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
         </DIV>`
@@ -119,6 +120,10 @@ function initializeMap() {
                             selectedRegion = "";
                             return;
                         }
+                    }
+
+                    if(territory.getAttribute("data-color") !== myColor) { //super scuffed, but it should work for basic client-side validation
+                        return;
                     }
 
                     possibleMoves = [];
@@ -262,7 +267,9 @@ function connect(div1, div2, color, thickness) {
 function attackTerritory(start, target) {
     console.log("[DEBUG] Attacking from " + start.getAttribute("data-code") + " to " + target.getAttribute("data-code"));
     let trooppercent = Math.round(document.getElementById("troopslider").value);
-    websocket.send(JSON.stringify({"action": "attack", "start": start.getAttribute("data-code"), "target": target.getAttribute("data-code"), "trooppercent": trooppercent, "uid": uid, "roomid": roomid,}));
+    if(start.getAttribute("data-color") === myColor) { //once again, it's super scuffed but it should do for basic client-side validation
+        websocket.send(JSON.stringify({"action": "attack", "start": start.getAttribute("data-code"), "target": target.getAttribute("data-code"), "trooppercent": trooppercent, "uid": uid, "roomid": roomid,}));
+    }
 }
 
 function deployTroops(target) {
@@ -321,6 +328,21 @@ function confirmJoinGame() {
     });
 }
 
+function troopChangeAnimation(value, location) {
+    let troopschangecounter = document.getElementById("t_troops_change_" + location);
+    troopschangecounter.style.display = "block";
+    if(value > 0) {
+        troopschangecounter.innerText = "+" + value;
+        troopschangecounter.style.color = "#12c708";
+    } else  {
+        troopschangecounter.innerText = value;
+        troopschangecounter.style.color = "#d40d1a";
+    }
+    setTimeout(function() {
+        document.getElementById("t_troops_change_" + location).style.display = "none";
+    }, 2000);
+}
+
 function initLB() {
     document.getElementById("players_container").innerHTML = "";
     for(let i=0; i<pnames.length; i++) {
@@ -355,7 +377,7 @@ function gameConnect(name, inputroomid, pcolor) {
                         document.getElementById("players_container").innerHTML = "";
                         for(let i=0; i<response.users.length; i++) {
                             document.getElementById("players_container").innerHTML += `
-                            <DIV CLASS="lb_player" ID="l-${response.users[i].id}">
+                            <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
                                 <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
                                 <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                             </DIV>`;
@@ -367,7 +389,7 @@ function gameConnect(name, inputroomid, pcolor) {
                         document.getElementById("lobbyptable").innerHTML = "";
                         for(let i=0; i<response.users.length; i++) {
                             document.getElementById("lobbyptable").innerHTML += `
-                            <DIV CLASS="glb_player" ID="l-${response.users[i].id}">
+                            <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
                                 <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
                                 <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                             </DIV>`;
@@ -407,6 +429,7 @@ function gameConnect(name, inputroomid, pcolor) {
                     for(let i=0; i<reslength; i++) {
                         let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
                         let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
+                        let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
                         document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
                         if(c_update_map_info.player != null) {
                             selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
@@ -414,6 +437,9 @@ function gameConnect(name, inputroomid, pcolor) {
                         } else {
                             selectterritory.setAttribute("data-color", "default");
                             selectterritory.setAttribute("fill", getColor(selectterritory, false));
+                        }
+                        if(c_update_map_info.troopcount - initialtroops != 0) {
+                            troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
                         }
                     }
                 } else if(response.setcolor) {

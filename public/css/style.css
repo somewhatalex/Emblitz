@@ -159,17 +159,31 @@ input { /*override default styles*/
     z-index: 69420;
     top: 20px;
     right: 0px;
-    background: var(--light);
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
     text-align: left;
     padding: 10px;
     width: 220px;
 }
 
+.leaderboard_bg {
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    height: 100%;
+    background: var(--dark);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    padding: 10px;
+    width: 220px;
+    opacity: 0.7;
+}
+
 .lb_header {
     font-size: 15px;
+    color: var(--light);
     font-weight: bold;
+    position: relative;
+    z-index: 6969;
+    margin-left: 10px;
 }
 
 .lb_player {
@@ -189,6 +203,8 @@ input { /*override default styles*/
     border-radius: 50%;
     border: 5px solid #fc0320;
     display: inline-block;
+    -webkit-box-shadow: 0px 0px 4px 2px #3B3B3B; 
+    box-shadow: 0px 0px 4px 2px #3B3B3B;
 }
 
 .lb_p_info {
@@ -204,6 +220,7 @@ input { /*override default styles*/
 .lb_p_name {
     font-size: 20px;
     font-weight: bold;
+    color: var(--light);
 }
 
 .territorylabel {
@@ -217,7 +234,7 @@ input { /*override default styles*/
     color: var(--light);
     font-weight: bold;
     font-size: 15px;
-    -webkit-text-shadow: 0px 0px 7px rgba(0,0,0,0.5); 
+    -webkit-text-shadow: 0px 0px 7px rgba(0,0,0,0.6); 
     text-shadow: 0px 0px 7px rgba(0,0,0,0.6);
 }
 
@@ -234,6 +251,20 @@ input { /*override default styles*/
     -webkit-box-shadow: 0px 0px 6px 4px rgba(0,0,0,0.5), inset 0px 0px 3px 3px rgba(0,0,0,0.3); 
     box-shadow: 0px 0px 6px 4px rgba(0,0,0,0.5), inset 0px 0px 3px 3px rgba(0,0,0,0.3);
     z-index: 2000;
+}
+
+.t_troop_change {
+    font-size: 25px;
+    font-weight: 900;
+    color: #12c708;
+    -webkit-text-shadow: 0px 0px 4px rgba(0,0,0,1); 
+    text-shadow: 0px 0px 4px rgba(0,0,0,1);
+    position: absolute;
+    margin: auto;
+    top: -30px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    display: none;
 }
 
 .attack-line {
@@ -361,6 +392,8 @@ input { /*override default styles*/
     border-radius: 50%;
     border: 5px solid #fc0320;
     display: inline-block;
+    -webkit-box-shadow: 0px 0px 4px 2px #3B3B3B; 
+    box-shadow: 0px 0px 4px 2px #3B3B3B;
 }
 
 .glb_p_info {
