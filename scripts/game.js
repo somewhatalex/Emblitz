@@ -67,8 +67,13 @@ function game() {
     this.addTroopsPassively = function(roomid) {
         var attackInterval = setInterval(function() {
             //your code here to add troops...
-
-                
+            let allterritories= Object.keys(games.get(roomid).mapstate);
+            allterritories_length = allterritories.length;
+            for(let i=0; i<allterritories_length; i++) {
+                if(games.get(roomid).mapstate[allterritories[i]].player != null){
+                    games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + 1;
+                }
+                }
             //do not remove the following line, but you can delete this comment
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
         }, 10000);
