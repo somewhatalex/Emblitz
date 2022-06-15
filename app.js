@@ -256,22 +256,23 @@ function joinroom() {
             }
         }
         
-        rooms.push({"id": id, "ingame": false, "map": roommap, "deploytime": deploytime, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime() / 1000), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
             console.log(result)
         });
         return id;
     } else {
         for(let i=0; i<rooms.length; i++) {
-            //remove rooms with 0 users -- futureproof, also see line 375
+            //remove rooms with 0 users that persist longer than 30 seconds -- futureproof, also see line 380ish
             if(rooms[i]["players"] < 1) {
-                game.removeGame(rooms[i].id);
-                rooms.splice(i, 1);
+                if((Math.floor(new Date().getTime() / 1000) - rooms[i]["created"]) > 30000) {
+                    game.removeGame(rooms[i].id);
+                    rooms.splice(i, 1);
+                }
             }
 
             //join room if available (and NOT in active game)
             if(rooms[i]["players"] < rooms[i]["maxplayers"] && rooms[i]["ingame"] == false) {
-                rooms[i]["players"]++;
                 return rooms[i]["id"];
             }
         }
@@ -289,7 +290,7 @@ function joinroom() {
             }
         }
 
-        rooms.push({"id": id, "ingame": false, "map": roommap, "maxplayers": maxplayers, "players": 1, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime() / 1000), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
             console.log(result)
         });
@@ -328,6 +329,17 @@ gameevents.on("startAttackPhase", function(result) {
     game.addTroopsPassively(result[0])
 });
 
+gameevents.on("startDeployPhase", function(result) {
+    sendRoomMsg(result[0], {"startgame": true});
+    let roomcount = rooms.length;
+    for(let i=0; i<rooms.length; i++) {
+        if(rooms[i].id === result[0]) {
+            rooms[i]["ingame"] = true;
+            break;
+        }
+    }
+});
+
 //passively send messages to all users in room w/o request
 //format: sendRoomMsg("room69", {"bobux": "momento"});
 
@@ -359,6 +371,19 @@ wss.on("connection", (ws) => {
             let room = escapeHTML(userinfo.roomid);
 
             //is room full? as a double check measure
+            //first add the player to the total room count though before checking
+            let totalroomcount = rooms.length;
+            for(let i=0; i<totalroomcount; i++) {
+                if(rooms[i].id === room) {
+                    if(rooms[i]["players"] == 1) {
+                        if(game.queryGameStatus(rooms[i]["id"]) === "lobby") {
+                            game.resumeLobbyTimer(rooms[i]["id"]);
+                        }
+                    }
+                    rooms[i]["players"]++;
+                    break;
+                }
+            }
             let roomplayercount = rooms.filter(function(item) {
                 return item.id === room;
             });
@@ -436,6 +461,10 @@ wss.on("connection", (ws) => {
                     if(!rooms[i]["playersconfirmed"].includes(JSON.parse(message).uid)) {
                         rooms[i]["playersconfirmed"].push(JSON.parse(message).uid);
                     }
+
+                    if(rooms[i]["playersconfirmed"].length == rooms[i]["players"] && rooms[i]["players"] > 1) {
+                        game.skipLobbyTimer(rooms[i].id);
+                    }
                     break;
                 }
             }
@@ -470,11 +499,6 @@ wss.on("connection", (ws) => {
                     sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
-                    //once all players have confirmed in lobby...
-                    if(rooms[i]["playersconfirmed"].length == rooms[i]["players"] && rooms[i]["players"] > 1) {
-                        rooms[i]["ingame"] = true;
-                        sendmsg({"startgame": true});
-                    }
                 }
             }
         });
@@ -487,9 +511,20 @@ wss.on("connection", (ws) => {
         for (var i=0; i < rooms.length; i++) {
             if (rooms[i].id === removeclient.room) {
                 rooms[i]["players"]--;
+                if(rooms[i]["players"] < 2) {
+                    if(game.queryGameStatus(rooms[i]["id"]) === "lobby") {
+                        game.pauseLobbyTimer(rooms[i]["id"]);
+                    }
+                }
                 if(rooms[i].ingame) {
                     rooms[i]["playersready"]--;
                 }
+
+                //pause lobby timer if is in lobby
+                if(game.queryGameStatus(removeclient.room) === "lobby" && rooms[i]["players"] == 1) {
+                    
+                }
+
                 //splice client id as well
                 if(rooms[i]["players"] < 1) {
                     game.removeGame(rooms[i].id);

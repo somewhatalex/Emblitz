@@ -440,6 +440,7 @@ function gameConnect(name, inputroomid, pcolor) {
                         let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
                         let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
                         let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
+                        let initialcolor = selectterritory.getAttribute("data-color");
                         document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
                         if(c_update_map_info.player != null) {
                             selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
@@ -448,8 +449,17 @@ function gameConnect(name, inputroomid, pcolor) {
                             selectterritory.setAttribute("data-color", "default");
                             selectterritory.setAttribute("fill", getColor(selectterritory, false));
                         }
-                        if(c_update_map_info.troopcount - initialtroops != 0) {
-                            troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
+
+                        if(attackPhase === "attack") {
+                            if(initialcolor === selectterritory.getAttribute("data-color")) {
+                                if(c_update_map_info.troopcount - initialtroops != 0) {
+                                    troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
+                                }
+                            } else {
+                                troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
+                            }
+                        } else if(attackPhase === "deploy" && c_update_map_info.troopcount - initialtroops != 0 && selectterritory.getAttribute("data-color") !== "default") {
+                            troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                         }
                     }
                 } else if(response.setcolor) {

@@ -2,6 +2,10 @@ const emitter = require("events").EventEmitter;
 const fs = require("fs");
 const self = new emitter();
 const games = new Map();
+var attackIntervals = {};
+var gameLobbyTimers = {};
+var gameLobbyTimerHandlers = {};
+var gameDeployTimers = {}
 
 function game() {
     this.newGame = function(roomid, roommap, deploytime) {
@@ -14,67 +18,120 @@ function game() {
                 for(let [key, value] of Object.entries(mapdict)) {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "deploy"});
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000});
                 resolve(games.get(roomid));
             });
         });
     }
 
+    this.queryGameStatus = function(roomid) {
+        return games.get(roomid).phase;
+    }
+
+    //lobby timer controls
+    this.pauseLobbyTimer = function(roomid) {
+        console.log("paused")
+        gameLobbyTimerHandlers[roomid].pause();
+    }
+
+    this.resumeLobbyTimer = function(roomid) {
+        gameLobbyTimerHandlers[roomid].resume();
+    }
+
+    this.skipLobbyTimer = function(roomid) {
+        clearTimeout(gameLobbyTimers[roomid]);
+        delete gameLobbyTimers[roomid];
+        startDeployPhase(roomid, games.get(roomid).deploytime);
+    }
+
+    function Timer(id, callback, delay) {
+        let args = arguments,
+            self = this, start;
+    
+        this.clear = function(id) {
+            clearTimeout(gameLobbyTimers[id]);
+        };
+    
+        this.pause = function(id) {
+            console.log("pausing")
+            this.clear();
+            delay -= new Date() - start;
+        };
+    
+        this.resume = function(id) {
+            start = new Date();
+            gameLobbyTimers[id] = setTimeout(function() {
+                callback.apply(self, Array.prototype.slice.call(args, 2, args.length));
+            }, delay);
+        };
+    
+        this.resume();
+    }
+
     function gameTimingEvents(roomid, deploytime) {
         //-- ADD LOBBY CODE/LOGIC/TIMING HERE
-
         deploytime = deploytime*1000; //convert to seconds
-        setTimeout(function() {
-            let targetterritory = Object.keys(games.get(roomid).mapstate);
-            let targetlength = targetterritory.length;
-            let playersdeployed = [];
-            for(let i=0; i<targetlength; i++) {
-                if(games.get(roomid).mapstate[targetterritory[i]].player != null) {
-                    playersdeployed.push(games.get(roomid).mapstate[targetterritory[i]].player);
-                }
-            }
+        
+        //set lobby timer (when lobby wait is done, start deploy phase)
+        gameLobbyTimerHandlers[roomid] = Timer(roomid, startDeployPhase, 20000, roomid, deploytime);
+    }
 
-            let playercount = games.get(roomid).playerstate.length;
-            let totalplayerids = [];
-            for(let i=0; i<playercount; i++) {
-                totalplayerids.push(games.get(roomid).playerstate[i].id);
-            }
-            
-            //get players who haven't deployed yet
-            let remainingplayers = totalplayerids.filter(x => !playersdeployed.includes(x));
+    function startDeployPhase(roomid, deploytime) {
+        delete gameLobbyTimers[roomid]
+        games.get(roomid).phase = "deploy";
+        self.emit("startDeployPhase", [roomid, "ok"]);
+        gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
+    }
 
-            //then assign them a random unclaimed territory
-            let availableterritories = [];
-            for(let i=0; i<targetlength; i++) {
-                if(games.get(roomid).mapstate[targetterritory[i]].player == null) {
-                    availableterritories.push(targetterritory[i]);
-                }
+    function endDeployPhase(roomid) {
+        let targetterritory = Object.keys(games.get(roomid).mapstate);
+        let targetlength = targetterritory.length;
+        let playersdeployed = [];
+        for(let i=0; i<targetlength; i++) {
+            if(games.get(roomid).mapstate[targetterritory[i]].player != null) {
+                playersdeployed.push(games.get(roomid).mapstate[targetterritory[i]].player);
             }
-            
-            for(let i=0; i<remainingplayers.length; i++) {
-                let territoryindex = Math.floor(Math.random()*availableterritories.length);
-                games.get(roomid).mapstate[availableterritories[territoryindex]].player = remainingplayers[i];
-                games.get(roomid).mapstate[availableterritories[territoryindex]].troopcount = 5;
-                availableterritories.splice(territoryindex, 1)
-            }
+        }
 
-            games.get(roomid).phase = "attack";
-            self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
-            self.emit("startAttackPhase", [roomid, "ok"]);
-        }, deploytime);
+        let playercount = games.get(roomid).playerstate.length;
+        let totalplayerids = [];
+        for(let i=0; i<playercount; i++) {
+            totalplayerids.push(games.get(roomid).playerstate[i].id);
+        }
+        
+        //get players who haven't deployed yet
+        let remainingplayers = totalplayerids.filter(x => !playersdeployed.includes(x));
+
+        //then assign them a random unclaimed territory
+        let availableterritories = [];
+        for(let i=0; i<targetlength; i++) {
+            if(games.get(roomid).mapstate[targetterritory[i]].player == null) {
+                availableterritories.push(targetterritory[i]);
+            }
+        }
+        
+        for(let i=0; i<remainingplayers.length; i++) {
+            let territoryindex = Math.floor(Math.random()*availableterritories.length);
+            games.get(roomid).mapstate[availableterritories[territoryindex]].player = remainingplayers[i];
+            games.get(roomid).mapstate[availableterritories[territoryindex]].troopcount = 10;
+            availableterritories.splice(territoryindex, 1)
+        }
+
+        games.get(roomid).phase = "attack";
+        self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+        self.emit("startAttackPhase", [roomid, "ok"]);
+        delete gameDeployTimers[roomid];
     }
 
     this.addTroopsPassively = function(roomid) {
-        var attackInterval = setInterval(function() {
-            //your code here to add troops...
+        attackIntervals[roomid] = setInterval(function() {
             let allterritories= Object.keys(games.get(roomid).mapstate);
             allterritories_length = allterritories.length;
             for(let i=0; i<allterritories_length; i++) {
                 if(games.get(roomid).mapstate[allterritories[i]].player != null){
                     games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + 1;
                 }
-                }
-            //do not remove the following line, but you can delete this comment
+            }
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
         }, 10000);
     }
@@ -99,7 +156,7 @@ function game() {
                     //only assign if not taken
                     if(queryterritory.player == null) {
                         games.get(roomid).mapstate[targetterritory[i]].player = playerid;
-                        games.get(roomid).mapstate[targetterritory[i]].troopcount = 5;
+                        games.get(roomid).mapstate[targetterritory[i]].troopcount = 10;
                     } else {
                         self.emit("gameError" + roomid, "cannot update");
                         return;
@@ -138,13 +195,23 @@ function game() {
                     games.get(roomid).mapstate[target].troopcount = targettroops + moveAmount;
                     games.get(roomid).mapstate[start].troopcount = starttroops - moveAmount;
                 } else {
-                    games.get(roomid).mapstate[target].troopcount = targettroops - moveAmount;
+                    //attacking enemy
+
+                    //boost enemy troop strength temporarily by 1.2 for defense
+                    let targetProxyTroops = targettroops*1.2;
+                    targetProxyTroops = targetProxyTroops - moveAmount;
+                    targetProxyTroops = Math.ceil(targetProxyTroops);
+                    if(targetProxyTroops > targettroops) {
+                        targetProxyTroops = targettroops;
+                    }
+
+                    games.get(roomid).mapstate[target].troopcount = targetProxyTroops;
                     games.get(roomid).mapstate[start].troopcount = starttroops - moveAmount;
 
                     //captured
                     if(games.get(roomid).mapstate[target].troopcount < 0) {
                         games.get(roomid).mapstate[target].player = playerid;
-                        games.get(roomid).mapstate[target].troopcount = Math.abs(targettroops - moveAmount);
+                        games.get(roomid).mapstate[target].troopcount = Math.abs(targetProxyTroops);
                     }
                 }
             }
@@ -154,6 +221,13 @@ function game() {
     }
 
     this.removeGame = function(roomid) {
+        clearInterval(attackIntervals[roomid]);
+        clearTimeout(gameDeployTimers[roomid]);
+        clearTimeout(gameLobbyTimers[roomid]);
+
+        delete attackIntervals[roomid];
+        delete gameDeployTimers[roomid];
+        delete gameLobbyTimers[roomid];
         games.delete(roomid);
     }
     
@@ -163,6 +237,14 @@ function game() {
             games.get(roomid).playerstate = games.get(roomid).playerstate.filter(function(item) {
                 return item.id !== id;
             });
+
+            let allterritories= Object.keys(games.get(roomid).mapstate);
+            allterritories_length = allterritories.length;
+            for(let i=0; i<allterritories_length; i++) {
+                if(games.get(roomid).mapstate[allterritories[i]].player === id){
+                    games.get(roomid).mapstate[allterritories[i]].player = null;
+                }
+            }
         } catch {};
         self.emit("removePlayer" + roomid, id);
     }
