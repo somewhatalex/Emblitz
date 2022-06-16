@@ -63,7 +63,11 @@
                         <INPUT TYPE="range" MIN="1" MAX="100" VALUE="75" CLASS="troopslider" ID="troopslider">
                     </DIV>
                 </DIV>
-                <DIV CLASS="playermessage">Select a starting point</DIV>
+                <DIV CLASS="infobar-main" ID="infobar">
+                    <DIV CLASS="infobar-bg"></DIV>
+                    <DIV CLASS="ibmain-text" ID="statustext"><B>Deploy Phase:</B> Select a starting point</DIV>
+                    <DIV CLASS="timer-bg"><DIV CLASS="timer-line" ID="eventstimer"></DIV></DIV>
+                </DIV>
             </DIV>
             <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">
                 <DIV ID="map" STYLE="transform: translate(0px, 0px);"><DIV ID="svg-map-bg" class="svg-map-bg"><DIV ID="mapl2"></DIV><DIV ID="maploading">Loading...</DIV></DIV></DIV>

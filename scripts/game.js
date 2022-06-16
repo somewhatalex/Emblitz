@@ -46,26 +46,21 @@ function game() {
     function Timer(id, callback, delay) {
         let args = arguments, self = this;
         let start = Math.floor(new Date().getTime());
-        console.log(start)
     
         this.clear = function(id) {
             clearTimeout(gameLobbyTimers[id]);
         };
     
         this.pause = function(id) {
-            console.log("--paused")
             clearTimeout(gameLobbyTimers[id]);
             delay = delay - (Math.floor(new Date().getTime()) - start);
-            console.log(delay)
         };
     
         this.resume = function(id) {
-            console.log("--resumed")
             start = Math.floor(new Date().getTime());
             gameLobbyTimers[id] = setTimeout(function() {
                 callback.apply(self, Array.prototype.slice.call(args, 3, args.length));
             }, delay);
-            console.log(delay)
         };
     
         this.pause(gameLobbyTimers[id]);
@@ -87,7 +82,7 @@ function game() {
             }
 
             games.get(roomid).phase = "deploy";
-            self.emit("startDeployPhase", [roomid, "ok"]);
+            self.emit("startDeployPhase", [roomid, deploytime, "ok"]);
             gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
         };
     }
@@ -209,7 +204,7 @@ function game() {
                     //boost enemy troop strength temporarily by 1.2 for defense
                     let targetProxyTroops = targettroops*1.2;
                     targetProxyTroops = targetProxyTroops - moveAmount;
-                    targetProxyTroops = Math.ceil(targetProxyTroops);
+                    targetProxyTroops = Math.round(targetProxyTroops);
                     if(targetProxyTroops > targettroops) {
                         targetProxyTroops = targettroops;
                     }
@@ -260,7 +255,7 @@ function game() {
 
     this.addPlayer = function(roomid, id) {
         return new Promise(function(resolve, reject) {
-            games.get(roomid).playerstate.push({"id": id, "reservecount": 5});
+            games.get(roomid).playerstate.push({"id": id});
             resolve("ok");
         });
     }

@@ -364,6 +364,15 @@ function initLB() {
     }
 }
 
+function infobar(display) {
+    if(display === "hide") {
+        document.getElementById("infobar").style.top = "-70px";
+    } else {
+        document.getElementById("infobar").style.display = "block";
+        document.getElementById("infobar").style.top = "20px";
+    }
+}
+
 function gameConnect(name, inputroomid, pcolor) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
@@ -426,6 +435,15 @@ function gameConnect(name, inputroomid, pcolor) {
                         inGame = true;
                         initLB();
                         ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid}));
+
+                        infobar("show");
+                        let deploytime = response.deploytime;
+                        document.getElementById("eventstimer").style.width = "0%";
+                        document.getElementById("eventstimer").style.transitionDuration = deploytime + "s";
+                        document.getElementById("eventstimer").style.width = "100%";
+                        setTimeout(function() {
+                            infobar("hide");
+                        }, deploytime*1000);
                     });
                 } else if(response.confirmedusers) {
                     for(let i=0; i<response.confirmedusers.length; i++) {
@@ -466,6 +484,19 @@ function gameConnect(name, inputroomid, pcolor) {
                     myColor = response.setcolor;
                 } else if(response.startAttackPhase) {
                     attackPhase = "attack";
+                    
+                    setTimeout(function() {
+                        document.getElementById("eventstimer").style.display = "none";
+                        document.getElementById("eventstimer").style.width = "0%";
+                        infobar("show");
+                        document.getElementById("statustext").innerHTML = "<B>Attack Phase Started:</B> Select one of your own territories to move troops or attack!";
+                        setTimeout(function() {
+                            infobar("hide");
+                            setTimeout(function() {
+                                document.getElementById("infobar").style.display = "none";
+                            }, 400);
+                        }, 6000)
+                    }, 1000);
                 }
             }
         });

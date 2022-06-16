@@ -330,7 +330,7 @@ gameevents.on("startAttackPhase", function(result) {
 });
 
 gameevents.on("startDeployPhase", function(result) {
-    sendRoomMsg(result[0], {"startgame": true});
+    sendRoomMsg(result[0], {"startgame": true, "deploytime": result[1]/1000});
     let roomcount = rooms.length;
     for(let i=0; i<rooms.length; i++) {
         if(rooms[i].id === result[0]) {
