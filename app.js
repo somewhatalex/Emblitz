@@ -256,16 +256,16 @@ function joinroom() {
             }
         }
         
-        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime() / 1000), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
-            console.log(result)
+            //console.log(result)
         });
         return id;
     } else {
         for(let i=0; i<rooms.length; i++) {
             //remove rooms with 0 users that persist longer than 30 seconds -- futureproof, also see line 380ish
             if(rooms[i]["players"] < 1) {
-                if((Math.floor(new Date().getTime() / 1000) - rooms[i]["created"]) > 30000) {
+                if((Math.floor(new Date().getTime()) - rooms[i]["created"]) > 30000) {
                     game.removeGame(rooms[i].id);
                     rooms.splice(i, 1);
                 }
@@ -290,9 +290,9 @@ function joinroom() {
             }
         }
 
-        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime() / 1000), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
-            console.log(result)
+            //console.log(result)
         });
         return id;
     }
@@ -375,12 +375,12 @@ wss.on("connection", (ws) => {
             let totalroomcount = rooms.length;
             for(let i=0; i<totalroomcount; i++) {
                 if(rooms[i].id === room) {
-                    if(rooms[i]["players"] == 1) {
+                    rooms[i]["players"]++;
+                    if(rooms[i]["players"] > 1) {
                         if(game.queryGameStatus(rooms[i]["id"]) === "lobby") {
                             game.resumeLobbyTimer(rooms[i]["id"]);
                         }
                     }
-                    rooms[i]["players"]++;
                     break;
                 }
             }
@@ -439,7 +439,7 @@ wss.on("connection", (ws) => {
                 if (rooms[i].id === tclient.room) {
                     rooms[i]["playerslist"].push({"id": uid, "name": pname, "pcolor": pcolor});
                     game.addPlayer(tclient.room, uid).then(function(result) {
-                        console.log(result);
+                        //console.log(result);
                     })
                     break;
                 }
@@ -518,11 +518,6 @@ wss.on("connection", (ws) => {
                 }
                 if(rooms[i].ingame) {
                     rooms[i]["playersready"]--;
-                }
-
-                //pause lobby timer if is in lobby
-                if(game.queryGameStatus(removeclient.room) === "lobby" && rooms[i]["players"] == 1) {
-                    
                 }
 
                 //splice client id as well

@@ -9,8 +9,8 @@ var gameDeployTimers = {}
 
 function game() {
     this.newGame = function(roomid, roommap, deploytime) {
-        gameTimingEvents(roomid, deploytime);
         return new Promise(function(resolve, reject) {
+            gameTimingEvents(roomid, deploytime);
             fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapterritorynames) {
                 let mapdict = JSON.parse(mapterritorynames);
                 let mapstate = {};
@@ -19,7 +19,7 @@ function game() {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
                 games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000});
-                resolve(games.get(roomid));
+                resolve("ok");
             });
         });
     }
@@ -30,12 +30,11 @@ function game() {
 
     //lobby timer controls
     this.pauseLobbyTimer = function(roomid) {
-        console.log("paused")
-        gameLobbyTimerHandlers[roomid].pause();
+        gameLobbyTimerHandlers[roomid].pause(gameLobbyTimers[roomid]);
     }
 
     this.resumeLobbyTimer = function(roomid) {
-        gameLobbyTimerHandlers[roomid].resume();
+        gameLobbyTimerHandlers[roomid].resume(gameLobbyTimers[roomid]);
     }
 
     this.skipLobbyTimer = function(roomid) {
@@ -45,27 +44,31 @@ function game() {
     }
 
     function Timer(id, callback, delay) {
-        let args = arguments,
-            self = this, start;
+        let args = arguments, self = this;
+        let start = Math.floor(new Date().getTime());
+        console.log(start)
     
         this.clear = function(id) {
             clearTimeout(gameLobbyTimers[id]);
         };
     
         this.pause = function(id) {
-            console.log("pausing")
-            this.clear();
-            delay -= new Date() - start;
+            console.log("--paused")
+            clearTimeout(gameLobbyTimers[id]);
+            delay = delay - (Math.floor(new Date().getTime()) - start);
+            console.log(delay)
         };
     
         this.resume = function(id) {
-            start = new Date();
+            console.log("--resumed")
+            start = Math.floor(new Date().getTime());
             gameLobbyTimers[id] = setTimeout(function() {
-                callback.apply(self, Array.prototype.slice.call(args, 2, args.length));
+                callback.apply(self, Array.prototype.slice.call(args, 3, args.length));
             }, delay);
+            console.log(delay)
         };
     
-        this.resume();
+        this.pause(gameLobbyTimers[id]);
     }
 
     function gameTimingEvents(roomid, deploytime) {
@@ -73,14 +76,20 @@ function game() {
         deploytime = deploytime*1000; //convert to seconds
         
         //set lobby timer (when lobby wait is done, start deploy phase)
-        gameLobbyTimerHandlers[roomid] = Timer(roomid, startDeployPhase, 20000, roomid, deploytime);
+        gameLobbyTimerHandlers[roomid] = new Timer(roomid, startDeployPhase, 20000, roomid, deploytime);
     }
 
     function startDeployPhase(roomid, deploytime) {
-        delete gameLobbyTimers[roomid]
-        games.get(roomid).phase = "deploy";
-        self.emit("startDeployPhase", [roomid, "ok"]);
-        gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
+        if(games.get(roomid).phase === "lobby") {
+            if(gameLobbyTimers[roomid]) {
+                clearTimeout(gameLobbyTimers[roomid]);
+                delete gameLobbyTimers[roomid];
+            }
+
+            games.get(roomid).phase = "deploy";
+            self.emit("startDeployPhase", [roomid, "ok"]);
+            gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
+        };
     }
 
     function endDeployPhase(roomid) {
@@ -252,7 +261,7 @@ function game() {
     this.addPlayer = function(roomid, id) {
         return new Promise(function(resolve, reject) {
             games.get(roomid).playerstate.push({"id": id, "reservecount": 5});
-            resolve(games);
+            resolve("ok");
         });
     }
 }
