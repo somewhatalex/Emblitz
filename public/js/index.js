@@ -66,7 +66,7 @@ function initializeMap() {
         //show outline
         mapelements[i].addEventListener("mouseover", function(d) {
             let countryCode = mapelements[i].getAttribute("data-code");
-            console.log(countryCode);
+            //console.log(countryCode);
             mapelements[i].setAttribute("fill", getColor(mapelements[i], true));
             let area = d.currentTarget;
             if(selectedRegion != area) {
@@ -268,7 +268,7 @@ function attackTerritory(start, target) {
     console.log("[DEBUG] Attacking from " + start.getAttribute("data-code") + " to " + target.getAttribute("data-code"));
     let trooppercent = Math.round(document.getElementById("troopslider").value);
     if(start.getAttribute("data-color") === myColor) { //once again, it's super scuffed but it should do for basic client-side validation
-        websocket.send(JSON.stringify({"action": "attack", "start": start.getAttribute("data-code"), "target": target.getAttribute("data-code"), "trooppercent": trooppercent, "uid": uid, "roomid": roomid,}));
+        websocket.send(JSON.stringify({"action": "attack", "start": start.getAttribute("data-code"), "target": target.getAttribute("data-code"), "trooppercent": trooppercent, "uid": uid, "roomid": roomid, "gid": gid}));
     }
 }
 
@@ -277,7 +277,7 @@ function deployTroops(target) {
     if(target.getAttribute("data-color") === "default") {
         target.setAttribute("data-color", myColor);
         target.setAttribute("fill", getColor(target, false));
-        websocket.send(JSON.stringify({"action": "deploy", "target": target.getAttribute("data-code"), "uid": uid, "roomid": roomid,}));
+        websocket.send(JSON.stringify({"action": "deploy", "target": target.getAttribute("data-code"), "uid": uid, "roomid": roomid, "gid": gid}));
     }
 }
 
@@ -373,6 +373,13 @@ function infobar(display) {
     }
 }
 
+function getCookie(name) {
+    var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    if (match) return match[2];
+}
+
+const gid = getCookie("GID");
+
 function gameConnect(name, inputroomid, pcolor) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
@@ -380,9 +387,9 @@ function gameConnect(name, inputroomid, pcolor) {
     joinGame(inputroomid).then(function() {
         connectToServer().then(function(ws) {
             websocket = ws
-            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "pcolor": pcolor}));
+            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "pcolor": pcolor, "gid": gid}));
             confirmJoinGame().then(function() {
-                ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid}));
+                ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
             });
 
             ws.onmessage = (message) => {
@@ -434,7 +441,7 @@ function gameConnect(name, inputroomid, pcolor) {
                     downloadMap().then(function() {
                         inGame = true;
                         initLB();
-                        ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid}));
+                        ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid, "gid": gid}));
 
                         infobar("show");
                         let deploytime = response.deploytime;
@@ -497,6 +504,15 @@ function gameConnect(name, inputroomid, pcolor) {
                             }, 400);
                         }, 6000)
                     }, 1000);
+                } else if(response.error) {
+                    if(response.error === "invalid credentials") {
+                        ws.close();
+                        document.getElementById("infobar").style.display = "block";
+                        document.getElementById("eventstimer").style.display = "none";
+                        document.getElementById("eventstimer").style.width = "0%";
+                        infobar("show");
+                        document.getElementById("statustext").innerHTML = "<B>An error occured:</B> Invalid credentials. Please reload the page and join a new game. If this problem persists, contact us.";
+                    }
                 }
             }
         });

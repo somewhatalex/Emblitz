@@ -132,8 +132,12 @@ function game() {
             let allterritories= Object.keys(games.get(roomid).mapstate);
             allterritories_length = allterritories.length;
             for(let i=0; i<allterritories_length; i++) {
-                if(games.get(roomid).mapstate[allterritories[i]].player != null){
-                    games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * 0.1) + 1;
+                if(games.get(roomid).mapstate[allterritories[i]].player != null) {
+                    let troopaddamount = Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * 0.1) + 1;
+                    if(troopaddamount > 5) {
+                        troopaddamount = 5;
+                    }
+                    games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + troopaddamount;
                 }
             }
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);

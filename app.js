@@ -91,6 +91,16 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
     let gettoken = req.cookies.auth;
 
+    //for now, create a new game id (GID) every time a page loads for security
+    //this way, leaking the game id won't compromise a player's "account"
+    //replacement for user registration FOR NOW
+    let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
+    let id = "";
+    for(let i=0; i<30; i++) {
+        id += chars.charAt(randomnumber(0, chars.length));
+    }
+    res.cookie("GID", id);
+
     //-- USER AUTH (work in progress) --
     //does user have a token?
 
@@ -120,7 +130,7 @@ app.get("/", (req, res) => {
                 res.cookie("auth", token);
             } else {
                 //do something with a valid token
-                console.log(decoded);
+                //console.log(decoded);
             }
         });
     }
@@ -365,10 +375,20 @@ wss.on("connection", (ws) => {
         //RESPONDS TO A SINGULAR PLAYER REQUEST
         let message = response.toString();
         let action = JSON.parse(message).action;
+
+        //auth
+        if(action !== "userlogin") {
+            if(clients.get(ws).gid !== JSON.parse(message).gid || clients.get(ws).uid !== JSON.parse(message).uid) {
+                ws.send(JSON.stringify({"error": "invalid credentials"}));
+                return;
+            }
+        }
+
         if(action === "userlogin") {
             let userinfo = JSON.parse(message);
             let uid = escapeHTML(userinfo.uid);
             let room = escapeHTML(userinfo.roomid);
+            let gid = userinfo.gid;
 
             //is room full? as a double check measure
             //first add the player to the total room count though before checking
@@ -428,7 +448,7 @@ wss.on("connection", (ws) => {
                 }
             }
             
-            var metadata = {uid, room, pname, pcolor};
+            var metadata = {uid, room, pname, pcolor, gid};
             clients.set(ws, metadata);
 
             ws.send(JSON.stringify({"setcolor": pcolor}));

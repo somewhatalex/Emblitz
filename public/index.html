@@ -13,27 +13,33 @@
         <SCRIPT TYPE="text/javascript" SRC="./js/mapnames.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/index.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/mapper.js"></SCRIPT>
+
+        <TITLE>Emblitz</TITLE>
     </HEAD>
     <BODY>
         <DIV CLASS="lobbyscreen" ID="lobbyscreen">
-            <DIV CLASS="header">Emblitz</DIV>
-            <DIV CLASS="join_input">
-                <INPUT ID="p_name" CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Name here...">
-                <DIV CLASS="h_button_options">
-                    <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value)">Play</BUTTON>
-                    <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
-                    <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;"><INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value)">Connect</BUTTON></DIV>
-                    <BR><BR>
-                    <!-- REMOVE THIS WHEN DONE, MAKE BETTER LOOKING COLOR SELECT MENU -->
-                    (color preference select; this is only for testing and is temporary)<BR>
-                    <SELECT ID="framecolor" STYLE="padding: 5px; font-size: 17px">
-                        <OPTION VALUE="red">red</OPTION>
-                        <OPTION VALUE="orange">orange</OPTION>
-                        <OPTION VALUE="yellow">yellow</OPTION>
-                        <OPTION VALUE="green">green</OPTION>
-                        <OPTION VALUE="blue">blue</OPTION>
-                        <OPTION VALUE="purple">purple</OPTION>
-                    </SELECT>
+            <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
+            <DIV CLASS="homemenu">
+                <DIV CLASS="homemenu-bg"></DIV>
+                <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
+                <DIV CLASS="join_input">
+                    <INPUT ID="p_name" CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Name here...">
+                    <DIV CLASS="h_button_options">
+                        <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value)">Play</BUTTON>
+                        <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
+                        <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;"><INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value)">Connect</BUTTON></DIV>
+                        <BR><BR>
+                        <!-- REMOVE THIS WHEN DONE, MAKE BETTER LOOKING COLOR SELECT MENU -->
+                        (color preference select; this is only for testing and is temporary)<BR>
+                        <SELECT ID="framecolor" STYLE="padding: 5px; font-size: 17px">
+                            <OPTION VALUE="red">red</OPTION>
+                            <OPTION VALUE="orange">orange</OPTION>
+                            <OPTION VALUE="yellow">yellow</OPTION>
+                            <OPTION VALUE="green">green</OPTION>
+                            <OPTION VALUE="blue">blue</OPTION>
+                            <OPTION VALUE="purple">purple</OPTION>
+                        </SELECT>
+                    </DIV>
                 </DIV>
             </DIV>
         </DIV>

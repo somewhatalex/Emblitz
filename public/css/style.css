@@ -491,3 +491,69 @@ input { /*override default styles*/
         left: 100%;
     }
 }
+
+.homemenu {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 500px;
+    text-align: center;
+    color: var(--light);
+}
+
+.mainlogoimg {
+    width: 400px;
+    padding: 10px;
+}
+
+.homemenu-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.9;
+    width: 100%;
+    background: var(--night);
+    z-index: -1;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.homebackgroundcontainer {
+    position: absolute;
+    z-index: -2;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #268cbb;
+}
+
+.homebackground {
+    position: absolute;
+    z-index: -2;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 250%;
+    height: 250%;
+    background-image: url(../images/background1.JPG);
+    background-position: left;
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(5px);
+    animation: moveX 50s 0s ease-in-out infinite alternate, moveY 30s 0s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+
+@keyframes moveX {
+  from { left: 0%; } to { left: -150%; }
+}
+@keyframes moveY {
+  from { top: 0%; } to { top: -150%; }
+}
