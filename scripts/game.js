@@ -246,12 +246,15 @@ function game() {
                 return item.id !== id;
             });
 
-            let allterritories= Object.keys(games.get(roomid).mapstate);
-            allterritories_length = allterritories.length;
-            for(let i=0; i<allterritories_length; i++) {
-                if(games.get(roomid).mapstate[allterritories[i]].player === id){
-                    games.get(roomid).mapstate[allterritories[i]].player = null;
+            if(games.get(roomid).phase !== "lobby") {
+                let allterritories = Object.keys(games.get(roomid).mapstate);
+                allterritories_length = allterritories.length;
+                for(let i=0; i<allterritories_length; i++) {
+                    if(games.get(roomid).mapstate[allterritories[i]].player === id){
+                        games.get(roomid).mapstate[allterritories[i]].player = null;
+                    }
                 }
+                self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
             }
         } catch {};
         self.emit("removePlayer" + roomid, id);
