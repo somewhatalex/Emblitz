@@ -166,10 +166,14 @@ app.post("/api", (req, res) => {
     try {
         if(req.body.action === "getmap") {
             var roommap = getroommap(req.body.roomid);
-            fs.readFile("./mapdata/" + roommap + "/miniworld.txt", "utf8", function(err, data) {
+            fs.readFile("./mapdata/" + roommap + "/" + roommap + ".txt", "utf8", function(err, data) {
                 fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapdict) {
                     fs.readFile("./mapdata/" + roommap + "/moves.json", "utf8", function(err, moves) {
-                        res.json({"mapdata": data, "mapdict": mapdict, "moves": moves});
+                        fs.readFile("./mapdata/" + roommap + "/coordadjust.json", "utf8", function(err, coordadjust) {
+                            fs.readFile("./mapdata/" + roommap + "/metadata.json", "utf8", function(err, metadata) {
+                                res.json({"mapdata": data, "mapdict": mapdict, "moves": moves, "coordadjust": coordadjust, "metadata": metadata});
+                            });
+                        });
                     });
                 });
             });
@@ -348,6 +352,10 @@ gameevents.on("startDeployPhase", function(result) {
             break;
         }
     }
+});
+
+gameevents.on("syncTroopTimer", function(result) {
+    sendRoomMsg(result[0], {"syncTroopTimer": result[1]});
 });
 
 //passively send messages to all users in room w/o request

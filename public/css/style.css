@@ -93,6 +93,11 @@ input { /*override default styles*/
     margin: 0;
     width: 900px;
     height: 0px;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
 }
 
 .gamescreen {
@@ -298,21 +303,37 @@ input { /*override default styles*/
     position: fixed;
     z-index: 69420;
     bottom: 20px;
-    height: 70px;
-    background: var(--light);
+    height: 75px;
+    background: none;
     width: 500px;
     left: 50%;
     transform: translateX(-50%);
+    border-radius: 10px;
+}
+
+.troopscontrolbg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.8;
+    width: 100%;
+    background: var(--dark);
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: -1;
 }
 
 .t_avatar-frame {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 5px solid #fc0320;
+    border: 5px solid var(--medium);
+    background: var(--light);
     display: inline-block;
     margin-top: -10px;
     margin-left: -40px;
+    -webkit-box-shadow: 0px 0px 4px 2px #3b3b3b;
+    box-shadow: 0px 0px 4px 2px #3b3b3b;
 }
 
 .t_p_info {
@@ -333,10 +354,10 @@ input { /*override default styles*/
 }
 
 .troopslider {
-    width: 300px;
-    background: var(--medium) !important;
+    width: 350px;
+    background: linear-gradient(to right, var(--green) 0%, var(--green) 75%, var(--medium) 75%, var(--medium) 100%);
     height: 25px;
-    accent-color: var(--green)
+    z-index: 100;
 }
 
 .troopslider::-webkit-slider-thumb {
@@ -346,6 +367,8 @@ input { /*override default styles*/
     background-color: var(--green);
     overflow: visible;
     cursor: pointer;
+    -webkit-box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.75); 
+    box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.75);
 }
   
 .troopslider::-moz-range-thumb { 
@@ -355,6 +378,21 @@ input { /*override default styles*/
     background-color: var(--green);
     overflow: visible;
     cursor: pointer;
+}
+
+.controlitem {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 3px;
+    border-radius: 5px;
+    font-size: 15px;
+    color: var(--night);
+    background: var(--light-darker);
+    font-weight: bold;
+    margin-left: 2px;
+    text-align: center;
+    min-width: 55px;
+    margin-right: 3px;
 }
 
 .globby_container {
@@ -550,10 +588,48 @@ input { /*override default styles*/
     will-change: transform;
 }
 
-
 @keyframes moveX {
   from { left: 0%; } to { left: -150%; }
 }
 @keyframes moveY {
   from { top: 0%; } to { top: -150%; }
+}
+
+.troopcounterinfo {
+    position: fixed;
+    z-index: 69420;
+    top: 20px;
+    font-size: 21px;
+    color: var(--light);
+    left: 0;
+    overflow: hidden;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 190px;
+}
+
+.troopcounter-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.7;
+    width: 100%;
+    background: var(--dark);
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: -1;
+}
+
+.troopcounterimage {
+    height: 55px;
+    width: 55px;
+    margin: 5px;
+}
+
+.troopcountertext {
+    font-size: 21px;
+    vertical-align: middle;
+    display: inline-block;
+    position: relative;
+    margin-top: -50px;
 }

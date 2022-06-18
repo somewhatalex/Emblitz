@@ -141,6 +141,7 @@ function game() {
                 }
             }
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+            self.emit("syncTroopTimer", [roomid, true]);
         }, 10000);
     }
 

@@ -14,6 +14,11 @@ var playerColors = {};
 var websocket = null;
 
 var attackPhase = "";
+var selectedRegion = "";
+
+var coordadjusts = null;
+var mapboundsX = null;
+var mapboundsY = null;
 
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
@@ -48,7 +53,7 @@ function getColor(element, darken) {
 function initializeMap() {
     let isDragging = false;
     var mapelements = document.getElementsByClassName("map-region");
-    var selectedRegion = "";
+    selectedRegion = "";
     for(let i=0; i<mapelements.length; i++) {
         mapelements[i].setAttribute("fill", getColor(mapelements[i], false));
         mapelements[i].style.stroke = "#171717";
@@ -56,12 +61,22 @@ function initializeMap() {
         mapelements[i].style.strokeLinejoin = "round";
         mapelements[i].style.cursor = "pointer";
         let labelpos = getOffset(mapelements[i]);
-        document.getElementById("mapl2").innerHTML += `
-        <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
-            <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
-            <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
-            <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
-        </DIV>`
+        if(coordadjusts[mapelements[i].getAttribute("data-code")]) {
+            let adjustamount = coordadjusts[mapelements[i].getAttribute("data-code")];
+            document.getElementById("mapl2").innerHTML += `
+            <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35+adjustamount[1]}px; left: ${labelpos.left+25+adjustamount[0]}px">
+                <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
+                <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
+                <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
+            </DIV>`
+        } else {
+            document.getElementById("mapl2").innerHTML += `
+            <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
+                <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
+                <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
+                <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
+            </DIV>`
+        }
 
         //show outline
         mapelements[i].addEventListener("mouseover", function(d) {
@@ -115,6 +130,7 @@ function initializeMap() {
                     let territory = d.currentTarget;
                     if(selectedRegion !== territory) {
                         if(possibleMoves.includes(territory.getAttribute("data-code"))) {
+                            document.getElementById("sendamount").innerText = "--";
                             possibleMoves = [];
                             attackTerritory(selectedRegion, territory);
                             selectedRegion = "";
@@ -136,6 +152,12 @@ function initializeMap() {
                             possibleMoves.push(dest.toString());
                         }
                     }
+
+                    let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
+                    if(troopmoveamount < 1) {
+                        troopmoveamount = 1;
+                    }
+                    document.getElementById("sendamount").innerText = troopmoveamount + " troops";
 
                     for(let i=0; i<possibleMoves.length; i++) {
                         let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase());
@@ -166,6 +188,7 @@ function initializeMap() {
                         selectedRegion.style.strokeWidth = "5px";
                         selectedRegion.style.strokeLinejoin = "round";
                         selectedRegion = "";
+                        document.getElementById("sendamount").innerText = "--"
                         possibleMoves = [];
                     }
                 }
@@ -179,7 +202,7 @@ function initializeMap() {
         if(zoomElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
             if(document.getElementById("player_gui").contains(e.target)) return;
             let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
-            var zoomdelta = (e.deltaY)/500;
+            var zoomdelta = (e.deltaY)/-500;
             if(zoomdelta > 0.3) {
                 zoomdelta = 0.3;
             } else if (zoomdelta < -0.3) {
@@ -229,15 +252,15 @@ function initializeMap() {
                 let deltaY = e.movementY/1.3;
 
                 //must check both x and y coords for scrolling
-                if(mapTranslate[0] > 400 && deltaX > 0) {
+                if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
                     deltaX = 0;
-                } else if(mapTranslate[0] < -350 && deltaX < 0) {
+                } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
                     deltaX = 0;
                 }
 
-                if(mapTranslate[1] > 180 && deltaY > 0) {
+                if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
                     deltaY = 0;
-                } else if(mapTranslate[1] < -200 && deltaY < 0) {
+                } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
                     deltaY = 0;
                 }
                 if(!mapTranslate[1]) {
@@ -300,6 +323,9 @@ function downloadMap() {
             response.json().then(function(text) {
                 mapdict = JSON.parse(text.mapdict);
                 mapmoves = JSON.parse(text.moves);
+                coordadjusts = JSON.parse(text.coordadjust);
+                mapboundsX = JSON.parse(text.metadata).boundsX;
+                mapboundsY = JSON.parse(text.metadata).boundsY;
                 makemap(text.mapdata);
                 resolve("ok");
             });
@@ -373,6 +399,30 @@ function infobar(display) {
     }
 }
 
+function troopTimerBar() {
+    let troopTimerInterval = null;
+    document.getElementById("troopstimer").style.transitionDuration = "0.5s";
+    document.getElementById("troopstimer").style.width = "0%";
+
+    document.getElementById("troopseconds").innerText = "10";
+    let trooptimeleft = 10;
+    troopTimerInterval = setInterval(function() {
+        trooptimeleft--;
+        document.getElementById("troopseconds").innerText = trooptimeleft;
+    }, 1000);
+
+    setTimeout(function() {
+        clearInterval(troopTimerInterval);
+        document.getElementById("troopseconds").innerText = "10";
+        trooptimeleft = 10;
+    }, 9900)
+
+    setTimeout(function() {
+        document.getElementById("troopstimer").style.transitionDuration = "9.5s";
+        document.getElementById("troopstimer").style.width = "100%";
+    }, 500);
+}
+
 function getCookie(name) {
     var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     if (match) return match[2];
@@ -402,11 +452,21 @@ function gameConnect(name, inputroomid, pcolor) {
                     if(inGame) {
                         document.getElementById("players_container").innerHTML = "";
                         for(let i=0; i<response.users.length; i++) {
-                            document.getElementById("players_container").innerHTML += `
-                            <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
-                                <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
-                            </DIV>`;
+                            if(response.users[i].id === uid) {
+                                document.getElementById("players_container").innerHTML += `
+                                <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                </DIV>`;
+                                document.getElementById("t-avatar-frame").style.border = "5px solid " + response.users[i].pcolor;
+                                document.getElementById("t-avatar-frame").style.background = colorData[response.users[i].pcolor].normal;
+                            } else {
+                                document.getElementById("players_container").innerHTML += `
+                                <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
+                                </DIV>`;
+                            }
                             playerColors[response.users[i].id] = response.users[i].pcolor;
                         }
                         
@@ -414,11 +474,19 @@ function gameConnect(name, inputroomid, pcolor) {
                         //in lobby
                         document.getElementById("lobbyptable").innerHTML = "";
                         for(let i=0; i<response.users.length; i++) {
-                            document.getElementById("lobbyptable").innerHTML += `
-                            <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
-                                <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
-                            </DIV>`;
+                            if(response.users[i].id === uid) {
+                                document.getElementById("lobbyptable").innerHTML += `
+                                <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                </DIV>`;
+                            } else {
+                                document.getElementById("lobbyptable").innerHTML += `
+                                <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
+                                </DIV>`;
+                            }
                         }
 
                         //add green outline for confirmed users
@@ -451,6 +519,22 @@ function gameConnect(name, inputroomid, pcolor) {
                         setTimeout(function() {
                             infobar("hide");
                         }, deploytime*1000);
+
+                        document.getElementById("troopslider").addEventListener("input", function() {
+                            let value = document.getElementById("troopslider").value;
+                            document.getElementById("trooppercentage").innerText = value + "%";
+                            this.style.background = "linear-gradient(to right, var(--green) 0%, var(--green) " + value + "%, var(--medium) " + value + "%, var(--medium) 100%)";
+
+                            if(selectedRegion) {
+                                let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
+                                if(troopmoveamount < 1) {
+                                    troopmoveamount = 1;
+                                }
+                                document.getElementById("sendamount").innerText = troopmoveamount + " troops";
+                            } else {
+                                document.getElementById("sendamount").innerText = "--";
+                            }
+                        });
                     });
                 } else if(response.confirmedusers) {
                     for(let i=0; i<response.confirmedusers.length; i++) {
@@ -483,6 +567,14 @@ function gameConnect(name, inputroomid, pcolor) {
                             } else {
                                 troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                             }
+
+                            if(selectedRegion) {
+                                let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
+                                if(troopmoveamount < 1) {
+                                    troopmoveamount = 1;
+                                }
+                                document.getElementById("sendamount").innerText = troopmoveamount + " troops";
+                            }
                         } else if(attackPhase === "deploy" && c_update_map_info.troopcount - initialtroops != 0 && selectterritory.getAttribute("data-color") !== "default") {
                             troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                         }
@@ -491,6 +583,8 @@ function gameConnect(name, inputroomid, pcolor) {
                     myColor = response.setcolor;
                 } else if(response.startAttackPhase) {
                     attackPhase = "attack";
+
+                    troopTimerBar();
                     
                     setTimeout(function() {
                         document.getElementById("eventstimer").style.display = "none";
@@ -504,6 +598,8 @@ function gameConnect(name, inputroomid, pcolor) {
                             }, 400);
                         }, 6000)
                     }, 1000);
+                } else if(response.syncTroopTimer) {
+                    troopTimerBar();
                 } else if(response.error) {
                     if(response.error === "invalid credentials") {
                         ws.close();
