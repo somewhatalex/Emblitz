@@ -16,7 +16,7 @@ const emitter = require("events").EventEmitter;
 
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
-const port = credentials.serverport;
+var port = credentials.serverport;
 //-- end configs --
 
 //-- version --
@@ -30,6 +30,9 @@ const playercoloroptions = ["red", "orange", "yellow", "green", "blue", "purple"
 var hostname = credentials.hostname + ":" + port;
 if(credentials.production === "yes") {
     hostname = credentials.hostname;
+    if(process.env.PORT) {
+        port = process.env.PORT;
+    }
 }
 
 const game = new gamehandler();
