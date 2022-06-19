@@ -27,7 +27,7 @@ console.log("Using server version 6.18.2022");
 const playercoloroptions = ["red", "orange", "yellow", "green", "blue", "purple"];
 //-- end player colors --
 
-const hostname = credentials.hostname + ":" + port;
+var hostname = credentials.hostname + ":" + port;
 if(credentials.production === "yes") {
     hostname = credentials.hostname;
 }
