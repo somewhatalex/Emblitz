@@ -28,6 +28,10 @@ const playercoloroptions = ["red", "orange", "yellow", "green", "blue", "purple"
 //-- end player colors --
 
 const hostname = credentials.hostname + ":" + port;
+if(credentials.production === "yes") {
+    hostname = credentials.hostname;
+}
+
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
