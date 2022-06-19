@@ -17,6 +17,9 @@ const emitter = require("events").EventEmitter;
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
 var port = credentials.serverport;
+
+//mapname, maxplayers
+const allmaps = {"miniworld": 3, "michigan": 6};
 //-- end configs --
 
 //-- version --
@@ -85,12 +88,21 @@ function removeFromArray(arr, item) {
     for (var i = arr.length; i--;) {
       if (arr[i] === item) arr.splice(i, 1);
     }
- }
+}
+
+function requireHTTPS(req, res, next) {
+    //for Heroku only
+    if (!req.secure && req.get('x-forwarded-proto') !== 'https' && credentials.production === "yes") {
+      return res.redirect('https://' + req.get('host') + req.url);
+    }
+    next();
+}
 
 app.set("view engine", "html");
 app.engine("html", require("ejs").renderFile);
 app.set("views", path.join(__dirname, "./public"));
 app.disable("x-powered-by");
+app.use(requireHTTPS);
 
 //enable req.body to be used
 app.use(bodyParser.urlencoded({
@@ -194,6 +206,7 @@ app.post("/api", (req, res) => {
             if(req.body.preset) {
                 //does room exist?
                 let preset = req.body.preset;
+                let roomfound = false;
                 for(let i=0; i<rooms.length; i++) {
                     if(rooms[i].id === preset) {
                         //is room full?
@@ -203,13 +216,15 @@ app.post("/api", (req, res) => {
                             rooms[i]["players"]++;
                             res.json({"uid": userid(), "room": preset});
                         }
-                        return;
-                    } else {
-                        res.json({"error": "room " + preset + " does not exist"});
+                        roomfound = true;
+                        break;
                     }
                 }
+                if(!roomfound) {
+                    res.json({"error": "room " + preset + " does not exist"});
+                }
             } else {
-                res.json({"uid": userid(), "room": joinroom()});
+                res.json({"uid": userid(), "room": joinroom(req.body.prefermap, req.body.createnewroom)});
             }
         } else if(req.body.action === "login") {
             // -- WORK ON PROGRESS --
@@ -264,11 +279,26 @@ function checkDupeRoom(id) {
     }
 }
 
-function joinroom() {
-    let roommap = "michigan";
-    let maxplayers = 6;
+function joinroom(map, createroom) {
+    let roommap = "";
+    let allmapnames = Object.keys(allmaps);
+    let randommap = false;
+    if(map !== "random" && allmapnames.includes(map)) {
+        roommap = map;
+    } else {
+        roommap = allmapnames[Math.floor(Math.random()*allmapnames.length)];
+        randommap = true;
+    }
+
+    let maxplayers = allmaps[roommap];
     let deploytime = 10;
-    if(rooms.length < 1) {
+
+    let isprivate = false;
+    if(createroom) {
+        isprivate = true;
+    }
+
+    if(rooms.length < 1 || createroom) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
         for(let i=1; i<7; i++) {
@@ -282,7 +312,7 @@ function joinroom() {
             }
         }
         
-        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
             //console.log(result)
         });
@@ -298,8 +328,12 @@ function joinroom() {
             }
 
             //join room if available (and NOT in active game)
-            if(rooms[i]["players"] < rooms[i]["maxplayers"] && rooms[i]["ingame"] == false) {
-                return rooms[i]["id"];
+            if(rooms[i]["players"] < rooms[i]["maxplayers"] && rooms[i]["ingame"] == false && rooms[i]["isprivate"] == false) {
+                if(randommap) {
+                    return rooms[i]["id"];
+                } else if(rooms[i]["map"] === roommap) {
+                    return rooms[i]["id"];
+                }
             }
         }
 
@@ -316,7 +350,7 @@ function joinroom() {
             }
         }
 
-        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
             //console.log(result)
         });
@@ -371,7 +405,7 @@ gameevents.on("syncTroopTimer", function(result) {
 });
 
 gameevents.on("playerdead", function(result) {
-    sendRoomMsg(result[0], {"playerdead": result[1]});
+    sendRoomMsg(result[0], {"playerdead": result[1], "place": result[2]});
 });
 
 gameevents.on("playerWon", function(result) {

@@ -239,7 +239,16 @@ function game() {
                 }
 
                 if(istargetdead) {
-                    self.emit("playerdead", [roomid, targetedplayer]);
+                    checkterritories = Object.keys(games.get(roomid).mapstate);
+                    checkterritories_length = checkterritories.length;
+                    let totalplayersinroom = []
+                    for(let i = 0; i < checkterritories_length; i++) {
+                        if(games.get(roomid).mapstate[checkterritories[i]].player && !totalplayersinroom.includes(games.get(roomid).mapstate[checkterritories[i]].player)) {
+                            totalplayersinroom.push(games.get(roomid).mapstate[checkterritories[i]].player);
+                        }
+                    }
+
+                    self.emit("playerdead", [roomid, targetedplayer, totalplayersinroom.length+1]);
                 }
             }
 

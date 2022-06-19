@@ -4,6 +4,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <LINK REL="stylesheet" HREF="./css/style.css">
+        
+        <link rel="icon" href="./images/icon.png">
 
         <!-- configs | put in front of js files -->
         <SCRIPT>
@@ -27,15 +29,26 @@
             <DIV CLASS="homemenu">
                 <DIV CLASS="homemenu-bg"></DIV>
                 <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
-                <DIV CLASS="join_input">
+                <DIV CLASS="join_input" ID="join_input">
                     <INPUT ID="p_name" CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Name here...">
+                    <DIV CLASS="mapselect">
+                        <DIV CLASS="mapselecttitle">Current map selection:</DIV>
+                        <DIV CLASS="selectedmap">
+                            
+                        </DIV>
+                    </DIV>
                     <DIV CLASS="h_button_options">
-                        <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value)">Play</BUTTON>
+                        <BUTTON CLASS="joinbutton jb_green" STYLE="margin-right: 5px" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, document.getElementById('mapselect').value, false)">Play</BUTTON>
                         <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
-                        <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;"><INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value)">Connect</BUTTON></DIV>
+                        <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
+                            <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game.</DIV>
+                            <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value, null, false)">Connect</BUTTON>
+                        </DIV>
+                        <BR><BR>
+                        <BUTTON CLASS="joinbutton jb_gray" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, document.getElementById('mapselect').value, true)">Create Room</BUTTON>
                         <BR><BR>
                         <!-- REMOVE THIS WHEN DONE, MAKE BETTER LOOKING COLOR SELECT MENU -->
-                        (color preference select; this is only for testing and is temporary)<BR>
+                        (preference select; this is only for testing and is temporary)<BR>
                         <SELECT ID="framecolor" STYLE="padding: 5px; font-size: 17px">
                             <OPTION VALUE="red">red</OPTION>
                             <OPTION VALUE="orange">orange</OPTION>
@@ -44,6 +57,12 @@
                             <OPTION VALUE="blue">blue</OPTION>
                             <OPTION VALUE="purple">purple</OPTION>
                         </SELECT>
+                        <SELECT ID="mapselect" STYLE="padding: 5px; font-size: 17px">
+                            <OPTION VALUE="random">Random Map</OPTION>
+                            <OPTION VALUE="miniworld">Micro World</OPTION>
+                            <OPTION VALUE="michigan">Michigan</OPTION>
+                        </SELECT>
+
                     </DIV>
                 </DIV>
             </DIV>
@@ -54,6 +73,7 @@
                 <DIV CLASS="lobbyptable" ID="lobbyptable">
 
                 </DIV>
+                <DIV CLASS="invitecode">Room join code: <SPAN ID="invitecode">-----</SPAN></DIV>
                 <BUTTON ID="startvote" CLASS="joinbutton jb_green" STYLE="margin-top: 10px;">Ready</BUTTON>
             </DIV>
         </DIV>
@@ -97,10 +117,24 @@
                         <DIV CLASS="s-territories-bar"><DIV ID="territoryprogress" CLASS="s-territories-bar-inner"></DIV></DIV>
                     </DIV>
                 </DIV>
-                <DIV CLASS="endscreen">
+                <DIV CLASS="leavegame">
+                    <BUTTON CLASS="leavegamebutton" ID="leavegamebutton" ONCLICK="toggleqcvisibility()"><I CLASS="fa fa-caret-square-o-left"></I></BUTTON>
+                    <DIV CLASS="quitconfirm" ID="quitconfirm" STYLE="display: none;">
+                        <DIV CLASS="quitconfirm-bg"></DIV>
+                        <DIV CLASS="qc-inner">
+                            <DIV CLASS="qc-title">Leave Game?</DIV>
+                            <DIV CLASS="qc-message">Are you sure you want to leave the game? You cannot rejoin and will be defeated!</DIV>
+                            <BUTTON CLASS="qc-button end-gray" STYLE="margin-right: 8px;" ONCLICK="leavegame()">Yes</BUTTON><BUTTON CLASS="qc-button end-red" ONCLICK='document.getElementById("quitconfirm").style.display = "none"'>Cancel</BUTTON>
+                        </DIV>
+                    </DIV>
+                </DIV>
+                <DIV CLASS="endscreen" ID="endscreen">
                     <DIV CLASS="endscreen-bg"></DIV>
-                    <DIV CLASS="e-header">You were defeated</DIV>
-                    <DIV CLASS=""></DIV>
+                    <DIV CLASS="endscreen-inner">
+                        <DIV CLASS="e-header" ID="e-header">You were defeated</DIV>
+                        <DIV CLASS="e-stats"><SPAN ID="e-intro">You lost all your territories and were defeated!</SPAN> You had a max of <SPAN ID="e-troops">0</SPAN> troops and controlled a max of <SPAN ID="e-territories">0</SPAN> territories at your peak. You placed <SPAN ID="e-place">6th</SPAN> playing the <SPAN ID="e-map"></SPAN> map. <SPAN ID="e-ending">Better luck next time!</SPAN></DIV>
+                        <BUTTON ONCLICK="share()" CLASS="endbutton end-blue"><I CLASS="fa fa-share-square-o"></I> Share</BUTTON><BUTTON CLASS="endbutton end-green" ONCLICK="spectategame()"><I CLASS="fa fa-eye"></I> Spectate</BUTTON><BUTTON CLASS="endbutton end-red" ONCLICK="leavegame()"><I CLASS="fa fa-chevron-circle-left"></I> Leave Game</BUTTON>
+                    </DIV>
                 </DIV>
             </DIV>
             <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">

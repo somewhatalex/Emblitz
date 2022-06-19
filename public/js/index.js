@@ -20,10 +20,38 @@ var coordadjusts = null;
 var mapboundsX = null;
 var mapboundsY = null;
 
-let totalterritories = 1;
+var totalterritories = 1;
 
-let lifetimepeaktroops = 0;
-let lifetimepeakterritories = 0;
+var lifetimepeaktroops = 0;
+var lifetimepeakterritories = 0;
+
+var mapname = "";
+
+var sharedetails = "";
+
+var setEventListeners = false; //do not reset this
+
+var alltimeouts = [];
+
+//mobile detection
+window.onload = function() {
+    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        document.getElementsByClassName("mainlogoimg")[0].style.width = "250px";
+        document.getElementById("join_input").innerHTML = `
+        <DIV STYLE="margin-left: 10px; padding-bottom: 20px; font-size: 20px; color: var(--light);">Sorry, we're still working on the mobile version for the game! Please use a desktop computer or laptop to play Emblitz. Don't worry though, we'll get the mobile version done soon. There could even be an app for it.<BR><BR>This this message is a mistake and you aren't on mobile right now? If so, send us a bug report.</DIV>`
+    }
+}
+
+function inithomepage() {
+    if(!localStorage.getItem("color")) {
+        localStorage.setItem("color", "red");
+    }
+    if(!localStorage.getItem("map")) {
+        localStorage.setItem("map", "random");
+    }
+}
+
+inithomepage();
 
 function resetAll() {
     roomid = "";
@@ -52,6 +80,12 @@ function resetAll() {
 
     lifetimepeaktroops = 0;
     lifetimepeakterritories = 0;
+
+    mapname = "";
+
+    sharedetails = "";
+    
+    alltimeouts = [];
 }
 
 function getOffset(el) {
@@ -229,81 +263,89 @@ function initializeMap() {
             }
         });
     }
+
     //manage zooming and panning
     let zoomElement = document.getElementById("mapcontainer");
     zoomElement.style.transform = "scale(1)";
-    document.addEventListener("wheel", function(e) {
-        if(zoomElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
-            if(document.getElementById("player_gui").contains(e.target)) return;
-            let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
-            var zoomdelta = (e.deltaY)/-500;
-            if(zoomdelta > 0.3) {
-                zoomdelta = 0.3;
-            } else if (zoomdelta < -0.3) {
-                zoomdelta = -0.3;
-            }
-            if(elementTransform >= 1.7) {
-                if(zoomdelta > 0) {
-                    zoomdelta = 0;
-                }
-                zoomElement.style.transform = "scale(1.7)";
-            } else if(elementTransform <= 0.5) {
-                if(zoomdelta < 0) {
-                    zoomdelta = 0;
-                }
-                zoomElement.style.transform = "scale(0.5)";
-            }
-
-            zoomElement.style.transform = `scale(${elementTransform += zoomdelta})`;
-        }
-    });
-
-    //panning
     var mapElement = document.getElementById("map");
     var isMouseDown = 0;
     mapElement.style.transform = "translate(0px, 0px)";
-    document.addEventListener("mousedown", function(e) {
-        isMouseDown = 1;
-    });
-    document.addEventListener("mouseup", function(e) {
-        isMouseDown = 0;
-        //delay 1ms to prevent immediate cancelation
-        if(isDragging == true) {
-            setTimeout(function() {
-                isDragging = false;
-            }, 1)
-        }
-    });
-    document.addEventListener("mousemove", function(e) {
-        if(isMouseDown) {
-            if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+
+    if(!setEventListeners) {
+        setEventListeners = true;
+        document.addEventListener("wheel", function(e) {
+            if(zoomElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
                 if(document.getElementById("player_gui").contains(e.target)) return;
-                isDragging = true;
-                let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
-                let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
-
-                let deltaX = e.movementX/1.3;
-                let deltaY = e.movementY/1.3;
-
-                //must check both x and y coords for scrolling
-                if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
-                    deltaX = 0;
-                } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
-                    deltaX = 0;
+                let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+                var zoomdelta = (e.deltaY)/-500;
+                if(zoomdelta > 0.3) {
+                    zoomdelta = 0.3;
+                } else if (zoomdelta < -0.3) {
+                    zoomdelta = -0.3;
+                }
+                if(elementTransform >= 1.7) {
+                    if(zoomdelta > 0) {
+                        zoomdelta = 0;
+                    }
+                    zoomElement.style.transform = "scale(1.7)";
+                } else if(elementTransform <= 0.5) {
+                    if(zoomdelta < 0) {
+                        zoomdelta = 0;
+                    }
+                    zoomElement.style.transform = "scale(0.5)";
                 }
 
-                if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
-                    deltaY = 0;
-                } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
-                    deltaY = 0;
-                }
-                if(!mapTranslate[1]) {
-                    mapTranslate[1] = 0;
-                }
-                mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
+                zoomElement.style.transform = `scale(${elementTransform += zoomdelta})`;
             }
-        }
-    });
+        });
+
+        //panning
+        document.addEventListener("mousedown", function(e) {
+            if(document.getElementById("quitconfirm").style.display === "block" && e.target !== document.getElementById("quitconfirm") && e.target !== document.getElementById("leavegamebutton") && !document.getElementById("quitconfirm").contains(e.target) && !document.getElementById("leavegamebutton").contains(e.target)) {
+                document.getElementById("quitconfirm").style.display = "none";
+            }
+            isMouseDown = 1;
+        });
+        document.addEventListener("mouseup", function(e) {
+            isMouseDown = 0;
+            //delay 1ms to prevent immediate cancelation
+            if(isDragging == true) {
+                setTimeout(function() {
+                    isDragging = false;
+                }, 1)
+            }
+        });
+        document.addEventListener("mousemove", function(e) {
+            if(isMouseDown) {
+                if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                    if(document.getElementById("player_gui").contains(e.target)) return;
+                    isDragging = true;
+                    let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
+                    let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+
+                    let deltaX = e.movementX/1.3;
+                    let deltaY = e.movementY/1.3;
+
+                    //must check both x and y coords for scrolling
+                    if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
+                        deltaX = 0;
+                    } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
+                        deltaX = 0;
+                    }
+
+                    if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
+                        deltaY = 0;
+                    } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
+                        deltaY = 0;
+                    }
+                    if(!mapTranslate[1]) {
+                        mapTranslate[1] = 0;
+                    }
+                    mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
+                }
+            }
+        });
+    }
 }
 
 function connect(div1, div2, color, thickness) {
@@ -371,9 +413,9 @@ function downloadMap() {
     });
 }
 
-function joinGame(inputroomid) {
+function joinGame(inputroomid, pmap, createnewroom) {
     return new Promise((resolve, reject) => {
-        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "joingame", preset: inputroomid})}).then(response => {
+        fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "joingame", prefermap: pmap, preset: inputroomid, createnewroom: createnewroom})}).then(response => {
             response.json().then(function(text) {
                 roomid = text.room;
                 uid = text.uid;
@@ -438,7 +480,7 @@ function infobar(display) {
 }
 
 function troopTimerBar() {
-    let troopTimerInterval = null;
+    var troopTimerInterval = null;
     document.getElementById("troopstimer").style.transitionDuration = "0.5s";
     document.getElementById("troopstimer").style.width = "0%";
 
@@ -446,19 +488,23 @@ function troopTimerBar() {
     let trooptimeleft = 10;
     troopTimerInterval = setInterval(function() {
         trooptimeleft--;
+        if(trooptimeleft < 0) {
+            trooptimeleft = 0;
+            clearInterval(troopTimerInterval);
+        }
         document.getElementById("troopseconds").innerText = trooptimeleft;
     }, 1000);
 
-    setTimeout(function() {
+    alltimeouts.push(setTimeout(function() {
         clearInterval(troopTimerInterval);
         document.getElementById("troopseconds").innerText = "10";
         trooptimeleft = 10;
-    }, 9900)
+    }, 9900))
 
-    setTimeout(function() {
+    alltimeouts.push(setTimeout(function() {
         document.getElementById("troopstimer").style.transitionDuration = "9.5s";
         document.getElementById("troopstimer").style.width = "100%";
-    }, 500);
+    }, 500));
 }
 
 function notification(type, title, content, persisttime) {
@@ -502,13 +548,14 @@ function getCookie(name) {
 
 const gid = getCookie("GID");
 
-function gameConnect(name, inputroomid, pcolor) {
+function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
     document.getElementById("gamelobby").style.display = "block";
-    joinGame(inputroomid).then(function() {
+    joinGame(inputroomid, pmap, createnewroom).then(function() {
         connectToServer().then(function(ws) {
-            websocket = ws
+            document.getElementById("invitecode").innerText = roomid.replace("r-", "");
+            websocket = ws;
             ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "pcolor": pcolor, "gid": gid}));
             confirmJoinGame().then(function() {
                 ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
@@ -520,6 +567,7 @@ function gameConnect(name, inputroomid, pcolor) {
                     
                 } else if(response.mapname) {
                     document.getElementById("mapname").innerText = mapnames[response.mapname];
+                    mapname = mapnames[response.mapname];
                 } else if(response.users) {
                     if(inGame) {
                         document.getElementById("players_container").innerHTML = "";
@@ -572,7 +620,16 @@ function gameConnect(name, inputroomid, pcolor) {
                     pnames = response.users;
                 } else if(response.playerleft) {
                     let p_displayed = document.getElementById("l-" + response.playerleft);
-                    p_displayed.remove();
+                    if(p_displayed) {
+                        p_displayed.remove();
+                    }
+                    if(inGame) {
+                        let leftname = pnames.filter(obj => {
+                            return obj.id === response.playerleft;
+                        });
+                        leftname = leftname[0].name;
+                        notification("notify", leftname + " left", leftname + " has left the game.", 5);
+                    }
                 //start game
                 } else if(response.startgame) { //now load in map...
                     document.getElementById("lobbyscreen").style.display = "none";
@@ -589,9 +646,9 @@ function gameConnect(name, inputroomid, pcolor) {
                         document.getElementById("eventstimer").style.width = "0%";
                         document.getElementById("eventstimer").style.transitionDuration = deploytime + "s";
                         document.getElementById("eventstimer").style.width = "100%";
-                        setTimeout(function() {
+                        alltimeouts.push(setTimeout(function() {
                             infobar("hide");
-                        }, deploytime*1000);
+                        }, deploytime*1000));
 
                         document.getElementById("troopslider").addEventListener("input", function() {
                             let value = document.getElementById("troopslider").value;
@@ -696,12 +753,12 @@ function gameConnect(name, inputroomid, pcolor) {
                         document.getElementById("eventstimer").style.width = "0%";
                         infobar("show");
                         document.getElementById("statustext").innerHTML = "<B>Attack Phase Started:</B> Select one of your own territories to move troops or attack! Last person standing wins!";
-                        setTimeout(function() {
+                        alltimeouts.push(setTimeout(function() {
                             infobar("hide");
                             setTimeout(function() {
                                 document.getElementById("infobar").style.display = "none";
                             }, 400);
-                        }, 7000);
+                        }, 7000));
                     }, 1000);
                 } else if(response.syncTroopTimer) {
                     troopTimerBar();
@@ -711,19 +768,135 @@ function gameConnect(name, inputroomid, pcolor) {
                         notification("error", "Error: Invalid credentials", "Please reload the page and join a new game. If this problem persists, contact us.", 10);
                     }
                 } else if(response.playerdead) {
+                    let p_displayed = document.getElementById("l-" + response.playerdead);
+                    p_displayed.remove();
                     if(response.playerdead !== uid) {
                         let defeatedname = pnames.filter(obj => {
                             return obj.id === response.playerdead;
                         });
-                        console.log(defeatedname)
                         defeatedname = defeatedname[0].name;
                         notification("warn", defeatedname + " was defeated", defeatedname + " lost all their territories and was defeated!", 6)
                     } else {
                         //you died
+                        document.getElementById("endscreen").style.display = "block";
+                        document.getElementById("endscreen").style.opacity = "0";
+                        document.getElementById("e-troops").innerText = lifetimepeaktroops;
+                        document.getElementById("e-territories").innerText = lifetimepeakterritories;
 
+                        let yourplace = response.place;
+                        switch(yourplace) {
+                            case 1:
+                                yourplace += "st";
+                                break;
+                            case 2:
+                                yourplace += "nd";
+                                break;
+                            case 3:
+                                yourplace += "rd";
+                                break;
+                            default:
+                                yourplace += "th";
+                        }
+                        document.getElementById("e-place").innerText = yourplace;
+                        document.getElementById("e-map").innerText = mapname;
+                        document.getElementById("e-header").innerText = "You were defeated";
+                        document.getElementById("e-intro").innerText = "You lost all your territories and were defeated!";
+                        document.getElementById("e-ending").innerText = "Better luck next time!";
+                        sharedetails = "I played ⚔Emblitz, a real-time online strategy game, and placed " + yourplace + " in the " + mapname + " map. I had " + lifetimepeaktroops + " troops and captured " + lifetimepeakterritories + " territories at my peak. Play it at https://emblitz.com\n\n#Emblitz";
+                        setTimeout(function() {
+                            document.getElementById("endscreen").style.opacity = "1";
+                        }, 100);
+                    }
+                } else if(response.playerWon) {
+                    if(response.playerWon !== uid) {
+                        let winname = pnames.filter(obj => {
+                            return obj.id === response.playerdead;
+                        });
+                        winname = winname[0].name;
+                        notification("notify", winname + " won the game!", winname + " defeated all other players and is the last player standing!", 6)
+                    } else {
+                        //you died
+                        document.getElementById("endscreen").style.display = "block";
+                        document.getElementById("endscreen").style.opacity = "0";
+                        document.getElementById("e-troops").innerText = lifetimepeaktroops;
+                        document.getElementById("e-territories").innerText = lifetimepeakterritories;
+                        document.getElementById("e-place").innerText = "1st";
+                        document.getElementById("e-map").innerText = mapname;
+                        document.getElementById("e-header").innerText = "You won the battle";
+                        document.getElementById("e-intro").innerText = "You won the battle by being the last player standing!";
+                        document.getElementById("e-ending").innerText = "Congrats! Maybe join a new game and give it another go?";
+                        sharedetails = "I played ⚔Emblitz, a real-time online strategy game, and won a battle in the " + mapname + " map. I had " + lifetimepeaktroops + " troops and captured " + lifetimepeakterritories + " territories at my peak. Play it at https://emblitz.com\n\n#Emblitz";
+                        setTimeout(function() {
+                            document.getElementById("endscreen").style.opacity = "1";
+                        }, 100);
                     }
                 }
             }
         });
     });
+}
+
+function share() {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(sharedetails);
+    } else {
+        //insecure copy paste for development purposes
+        let textArea = document.createElement("textarea");
+        textArea.value = sharedetails;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+    }
+    notification("notify", "Copied to clipboard!", "Copied your game stats to your clipboard. Feel free to share them whereever! Thanks for playing Emblitz.", 10);
+}
+
+function spectategame() {
+    document.getElementById("endscreen").style.opacity = "0";
+    setTimeout(function() {
+        document.getElementById("endscreen").style.display = "none";
+        notification("notify", "Spectating", "You're now spectating the game.", 6);
+    }, 3000);
+}
+
+function leavegame() {
+    websocket.close();
+    for (let i=0; i<alltimeouts.length; i++) {
+        clearTimeout(alltimeouts[i]);
+    }
+    document.getElementById("troopseconds").innerText = "10";
+    resetAll();
+    document.getElementById("mapl2").innerHTML = "";
+    document.getElementById("mapsvgbox").remove();
+    document.getElementById("lobbyscreen").style.display = "block";
+    document.getElementById("lobbyscreen").style.display = "block";
+    document.getElementById("gamescreen").style.display = "none";
+    document.getElementById("gamelobby").style.display = "none";
+    document.getElementById("lobbyptable").innerHTML = "";
+
+    document.getElementById("infobar").innerHTML = `<DIV CLASS="infobar-bg"></DIV>
+    <DIV CLASS="ibmain-text" ID="statustext"><B>Deploy Phase:</B> Select a starting point</DIV>
+    <DIV CLASS="timer-bg"><DIV CLASS="timer-line" ID="eventstimer"></DIV></DIV>`;
+    document.getElementById("infobar").style.top = "-70px";
+    document.getElementById("eventstimer").style.transitionDuration = "0.3s";
+    document.getElementById("eventstimer").style.width = "0%";
+    document.getElementById("troopstimer").style.transitionDuration = "0.5s";
+    document.getElementById("troopstimer").style.width = "0%";
+
+    document.getElementById("endscreen").style.opacity = "0";
+    document.getElementById("endscreen").style.display = "none";
+
+    inithomepage()
+}
+
+function toggleqcvisibility() {
+    if(document.getElementById("quitconfirm").style.display === "block") {
+        document.getElementById("quitconfirm").style.display = "none";
+    } else {
+        document.getElementById("quitconfirm").style.display = "block"
+    }
 }

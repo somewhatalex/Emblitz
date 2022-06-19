@@ -1,4 +1,4 @@
 const mapnames = {
-    miniworld: "Micro World Map",
+    miniworld: "Micro World",
     michigan: "Michigan"
 }

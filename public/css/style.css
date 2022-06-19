@@ -116,14 +116,17 @@ input { /*override default styles*/
 
 .join_input  {
     text-align: center;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .name_input {
     width: 80%;
     max-width: 350px;
-    padding: 5px;
+    padding: 8px;
     font-size: 18px;
-    border: 1px solid var(--dark);
+    border: 3px solid var(--medium);
+    background: var(--light);
 }
 
 .h_button_options {
@@ -131,14 +134,20 @@ input { /*override default styles*/
 }
 
 .joinbutton {
-    width: 120px;
-    font-size: 18px;
+    min-width: 180px;
+    font-size: 20px;
     padding: 5px;
     padding-top: 10px;
     padding-bottom: 10px;
     border: none;
     cursor: pointer;
     transition: 0.4s;
+    border-radius: 10px;
+}
+
+.joinroomtext {
+    font-size: 16px;
+    margin-bottom: 5px;
 }
 
 .jb_green {
@@ -472,6 +481,7 @@ input { /*override default styles*/
     overflow: hidden;
     border-radius: 10px;
     transition: 0.4s;
+    pointer-events: none;
 }
 
 .infobar-bg {
@@ -497,9 +507,15 @@ input { /*override default styles*/
 
 .room_input {
     width: 100px;
-    padding: 5px;
+    padding: 8px;
     font-size: 18px;
-    border: 1px solid var(--dark);
+    border: none;
+    border-radius: 10px;
+}
+
+.mapselect {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .timer-bg {
@@ -647,7 +663,7 @@ input { /*override default styles*/
 
 #notifications {
     position: fixed;
-    z-index: 69696;
+    z-index: 999999;
     bottom: 20px;
     right: 0px;
 }
@@ -655,7 +671,7 @@ input { /*override default styles*/
 .notification {
     display: block;
     position: relative;
-    z-index: 69696;
+    z-index: 99999;
     margin-bottom: 10px;
     text-align: left;
     padding: 10px;
@@ -702,6 +718,8 @@ input { /*override default styles*/
     width: 100%;
     z-index: 969696;
     display: none;
+    transition: 3s;
+    opacity: 0;
 }
 
 .endscreen-bg {
@@ -712,7 +730,6 @@ input { /*override default styles*/
     width: 100%;
     background: var(--night);
     z-index: -1;
-    border-radius: 10px;
     padding: 10px;
 }
 
@@ -776,3 +793,158 @@ input { /*override default styles*/
     transition: 0.3s;
 }
 
+.endscreen-inner {
+    color: var(--lignt);
+    max-width: 500px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.e-header {
+    color: var(--light);
+    font-weight: bold;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.e-stats {
+    font-size: 18px;
+    color: var(--light);
+}
+
+.endbutton {
+    display: inline-block;
+    min-width: 120px;
+    font-size: 18px;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 5px;
+    color: var(--light);
+    text-align: center;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-top: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.end-blue {
+    background: #036ffc;
+}
+
+.end-blue:hover {
+    background: #0051ba;
+}
+
+.end-green {
+    background: var(--green);
+}
+
+.end-green:hover {
+    background: var(--green-darker);
+}
+
+.end-red {
+    background: #e00d0d;
+}
+
+.end-red:hover {
+    background: #ba0d0d;
+}
+
+.end-gray {
+    background: #696969;
+}
+
+.end-gray:hover {
+    background: #3b3b3b;
+}
+
+.leavegame {
+    position: fixed;
+    left: 10px;
+    bottom: 20px;
+    z-index: 999998;
+}
+
+.leavegamebutton {
+    display: inline-block;
+    font-size: 30px;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+    background: var(--dark);
+    opacity: 0.85;
+    color: var(--light);
+    border-radius: 5px;
+}
+
+.leavegamebutton:hover {
+    color: var(--medium);
+}
+
+.quitconfirm {
+    position: absolute;
+    bottom: 44px;
+    padding: 10px;
+    width: 220px;
+    margin-left: -10px;
+    padding-right: 0px;
+}
+
+.quitconfirm-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.9;
+    width: 100%;
+    background: var(--night);
+    z-index: -1;
+    border-radius: 10px;
+}
+
+.qc-inner {
+    margin-left: 10px;
+}
+
+.qc-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--light);
+}
+
+.qc-message {
+    font-size: 16px;
+    color: var(--light);
+}
+
+.qc-button {
+    display: inline-block;
+    min-width: 100px;
+    font-size: 15px;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 5px;
+    color: var(--light);
+    text-align: center;
+    margin-top: 10px;
+}
+
+.invitecode {
+    font-size: 17px;
+    margin-top: 10px;
+}
+
+#invitecode {
+    font-weight: bold;
+}
