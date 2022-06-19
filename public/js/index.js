@@ -548,6 +548,9 @@ function gameConnect(name, inputroomid, pcolor) {
                     for(let i=0; i<reslength; i++) {
                         let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
                         let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
+                        if(!document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase())) {
+                        console.log(c_update_map_info.territory.toLowerCase());
+                        }
                         let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
                         let initialcolor = selectterritory.getAttribute("data-color");
                         document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;

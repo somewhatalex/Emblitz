@@ -159,6 +159,14 @@ input { /*override default styles*/
     background-color: var(--medium);
 }
 
+#player_gui {
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+}
+
 .leaderboard {
     position: fixed;
     z-index: 69420;

@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const mysql = require("mysql");
+//const mysql = require("mysql");
 const credentials = require("./auth.json");
 const auth = require("./scripts/auth.js");
 const gamehandler = require("./scripts/game.js");
@@ -20,7 +20,7 @@ const port = credentials.serverport;
 //-- end configs --
 
 //-- version --
-console.log("Using server version 6.14.2022");
+console.log("Using server version 6.18.2022");
 //-- end version --
 
 //-- player colors --
@@ -31,26 +31,30 @@ const hostname = credentials.hostname + ":" + port;
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
+
+//database -- make it later
 //edit this in auth.json
-const db = mysql.createConnection({
-    host: credentials.host,
-    user: credentials.user,
-    password: credentials.password,
-    port: credentials.port,
-    database: credentials.database
-});
+/*
+    const db = mysql.createConnection({
+        host: credentials.host,
+        user: credentials.user,
+        password: credentials.password,
+        port: credentials.port,
+        database: credentials.database
+    });
 
-db.connect(function(err) {
-    if (err) throw err; //literally just give up by this point
+    db.connect(function(err) {
+        if (err) throw err; //literally just give up by this point
 
-    //export db configs
-    module.exports.db = db;
+        //export db configs
+        module.exports.db = db;
 
-    console.log("Connected to database!");
-    auth.getUserInfo("bobux");
+        console.log("Connected to database!");
+        auth.getUserInfo("bobux");
 
 
-});
+    });
+*/
 
 const clients = new Map();
 const rooms = [];
@@ -253,7 +257,7 @@ function checkDupeRoom(id) {
 }
 
 function joinroom() {
-    let roommap = "miniworld";
+    let roommap = "michigan";
     let maxplayers = 6;
     let deploytime = 10;
     if(rooms.length < 1) {
