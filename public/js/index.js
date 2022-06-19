@@ -20,6 +20,40 @@ var coordadjusts = null;
 var mapboundsX = null;
 var mapboundsY = null;
 
+let totalterritories = 1;
+
+let lifetimepeaktroops = 0;
+let lifetimepeakterritories = 0;
+
+function resetAll() {
+    roomid = "";
+    uid = "";
+    pnames = [];
+
+    mapdict = "";
+    mapmoves = "";
+    possibleMoves = [];
+
+    inGame = false;
+
+    myColor = "";
+    playerColors = {};
+
+    websocket = null;
+
+    attackPhase = "";
+    selectedRegion = "";
+
+    coordadjusts = null;
+    mapboundsX = null;
+    mapboundsY = null;
+
+    totalterritories = 1;
+
+    lifetimepeaktroops = 0;
+    lifetimepeakterritories = 0;
+}
+
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
     var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
@@ -427,6 +461,40 @@ function troopTimerBar() {
     }, 500);
 }
 
+function notification(type, title, content, persisttime) {
+    let toastcolor = "";
+    let currenttoast = document.createElement("div");
+    currenttoast.className = "notification";
+    currenttoast.style.right = "-320px";
+    
+    if(type === "warn") {
+        toastcolor = "#dae813";
+    } else if(type === "notify") {
+        toastcolor = "#1356e8";
+    } else if(type === "error") {
+        toastcolor = "#e81313";
+    }
+    
+    currenttoast.innerHTML = `<DIV CLASS="notification-bg" STYLE="border-left: 5px solid ${toastcolor}"></DIV>
+    <DIV CLASS="notification-inner">
+        <DIV CLASS="notification-title" ID="note-title">${title}</DIV>
+        <DIV CLASS="notification-content" ID="note-content">${content}</DIV>
+    </DIV>`
+
+    document.getElementById("notifications").appendChild(currenttoast);
+
+    setTimeout(function() {
+        currenttoast.style.right = "0px";
+    }, 10);
+
+    setTimeout(function() {
+        currenttoast.style.right = "-320px";
+        setTimeout(function() {
+            currenttoast.remove();
+        }, 300)
+    }, persisttime*1000);
+}
+
 function getCookie(name) {
     var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
     if (match) return match[2];
@@ -459,15 +527,16 @@ function gameConnect(name, inputroomid, pcolor) {
                             if(response.users[i].id === uid) {
                                 document.getElementById("players_container").innerHTML += `
                                 <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
                                     <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
                                 </DIV>`;
                                 document.getElementById("t-avatar-frame").style.border = "5px solid " + response.users[i].pcolor;
+                                document.getElementById("t-avatar-frame").innerHTML = `<IMG STYLE="width: 90px; height: 90px" SRC="./images/defaultpfp.png">`;
                                 document.getElementById("t-avatar-frame").style.background = colorData[response.users[i].pcolor].normal;
                             } else {
                                 document.getElementById("players_container").innerHTML += `
                                 <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
                                     <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                                 </DIV>`;
                             }
@@ -481,13 +550,13 @@ function gameConnect(name, inputroomid, pcolor) {
                             if(response.users[i].id === uid) {
                                 document.getElementById("lobbyptable").innerHTML += `
                                 <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
                                     <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
                                 </DIV>`;
                             } else {
                                 document.getElementById("lobbyptable").innerHTML += `
                                 <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"></DIV>
+                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
                                     <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
                                 </DIV>`;
                             }
@@ -539,6 +608,16 @@ function gameConnect(name, inputroomid, pcolor) {
                                 document.getElementById("sendamount").innerText = "--";
                             }
                         });
+
+                        totalterritories = document.getElementsByClassName("map-region").length;
+
+                        document.getElementById("statsbar-bg").style.borderTop = "10px solid " + colorData[myColor].normal;
+                        document.getElementById("territoryprogress").style.background = colorData[myColor].normal;
+                        document.getElementById("territoryprogress").style.width = "0%";
+                        document.getElementById("s-totalterritories").innerText = totalterritories;
+
+                        document.getElementById("s-troops").innerText = "0";
+                        document.getElementById("s-territories").innerText = "0";
                     });
                 } else if(response.confirmedusers) {
                     for(let i=0; i<response.confirmedusers.length; i++) {
@@ -549,6 +628,8 @@ function gameConnect(name, inputroomid, pcolor) {
                 } else if(response.updatemap) {
                     let updatemapdata = response.updatemap;
                     let reslength = Object.keys(updatemapdata).length;
+                    let playeroccupied = 0;
+                    let playertotaltroops = 0;
                     for(let i=0; i<reslength; i++) {
                         let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
                         let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
@@ -564,6 +645,11 @@ function gameConnect(name, inputroomid, pcolor) {
                         } else {
                             selectterritory.setAttribute("data-color", "default");
                             selectterritory.setAttribute("fill", getColor(selectterritory, false));
+                        }
+
+                        if(selectterritory.getAttribute("data-color") === myColor) {
+                            playertotaltroops = playertotaltroops + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText);
+                            playeroccupied++;
                         }
 
                         if(attackPhase === "attack") {
@@ -586,6 +672,18 @@ function gameConnect(name, inputroomid, pcolor) {
                             troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                         }
                     }
+
+                    if(playertotaltroops > lifetimepeaktroops) {
+                        lifetimepeaktroops = playertotaltroops;
+                    }
+
+                    if(playeroccupied > lifetimepeakterritories) {
+                        lifetimepeakterritories = playeroccupied;
+                    }
+
+                    document.getElementById("s-troops").innerText = playertotaltroops;
+                    document.getElementById("s-territories").innerText = playeroccupied;
+                    document.getElementById("territoryprogress").style.width = (playeroccupied/totalterritories)*100 + "%";
                 } else if(response.setcolor) {
                     myColor = response.setcolor;
                 } else if(response.startAttackPhase) {
@@ -597,24 +695,32 @@ function gameConnect(name, inputroomid, pcolor) {
                         document.getElementById("eventstimer").style.display = "none";
                         document.getElementById("eventstimer").style.width = "0%";
                         infobar("show");
-                        document.getElementById("statustext").innerHTML = "<B>Attack Phase Started:</B> Select one of your own territories to move troops or attack!";
+                        document.getElementById("statustext").innerHTML = "<B>Attack Phase Started:</B> Select one of your own territories to move troops or attack! Last person standing wins!";
                         setTimeout(function() {
                             infobar("hide");
                             setTimeout(function() {
                                 document.getElementById("infobar").style.display = "none";
                             }, 400);
-                        }, 6000)
+                        }, 7000);
                     }, 1000);
                 } else if(response.syncTroopTimer) {
                     troopTimerBar();
                 } else if(response.error) {
                     if(response.error === "invalid credentials") {
                         ws.close();
-                        document.getElementById("infobar").style.display = "block";
-                        document.getElementById("eventstimer").style.display = "none";
-                        document.getElementById("eventstimer").style.width = "0%";
-                        infobar("show");
-                        document.getElementById("statustext").innerHTML = "<B>An error occured:</B> Invalid credentials. Please reload the page and join a new game. If this problem persists, contact us.";
+                        notification("error", "Error: Invalid credentials", "Please reload the page and join a new game. If this problem persists, contact us.", 10);
+                    }
+                } else if(response.playerdead) {
+                    if(response.playerdead !== uid) {
+                        let defeatedname = pnames.filter(obj => {
+                            return obj.id === response.playerdead;
+                        });
+                        console.log(defeatedname)
+                        defeatedname = defeatedname[0].name;
+                        notification("warn", defeatedname + " was defeated", defeatedname + " lost all their territories and was defeated!", 6)
+                    } else {
+                        //you died
+
                     }
                 }
             }

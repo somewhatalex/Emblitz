@@ -19,6 +19,9 @@
         <TITLE>Emblitz</TITLE>
     </HEAD>
     <BODY>
+        <DIV ID="notifications">
+            <!-- notifications display here -->
+        </DIV>
         <DIV CLASS="lobbyscreen" ID="lobbyscreen">
             <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
             <DIV CLASS="homemenu">
@@ -83,6 +86,21 @@
                     <DIV CLASS="troopcounter-bg"></DIV>
                     <DIV CLASS="troopcounter"><IMG CLASS="troopcounterimage" SRC="./images/troopgaincounter.png"><DIV CLASS="troopcountertext"><SPAN ID="troopseconds">10</SPAN> seconds</DIV></DIV>
                     <DIV CLASS="timer-bg"><DIV CLASS="timer-line" ID="troopstimer"></DIV></DIV>
+                </DIV>
+                <DIV CLASS="statsbar">
+                    <DIV CLASS="statsbar-bg" ID="statsbar-bg"></DIV>
+                    <DIV CLASS="statsbar-inner">
+                        <DIV CLASS="s-title">Your Stats</DIV>
+                        <DIV CLASS="s-troops"><I CLASS="fa fa-male"></I> <SPAN ID="s-troops">0</SPAN> Troops</DIV>
+                        <DIV CLASS="s-territories"><I CLASS="fa fa-map-marker"></I> <SPAN ID="s-territories">0</SPAN>/<SPAN ID="s-totalterritories">0</SPAN> Territories</DIV>
+                        <DIV CLASS="s-territories-label">Territories captured:</DIV>
+                        <DIV CLASS="s-territories-bar"><DIV ID="territoryprogress" CLASS="s-territories-bar-inner"></DIV></DIV>
+                    </DIV>
+                </DIV>
+                <DIV CLASS="endscreen">
+                    <DIV CLASS="endscreen-bg"></DIV>
+                    <DIV CLASS="e-header">You were defeated</DIV>
+                    <DIV CLASS=""></DIV>
                 </DIV>
             </DIV>
             <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">

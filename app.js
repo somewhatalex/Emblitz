@@ -363,6 +363,14 @@ gameevents.on("syncTroopTimer", function(result) {
     sendRoomMsg(result[0], {"syncTroopTimer": result[1]});
 });
 
+gameevents.on("playerdead", function(result) {
+    sendRoomMsg(result[0], {"playerdead": result[1]});
+});
+
+gameevents.on("playerWon", function(result) {
+    sendRoomMsg(result[0], {"playerWon": result[1]});
+});
+
 //passively send messages to all users in room w/o request
 //format: sendRoomMsg("room69", {"bobux": "momento"});
 

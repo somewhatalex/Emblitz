@@ -181,6 +181,8 @@ function game() {
             let starttroops = games.get(roomid).mapstate[start].troopcount;
             let targettroops = games.get(roomid).mapstate[target].troopcount;
 
+            let targetedplayer = games.get(roomid).mapstate[target].player;
+
             //anticheat
             if(trooppercent > 100) {
                 trooppercent = 100;
@@ -225,7 +227,40 @@ function game() {
                 }
             }
 
+            if(targetedplayer) {
+                let checkterritories = Object.keys(games.get(roomid).mapstate);
+                checkterritories_length = checkterritories.length;
+                let istargetdead = true;
+                for(let i = 0; i < checkterritories_length; i++) {
+                    if(games.get(roomid).mapstate[checkterritories[i]].player === targetedplayer) {
+                        istargetdead = false;
+                        break;
+                    }
+                }
+
+                if(istargetdead) {
+                    self.emit("playerdead", [roomid, targetedplayer]);
+                }
+            }
+
+            checkForWin(roomid);
+
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+        }
+    }
+
+    function checkForWin(roomid) {
+        let checkterritories = Object.keys(games.get(roomid).mapstate);
+        checkterritories_length = checkterritories.length;
+        let totalplayersinroom = []
+        for(let i = 0; i < checkterritories_length; i++) {
+            if(games.get(roomid).mapstate[checkterritories[i]].player && !totalplayersinroom.includes(games.get(roomid).mapstate[checkterritories[i]].player)) {
+                totalplayersinroom.push(games.get(roomid).mapstate[checkterritories[i]].player);
+            }
+        }
+
+        if(totalplayersinroom.length == 1) {
+            self.emit("playerWon", [roomid, totalplayersinroom[0]]);
         }
     }
 
@@ -251,12 +286,14 @@ function game() {
                 let allterritories = Object.keys(games.get(roomid).mapstate);
                 allterritories_length = allterritories.length;
                 for(let i=0; i<allterritories_length; i++) {
-                    if(games.get(roomid).mapstate[allterritories[i]].player === id){
+                    if(games.get(roomid).mapstate[allterritories[i]].player === id) {
                         games.get(roomid).mapstate[allterritories[i]].player = null;
                     }
                 }
                 self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
             }
+
+            checkForWin(roomid);
         } catch {};
         self.emit("removePlayer" + roomid, id);
     }

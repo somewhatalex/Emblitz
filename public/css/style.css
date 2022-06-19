@@ -343,6 +343,7 @@ input { /*override default styles*/
     margin-left: -40px;
     -webkit-box-shadow: 0px 0px 4px 2px #3b3b3b;
     box-shadow: 0px 0px 4px 2px #3b3b3b;
+    overflow: hidden;
 }
 
 .t_p_info {
@@ -442,6 +443,7 @@ input { /*override default styles*/
     display: inline-block;
     -webkit-box-shadow: 0px 0px 4px 2px #3B3B3B; 
     box-shadow: 0px 0px 4px 2px #3B3B3B;
+    overflow: hidden;
 }
 
 .glb_p_info {
@@ -642,3 +644,135 @@ input { /*override default styles*/
     position: relative;
     margin-top: -50px;
 }
+
+#notifications {
+    position: fixed;
+    z-index: 69696;
+    bottom: 20px;
+    right: 0px;
+}
+
+.notification {
+    display: block;
+    position: relative;
+    z-index: 69696;
+    margin-bottom: 10px;
+    text-align: left;
+    padding: 10px;
+    max-width: 320px;
+    min-height: 50px;
+    transition: 0.3s;
+}
+
+.notification-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.8;
+    width: 100%;
+    background: var(--dark);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    z-index: -1;
+    border-left: 5px solid #2aad4d;
+}
+
+.notification-inner {
+    color: var(--light);
+    padding: 5px;
+    margin-left: 10px;
+}
+
+.notification-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.notification-content {
+    font-size: 17px;
+}
+
+.endscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 969696;
+    display: none;
+}
+
+.endscreen-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.9;
+    width: 100%;
+    background: var(--night);
+    z-index: -1;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.statsbar {
+    position: fixed;
+    z-index: 69420;
+    top: 120px;
+    color: var(--light);
+    left: 0;
+    overflow: hidden;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 220px;
+}
+
+.statsbar-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.85;
+    width: 100%;
+    background: var(--dark);
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: -1;
+    border-top: 10px solid #1b63e9;
+}
+
+.statsbar-inner {
+    margin-top: 20px;
+    margin-left: 10px;
+    padding-bottom: 20px;
+}
+
+.s-title {
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.s-troops {
+    margin-top: 5px;
+    line-height: 30px;
+    font-size: 17px;
+}
+
+.s-territories-label {
+    margin-top: 10px;
+}
+
+.s-territories-bar {
+    margin-top: 5px;
+    width: 200px;
+    height: 10px;
+    background: var(--medium);
+}
+
+.s-territories-bar-inner {
+    width: 0%;
+    height: 100%;
+    background: var(--green);
+    transition: 0.3s;
+}
+
