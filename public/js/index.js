@@ -837,8 +837,8 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
 }
 
 function share() {
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(sharedetails);
+    if (parent.navigator.clipboard && window.isSecureContext) {
+        parent.navigator.clipboard.writeText(sharedetails);
     } else {
         //insecure copy paste for development purposes
         let textArea = document.createElement("textarea");
