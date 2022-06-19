@@ -305,7 +305,11 @@ function deployTroops(target) {
 }
 
 async function connectToServer() {
-    const ws = new WebSocket("ws://" + hostname + "/ws");
+    let websockettype = "ws://"
+    if(prod === "yes") {
+        websockettype = "wss://";
+    }
+    const ws = new WebSocket(websockettype + hostname + "/ws");
     return new Promise((resolve, reject) => {
         const timer = setInterval(() => {
             if(ws.readyState === 1) {

@@ -218,6 +218,7 @@ input { /*override default styles*/
     display: inline-block;
     -webkit-box-shadow: 0px 0px 4px 2px #3B3B3B; 
     box-shadow: 0px 0px 4px 2px #3B3B3B;
+    overflow: hidden;
 }
 
 .lb_p_info {

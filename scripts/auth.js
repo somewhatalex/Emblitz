@@ -1,3 +1,4 @@
+/*
 const app = require("../app.js");
 const credentials = require("../auth.json");
 
@@ -32,3 +33,4 @@ function makeUser () {
 module.exports = {
     getUserInfo: getUserInfo
 };
+*/

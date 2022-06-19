@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 //const mysql = require("mysql");
 const credentials = require("./auth.json");
-const auth = require("./scripts/auth.js");
+//const auth = require("./scripts/auth.js");
 const gamehandler = require("./scripts/game.js");
 const emitter = require("events").EventEmitter;
 
@@ -140,7 +140,8 @@ app.get("/", (req, res) => {
     }
 
     res.render("index", {
-        host_name: hostname
+        host_name: hostname,
+        prod: credentials.production
     });
 });
 
