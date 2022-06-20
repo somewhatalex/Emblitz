@@ -33,6 +33,9 @@ var setEventListeners = false; //do not reset this
 
 var alltimeouts = [];
 
+var mapselectindex = 0;
+var mapselectedvalue = "random";
+
 //mobile detection
 window.onload = function() {
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -40,18 +43,47 @@ window.onload = function() {
         document.getElementById("join_input").innerHTML = `
         <DIV STYLE="margin-left: 10px; padding-bottom: 20px; font-size: 20px; color: var(--light);">Sorry, we're still working on the mobile version for the game! Please use a desktop computer or laptop to play Emblitz. Don't worry though, we'll get the mobile version done soon. There could even be an app for it.<BR><BR>This this message is a mistake and you aren't on mobile right now? If so, send us a bug report.</DIV>`
     }
+
+    if(history.scrollRestoration) {
+        history.scrollRestoration = "manual";
+    } else {
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+    }
+
+
+    inithomepage();
 }
 
 function inithomepage() {
     if(!localStorage.getItem("color")) {
         localStorage.setItem("color", "red");
     }
+
     if(!localStorage.getItem("map")) {
         localStorage.setItem("map", "random");
     }
-}
 
-inithomepage();
+    for(let i=0; i<mapDescriptions.length; i++) {
+        if(mapDescriptions[i][3] === localStorage.getItem("map")) {
+            mapselectindex = i;
+
+            mapselectedvalue = mapDescriptions[i][3];
+
+            document.getElementById("s-title").innerText = mapDescriptions[mapselectindex][0];
+            document.getElementById("s-description").innerText = mapDescriptions[mapselectindex][1];
+            document.getElementById("s-image").src = mapDescriptions[mapselectindex][2];
+            if(mapDescriptions[mapselectindex][4]) {
+                document.getElementById("s-maxplayers").style.display = "block";
+                document.getElementById("s-maxplayers").innerText = "Max players: " + mapDescriptions[mapselectindex][4];
+            } else {
+                document.getElementById("s-maxplayers").style.display = "none";
+            }
+            break;
+        }
+    }
+}
 
 function resetAll() {
     roomid = "";
@@ -86,6 +118,8 @@ function resetAll() {
     sharedetails = "";
     
     alltimeouts = [];
+
+    mapselectindex = 0;
 }
 
 function getOffset(el) {
@@ -899,4 +933,32 @@ function toggleqcvisibility() {
     } else {
         document.getElementById("quitconfirm").style.display = "block"
     }
+}
+
+function changeMapSelect(direction) {
+    if(direction === "left") {
+        mapselectindex--;
+        if(mapselectindex <= 0) {
+            mapselectindex = mapDescriptions.length;
+        }
+    } else {
+        mapselectindex++;
+        if(mapselectindex >= mapDescriptions.length) {
+            mapselectindex = 0;
+        }
+    }
+
+    mapselectedvalue = mapDescriptions[mapselectindex][3];
+    
+    document.getElementById("s-title").innerText = mapDescriptions[mapselectindex][0];
+    document.getElementById("s-description").innerText = mapDescriptions[mapselectindex][1];
+    document.getElementById("s-image").src = mapDescriptions[mapselectindex][2];
+    if(mapDescriptions[mapselectindex][4]) {
+        document.getElementById("s-maxplayers").style.display = "block";
+        document.getElementById("s-maxplayers").innerText = "Max players: " + mapDescriptions[mapselectindex][4];
+    } else {
+        document.getElementById("s-maxplayers").style.display = "none";
+    }
+
+    localStorage.setItem("map", mapDescriptions[mapselectindex][3]);
 }

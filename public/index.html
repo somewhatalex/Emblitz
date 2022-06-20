@@ -17,6 +17,7 @@
         <SCRIPT TYPE="text/javascript" SRC="./js/mapnames.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/index.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/mapper.js"></SCRIPT>
+        <SCRIPT TYPE="text/javascript" SRC="./js/mapdescriptions.js"></SCRIPT>
 
         <TITLE>Emblitz</TITLE>
     </HEAD>
@@ -31,38 +32,60 @@
                 <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
                 <DIV CLASS="join_input" ID="join_input">
                     <INPUT ID="p_name" CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Name here...">
+                    <SELECT CLASS="framecolorselect" ID="framecolor" STYLE="padding: 5px; font-size: 17px">
+                        <OPTION VALUE="red">red</OPTION>
+                        <OPTION VALUE="orange">orange</OPTION>
+                        <OPTION VALUE="yellow">yellow</OPTION>
+                        <OPTION VALUE="green">green</OPTION>
+                        <OPTION VALUE="blue">blue</OPTION>
+                        <OPTION VALUE="purple">purple</OPTION>
+                    </SELECT>
                     <DIV CLASS="mapselect">
                         <DIV CLASS="mapselecttitle">Current map selection:</DIV>
-                        <DIV CLASS="selectedmap">
-                            
-                        </DIV>
+                        <TABLE CLASS="mapnav">
+                            <TBODY>
+                                <TR>
+                                    <TD>
+                                        <BUTTON CLASS="mapnavbutton" ID="mapleft" ONCLICK="changeMapSelect('left')"><I CLASS="fa fa-chevron-left"></I></BUTTON>
+                                    </TD>
+                                    <TD>
+                                        <!-- map selection card -->
+                                        <DIV CLASS="selectedmapcontainer">
+                                            <TABLE CLASS="selectedmap">
+                                                <TBODY>
+                                                    <TR>
+                                                        <TD>
+                                                            <DIV CLASS="s-image"><IMG ID="s-image" SRC="./images/randompreview.JPG"></DIV>
+                                                        </TD>
+                                                        <TD>
+                                                            <DIV CLASS="s-text">
+                                                                <DIV CLASS="s-title" ID="s-title">Random Map</DIV>
+                                                                <DIV ID="s-maxplayers" STYLE="font-size: 13px; display: none"></DIV>
+                                                                <DIV CLASS="s-description" ID="s-description">You'll join a game with a random map. It could be anything, so be prepared!</DIV>
+                                                            </DIV>
+                                                        </TD>
+                                                    </TR>
+                                                </TBODY>
+                                            </TABLE>
+                                        </DIV>
+                                    </TD>
+                                    <TD>
+                                        <BUTTON CLASS="mapnavbutton" ID="mapright" ONCLICK="changeMapSelect('right')"><I CLASS="fa fa-chevron-right"></I></BUTTON>
+                                    </TD>
+                                </TR>
+                            </TBODY>
+                        </TABLE>
                     </DIV>
                     <DIV CLASS="h_button_options">
-                        <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, document.getElementById('mapselect').value, false)">Play</BUTTON>
+                        <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, false)">Play</BUTTON>
                         <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
                         <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
                             <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game.</DIV>
                             <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value, null, false)">Connect</BUTTON>
                         </DIV>
                         <BR><BR>
-                        <BUTTON CLASS="joinbutton jb_gray" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, document.getElementById('mapselect').value, true)">Create Room</BUTTON>
+                        <BUTTON CLASS="joinbutton jb_gray" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)">Create Room</BUTTON>
                         <BR><BR>
-                        <!-- REMOVE THIS WHEN DONE, MAKE BETTER LOOKING COLOR SELECT MENU -->
-                        (preference select; this is only for testing and is temporary)<BR>
-                        <SELECT ID="framecolor" STYLE="padding: 5px; font-size: 17px">
-                            <OPTION VALUE="red">red</OPTION>
-                            <OPTION VALUE="orange">orange</OPTION>
-                            <OPTION VALUE="yellow">yellow</OPTION>
-                            <OPTION VALUE="green">green</OPTION>
-                            <OPTION VALUE="blue">blue</OPTION>
-                            <OPTION VALUE="purple">purple</OPTION>
-                        </SELECT>
-                        <SELECT ID="mapselect" STYLE="padding: 5px; font-size: 17px">
-                            <OPTION VALUE="random">Random Map</OPTION>
-                            <OPTION VALUE="miniworld">Micro World</OPTION>
-                            <OPTION VALUE="michigan">Michigan</OPTION>
-                        </SELECT>
-
                     </DIV>
                 </DIV>
             </DIV>

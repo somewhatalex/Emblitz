@@ -17,6 +17,26 @@ body {
     overflow-x: hidden;
 }
 
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #404040;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 button { /*override default styles*/
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -116,7 +136,7 @@ input { /*override default styles*/
 
 .join_input  {
     text-align: center;
-    margin-left: 20px;
+    margin-left: 30px;
     margin-right: 20px;
 }
 
@@ -563,14 +583,16 @@ input { /*override default styles*/
     top: 50px;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 500px;
+    width: 500px;
     text-align: center;
     color: var(--light);
+    margin-left: -25px;
 }
 
 .mainlogoimg {
     width: 400px;
     padding: 10px;
+    margin-left: 10px;
 }
 
 .homemenu-bg {
@@ -592,8 +614,8 @@ input { /*override default styles*/
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
     background: #268cbb;
 }
@@ -948,4 +970,68 @@ input { /*override default styles*/
 
 #invitecode {
     font-weight: bold;
+}
+
+.s-image {
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+#s-image {
+    width: 80px;
+}
+
+.selectedmapcontainer {
+    background: #3f3f3f;
+    margin: auto;
+    max-width: 370px;
+    border-radius: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.selectedmap {
+    margin: auto;
+    border-collapse: collapse;
+    max-width: 350px;
+    max-height: 270px;
+}
+
+.s-text {
+    display: inline-block;
+    text-align: left;
+    padding-left: 10px;
+    overflow: auto;
+    height: 108px;
+}
+
+.s-description {
+    font-size: 15px;
+}
+
+.mapnav {
+    margin: auto;
+    margin-top: 5px;
+    border-collapse: collapse;
+}
+
+.mapnavbutton {
+    border: none;
+    background: none;
+    color: var(--light);
+    font-size: 28px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.mapnavbutton:hover {
+    font-size: 34px;
+}
+
+.framecolor-select {
+    
 }

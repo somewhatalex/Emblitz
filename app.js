@@ -176,6 +176,10 @@ app.get("/login", (req, res) => {
     });
 });
 
+app.get("/tutorial", (req, res) => {
+    res.render("tutorial")
+});
+
 //id = roomid
 function getroommap(id) {
     for(let i=0; i<rooms.length; i++) {
