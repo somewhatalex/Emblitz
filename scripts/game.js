@@ -34,7 +34,7 @@ function game() {
     }
 
     this.resumeLobbyTimer = function(roomid) {
-        gameLobbyTimerHandlers[roomid].resume(gameLobbyTimers[roomid]);
+        gameLobbyTimerHandlers[roomid].resume(gameLobbyTimers[roomid], roomid);
     }
 
     this.skipLobbyTimer = function(roomid) {
@@ -44,7 +44,7 @@ function game() {
     }
 
     function Timer(id, callback, delay) {
-        let args = arguments, self = this;
+        let args = arguments, selftimer = this;
         let start = Math.floor(new Date().getTime());
     
         this.clear = function(id) {
@@ -56,10 +56,11 @@ function game() {
             delay = delay - (Math.floor(new Date().getTime()) - start);
         };
     
-        this.resume = function(id) {
+        this.resume = function(id, roomid) {
             start = Math.floor(new Date().getTime());
+            self.emit("updateLobbyTimer", [roomid, delay]);
             gameLobbyTimers[id] = setTimeout(function() {
-                callback.apply(self, Array.prototype.slice.call(args, 3, args.length));
+                callback.apply(selftimer, Array.prototype.slice.call(args, 3, args.length));
             }, delay);
         };
     

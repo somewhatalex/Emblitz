@@ -59,10 +59,16 @@ window.onload = function() {
 function inithomepage() {
     if(!localStorage.getItem("color")) {
         localStorage.setItem("color", "red");
+    } else {
+        document.getElementById("framecolor").value = localStorage.getItem("color");
     }
 
     if(!localStorage.getItem("map")) {
         localStorage.setItem("map", "random");
+    }
+
+    if(localStorage.getItem("username")) {
+        document.getElementById("p_name").value = localStorage.getItem("username");
     }
 
     for(let i=0; i<mapDescriptions.length; i++) {
@@ -582,6 +588,19 @@ function getCookie(name) {
 
 const gid = getCookie("GID");
 
+var lobbytimeinterval = null;
+var lobbycountdown = 20;
+function tickLobbyTimer() {
+    lobbycountdown = 20;
+    document.getElementById("timeramount").innerText = lobbycountdown;
+    lobbytimeinterval = setInterval(function() {
+        if(document.getElementsByClassName("glb_player").length > 1 && lobbycountdown > 0) {
+            lobbycountdown--
+            document.getElementById("timeramount").innerText = lobbycountdown;
+        }
+    }, 1000);
+}
+
 function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
@@ -589,6 +608,7 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
     joinGame(inputroomid, pmap, createnewroom).then(function() {
         connectToServer().then(function(ws) {
             document.getElementById("invitecode").innerText = roomid.replace("r-", "");
+            tickLobbyTimer();
             websocket = ws;
             ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "pcolor": pcolor, "gid": gid}));
             confirmJoinGame().then(function() {
@@ -628,6 +648,11 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                     } else {
                         //in lobby
                         document.getElementById("lobbyptable").innerHTML = "";
+                        if(response.isprivateroom) {
+                            document.getElementById("proomdisplay").style.display = "block";
+                        } else {
+                            document.getElementById("proomdisplay").style.display = "none";
+                        }
                         for(let i=0; i<response.users.length; i++) {
                             if(response.users[i].id === uid) {
                                 document.getElementById("lobbyptable").innerHTML += `
@@ -864,6 +889,9 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                             document.getElementById("endscreen").style.opacity = "1";
                         }, 100);
                     }
+                } else if(response.lobbytimer) {
+                    lobbycountdown = response.lobbytimer;
+                    document.getElementById("timeramount").innerText = lobbycountdown;
                 }
             }
         });
@@ -907,7 +935,6 @@ function leavegame() {
     document.getElementById("mapl2").innerHTML = "";
     document.getElementById("mapsvgbox").remove();
     document.getElementById("lobbyscreen").style.display = "block";
-    document.getElementById("lobbyscreen").style.display = "block";
     document.getElementById("gamescreen").style.display = "none";
     document.getElementById("gamelobby").style.display = "none";
     document.getElementById("lobbyptable").innerHTML = "";
@@ -938,8 +965,8 @@ function toggleqcvisibility() {
 function changeMapSelect(direction) {
     if(direction === "left") {
         mapselectindex--;
-        if(mapselectindex <= 0) {
-            mapselectindex = mapDescriptions.length;
+        if(mapselectindex < 0) {
+            mapselectindex = mapDescriptions.length-1;
         }
     } else {
         mapselectindex++;
@@ -961,4 +988,16 @@ function changeMapSelect(direction) {
     }
 
     localStorage.setItem("map", mapDescriptions[mapselectindex][3]);
+}
+
+function exitLobby() {
+    websocket.close();
+    for (let i=0; i<alltimeouts.length; i++) {
+        clearTimeout(alltimeouts[i]);
+    }
+    clearInterval(lobbytimeinterval);
+    lobbycountdown = 20;
+    document.getElementById("lobbyscreen").style.display = "block";
+    document.getElementById("gamescreen").style.display = "none";
+    document.getElementById("gamelobby").style.display = "none";
 }

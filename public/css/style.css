@@ -141,12 +141,13 @@ input { /*override default styles*/
 }
 
 .name_input {
-    width: 80%;
+    width: calc(80% - 87px);
     max-width: 350px;
     padding: 8px;
     font-size: 18px;
     border: 3px solid var(--medium);
     background: var(--light);
+    margin-right: 0px;
 }
 
 .h_button_options {
@@ -966,10 +967,25 @@ input { /*override default styles*/
 .invitecode {
     font-size: 17px;
     margin-top: 10px;
+    margin-left: 8px;
 }
 
 #invitecode {
     font-weight: bold;
+}
+
+.timercode {
+    margin-top: 5px;
+    margin-left: 8px;
+}
+
+#timeramount {
+    font-weight: bold;
+}
+
+.privateroomdisplay {
+    margin-top: 5px;
+    margin-left: 8px;
 }
 
 .s-image {
@@ -1032,6 +1048,30 @@ input { /*override default styles*/
     font-size: 34px;
 }
 
-.framecolor-select {
-    
+.framecolorselect {
+    display: inline-block;
+    padding: 7px;
+    padding-bottom: 8px;
+    font-size: 18px;
+    margin-left: -5px;
+    border-top: 3px solid var(--medium);
+    border-bottom: 3px solid var(--medium);
+    border-right: 3px solid var(--medium);
+    border-left: none;
+}
+
+.ji-area {
+    text-align: center;
+}
+
+.ji-header {
+    margin-bottom: 15px;
+}
+
+.gameversion {
+    font-size: 18px;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: var(--light);
 }

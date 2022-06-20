@@ -18,12 +18,15 @@ const emitter = require("events").EventEmitter;
 const authsecret = "average-balls-enjoyer-69";
 var port = credentials.serverport;
 
+//GAME VERSION
+const gameversion = "Alpha 1.0.0";
+
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6};
 //-- end configs --
 
 //-- version --
-console.log("Using server version 6.18.2022");
+console.log("Using game version " + gameversion);
 //-- end version --
 
 //-- player colors --
@@ -160,7 +163,8 @@ app.get("/", (req, res) => {
 
     res.render("index", {
         host_name: hostname,
-        prod: credentials.production
+        prod: credentials.production,
+        gameversion: gameversion
     });
 });
 
@@ -217,7 +221,6 @@ app.post("/api", (req, res) => {
                         if(rooms[i]["players"] >= rooms[i]["maxplayers"]) {
                             res.json({"error": "room " + preset + " is full"});
                         } else {
-                            rooms[i]["players"]++;
                             res.json({"uid": userid(), "room": preset});
                         }
                         roomfound = true;
@@ -396,7 +399,7 @@ gameevents.on("startAttackPhase", function(result) {
 gameevents.on("startDeployPhase", function(result) {
     sendRoomMsg(result[0], {"startgame": true, "deploytime": result[1]/1000});
     let roomcount = rooms.length;
-    for(let i=0; i<rooms.length; i++) {
+    for(let i=0; i<roomcount; i++) {
         if(rooms[i].id === result[0]) {
             rooms[i]["ingame"] = true;
             break;
@@ -406,6 +409,12 @@ gameevents.on("startDeployPhase", function(result) {
 
 gameevents.on("syncTroopTimer", function(result) {
     sendRoomMsg(result[0], {"syncTroopTimer": result[1]});
+});
+
+gameevents.on("updateLobbyTimer", function(result) {
+    setTimeout(function() {
+        sendRoomMsg(result[0], {"lobbytimer": Math.round(result[1]/1000)-1});
+    }, 1000);
 });
 
 gameevents.on("playerdead", function(result) {
@@ -582,7 +591,7 @@ wss.on("connection", (ws) => {
                         sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
                     }
                 } else if(action === "userlogin") {
-                    sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
+                    sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"], "isprivateroom": rooms[i]["isprivate"]});
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 }

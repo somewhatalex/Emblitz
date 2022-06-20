@@ -31,15 +31,18 @@
                 <DIV CLASS="homemenu-bg"></DIV>
                 <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
                 <DIV CLASS="join_input" ID="join_input">
-                    <INPUT ID="p_name" CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Name here...">
-                    <SELECT CLASS="framecolorselect" ID="framecolor" STYLE="padding: 5px; font-size: 17px">
-                        <OPTION VALUE="red">red</OPTION>
-                        <OPTION VALUE="orange">orange</OPTION>
-                        <OPTION VALUE="yellow">yellow</OPTION>
-                        <OPTION VALUE="green">green</OPTION>
-                        <OPTION VALUE="blue">blue</OPTION>
-                        <OPTION VALUE="purple">purple</OPTION>
-                    </SELECT>
+                    <DIV CLASS="ji-area">
+                        <DIV CLASS="ji-header">Enter your username and preferred player color.</DIV>
+                        <INPUT ID="p_name" ONKEYUP='localStorage.setItem("username", this.value);' CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Username here...">
+                        <SELECT ONCHANGE='localStorage.setItem("color", this.value);' CLASS="framecolorselect" ID="framecolor">
+                            <OPTION VALUE="red">red</OPTION>
+                            <OPTION VALUE="orange">orange</OPTION>
+                            <OPTION VALUE="yellow">yellow</OPTION>
+                            <OPTION VALUE="green">green</OPTION>
+                            <OPTION VALUE="blue">blue</OPTION>
+                            <OPTION VALUE="purple">purple</OPTION>
+                        </SELECT>
+                    </DIV>
                     <DIV CLASS="mapselect">
                         <DIV CLASS="mapselecttitle">Current map selection:</DIV>
                         <TABLE CLASS="mapnav">
@@ -84,11 +87,12 @@
                             <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value, null, false)">Connect</BUTTON>
                         </DIV>
                         <BR><BR>
-                        <BUTTON CLASS="joinbutton jb_gray" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)">Create Room</BUTTON>
+                        <BUTTON CLASS="joinbutton jb_gray" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                         <BR><BR>
                     </DIV>
                 </DIV>
             </DIV>
+            <DIV CLASS="gameversion"><%= gameversion %></DIV>
         </DIV>
         <DIV CLASS="gamelobby" ID="gamelobby">
             <DIV CLASS="globby_container">
@@ -97,7 +101,10 @@
 
                 </DIV>
                 <DIV CLASS="invitecode">Room join code: <SPAN ID="invitecode">-----</SPAN></DIV>
+                <DIV CLASS="timercode">Auto starts in: <SPAN ID="timeramount">-----</SPAN> seconds</DIV>
+                <DIV CLASS="privateroomdisplay" ID="proomdisplay" STYLE="display: none"><I CLASS="fa fa-lock"></I> This room is a private room. Users can only join using the room join code.</DIV>
                 <BUTTON ID="startvote" CLASS="joinbutton jb_green" STYLE="margin-top: 10px;">Ready</BUTTON>
+                <BUTTON ONCLICK="exitLobby()" CLASS="joinbutton jb_gray" STYLE="margin-top: 10px; padding-left: 5px; padding-right: 5px">Back to Main Menu</BUTTON>
             </DIV>
         </DIV>
         <DIV CLASS="gamescreen" ID="gamescreen">
