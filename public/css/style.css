@@ -1075,3 +1075,21 @@ input { /*override default styles*/
     left: 10px;
     color: var(--light);
 }
+
+.ltp-link {
+    margin: 10px;
+    color: var(--light);
+    font-size: 17px;
+}
+
+.ltp-link:visited {
+    color: var(--light);
+}
+
+.ltp-link:hover {
+    color: var(--medium);
+}
+
+.ltp-link:visited:hover {
+    color: var(--medium);
+}
