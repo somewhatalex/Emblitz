@@ -1018,5 +1018,5 @@ function showtutorialtt() {
     document.getElementById("t-tooltip").style.display = "block";
     setTimeout(function() {
         document.getElementById("t-tooltip").style.right = "10px";
-    }, 2000);
+    }, 100);
 }
