@@ -71,6 +71,11 @@ function inithomepage() {
         document.getElementById("p_name").value = localStorage.getItem("username");
     }
 
+    if(!localStorage.getItem("hasvisited")) {
+        showtutorialtt();
+        localStorage.setItem("hasvisited", true);
+    }
+
     for(let i=0; i<mapDescriptions.length; i++) {
         if(mapDescriptions[i][3] === localStorage.getItem("map")) {
             mapselectindex = i;
@@ -1000,4 +1005,18 @@ function exitLobby() {
     document.getElementById("lobbyscreen").style.display = "block";
     document.getElementById("gamescreen").style.display = "none";
     document.getElementById("gamelobby").style.display = "none";
+}
+
+function hidetutorialtt() {
+    document.getElementById('t-tooltip').style.right = "-350px";
+    setTimeout(function() {
+        document.getElementById('t-tooltip').style.display = "none";
+    }, 300)
+}
+
+function showtutorialtt() {
+    document.getElementById("t-tooltip").style.display = "block";
+    setTimeout(function() {
+        document.getElementById("t-tooltip").style.right = "10px";
+    }, 2000);
 }

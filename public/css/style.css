@@ -1093,3 +1093,56 @@ input { /*override default styles*/
 .ltp-link:visited:hover {
     color: var(--medium);
 }
+
+.tutorial-tooltip {
+    position: fixed;
+    top: 10px;
+    background: var(--light);
+    -webkit-box-shadow: 0px 0px 4px 2px #3B3B3B; 
+    box-shadow: 0px 0px 4px 2px #3B3B3B;
+    text-align: left;
+    right: -350px;
+    transition: 0.3s;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 10px;
+    z-index: 6969;
+    width: 300px;
+    display: none;
+}
+
+.tooltip-link {
+    padding: 10px;
+    background-color: var(--green);
+    display: block;
+    text-align: center;
+    color: var(--light);
+    text-decoration: none;
+    margin-top: 5px;
+    transition: 0.3s;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.tooltip-link:hover {
+    background: var(--green-darker)
+}
+
+.tooltip-link-second {
+    padding: 10px;
+    background-color: #6e6e6e;
+    display: block;
+    text-align: center;
+    color: var(--light);
+    text-decoration: none;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+    font-size: 16px;
+    border: none;
+}
+
+.tooltip-link-second:hover {
+    background: #4d4d4d;
+}

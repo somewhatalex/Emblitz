@@ -47,6 +47,7 @@
         </DIV>
         <DIV CLASS="lobbyscreen" ID="lobbyscreen">
             <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
+            <DIV CLASS="tutorial-tooltip" ID="t-tooltip">Hello there! Thanks for playing our game. Would you like to check out the tutorial? It's always accessible through the "Learn to Play" button on the bottom of the page as well.<A HREF="./tutorial" ONCLICK="hidetutorialtt()" TARGET="_blank" CLASS="tooltip-link">Sure!</A><BUTTON ONCLICK="hidetutorialtt();" CLASS="tooltip-link-second">No thanks</BUTTON></DIV>
             <DIV CLASS="homemenu">
                 <DIV CLASS="homemenu-bg"></DIV>
                 <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
@@ -110,7 +111,7 @@
                         <BUTTON CLASS="joinbutton jb_gray" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                         <BR>
                     </DIV>
-                    <A HREF="./tutorial" CLASS="ltp-link">Learn to Play</A><BR><BR>
+                    <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link">Learn to Play</A><BR><BR>
                 </DIV>
             </DIV>
             <DIV CLASS="gameversion"><%= gameversion %></DIV>
