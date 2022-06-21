@@ -581,7 +581,7 @@ input { /*override default styles*/
 
 .homemenu {
     position: absolute;
-    top: 50px;
+    top: 35px;
     left: 50%;
     transform: translateX(-50%);
     width: 500px;
@@ -1074,6 +1074,7 @@ input { /*override default styles*/
     bottom: 10px;
     left: 10px;
     color: var(--light);
+    z-index: -1;
 }
 
 .ltp-link {
@@ -1145,4 +1146,42 @@ input { /*override default styles*/
 
 .tooltip-link-second:hover {
     background: #4d4d4d;
+}
+
+.socials {
+    position: fixed;
+    z-index: -1;
+    top: 35px;
+    font-size: 21px;
+    color: var(--light);
+    left: 0;
+    overflow: hidden;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 160px;
+    text-align: center;
+}
+
+.socials-header {
+    font-size: 17px;
+    color: var(--light);
+}
+
+.socials-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.7;
+    width: 100%;
+    background: var(--dark);
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: -1;
+}
+
+.socials-icon {
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    margin: 5px;
 }
