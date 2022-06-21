@@ -19,7 +19,7 @@ const authsecret = "average-balls-enjoyer-69";
 var port = credentials.serverport;
 
 //GAME VERSION
-const gameversion = "Alpha 1.0.4";
+const gameversion = "Alpha 1.0.5 | 6/21/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6};

@@ -462,9 +462,15 @@ function joinGame(inputroomid, pmap, createnewroom) {
     return new Promise((resolve, reject) => {
         fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "joingame", prefermap: pmap, preset: inputroomid, createnewroom: createnewroom})}).then(response => {
             response.json().then(function(text) {
-                roomid = text.room;
-                uid = text.uid;
-                resolve("ok");
+                if(!text.error) {
+                    roomid = text.room;
+                    uid = text.uid;
+                    resolve("ok");
+                } else if(text.error === "room " + inputroomid + " is full") {
+                    reject("The room you tried joining is full. Try joining another game.");
+                } else if(text.error === "room " + inputroomid + " does not exist") {
+                    reject("The room you tried joining does not exist. Did you type the join code correctly?");
+                }
             });
         });
     });
@@ -900,6 +906,9 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                 }
             }
         });
+    }).catch(function(error) {
+        notification("error", "Error", error, 6);
+        exitLobby();
     });
 }
 
@@ -996,7 +1005,9 @@ function changeMapSelect(direction) {
 }
 
 function exitLobby() {
-    websocket.close();
+    if(websocket) {
+        websocket.close();
+    }
     for (let i=0; i<alltimeouts.length; i++) {
         clearTimeout(alltimeouts[i]);
     }
