@@ -641,7 +641,8 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                                 document.getElementById("players_container").innerHTML += `
                                 <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
                                     <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV>
+                                    <BR><DIV CLASS="l-stats"><I CLASS="fa fa-male"></I> <SPAN ID="troops-${response.users[i].id}">0</SPAN> | <I CLASS="fa fa-map-marker"></I> <SPAN ID="territories-${response.users[i].id}">0</SPAN></DIV></DIV>
                                 </DIV>`;
                                 document.getElementById("t-avatar-frame").style.border = "5px solid " + response.users[i].pcolor;
                                 document.getElementById("t-avatar-frame").innerHTML = `<IMG STYLE="width: 90px; height: 90px" SRC="./images/defaultpfp.png">`;
@@ -650,7 +651,8 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                                 document.getElementById("players_container").innerHTML += `
                                 <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
                                     <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
+                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV>
+                                    <BR><DIV CLASS="l-stats"><I CLASS="fa fa-male"></I> <SPAN ID="troops-${response.users[i].id}">0</SPAN> | <I CLASS="fa fa-map-marker"></I> <SPAN ID="territories-${response.users[i].id}">0</SPAN></DIV></DIV>
                                 </DIV>`;
                             }
                             playerColors[response.users[i].id] = response.users[i].pcolor;
@@ -757,11 +759,12 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                     let reslength = Object.keys(updatemapdata).length;
                     let playeroccupied = 0;
                     let playertotaltroops = 0;
+                    let playerstats = {};
                     for(let i=0; i<reslength; i++) {
                         let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
                         let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
                         if(!document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase())) {
-                        console.log(c_update_map_info.territory.toLowerCase());
+                            console.log(c_update_map_info.territory.toLowerCase());
                         }
                         let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
                         let initialcolor = selectterritory.getAttribute("data-color");
@@ -777,6 +780,12 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                         if(selectterritory.getAttribute("data-color") === myColor) {
                             playertotaltroops = playertotaltroops + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText);
                             playeroccupied++;
+                        } else if(selectterritory.getAttribute("data-color") !== "default"){
+                            if(!playerstats.hasOwnProperty(selectterritory.getAttribute("data-color"))) {
+                                playerstats[selectterritory.getAttribute("data-color")] = [Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), 1];
+                            } else {
+                                playerstats[selectterritory.getAttribute("data-color")] = [playerstats[selectterritory.getAttribute("data-color")][0] + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), playerstats[selectterritory.getAttribute("data-color")][1] + 1];
+                            }
                         }
 
                         if(attackPhase === "attack") {
@@ -811,6 +820,19 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                     document.getElementById("s-troops").innerText = playertotaltroops;
                     document.getElementById("s-territories").innerText = playeroccupied;
                     document.getElementById("territoryprogress").style.width = (playeroccupied/totalterritories)*100 + "%";
+
+                    document.getElementById("troops-" + uid).innerText = playertotaltroops;
+                    document.getElementById("territories-" + uid).innerText = playeroccupied;
+
+                    for(p_key in playerstats) {
+                        for(key in playerColors) {
+                            if(playerColors[key] === p_key) {
+                                document.getElementById("troops-" + key).innerText = playerstats[p_key][0];
+                                document.getElementById("territories-" + key).innerText = playerstats[p_key][1];
+                                break;
+                            }
+                        }
+                    }
                 } else if(response.setcolor) {
                     myColor = response.setcolor;
                 } else if(response.startAttackPhase) {

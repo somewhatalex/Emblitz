@@ -494,7 +494,7 @@ input { /*override default styles*/
 
 .infobar-main {
     position: fixed;
-    z-index: 69420;
+    z-index: 694200;
     top: -70px;
     font-size: 21px;
     color: var(--light);
@@ -1184,4 +1184,10 @@ input { /*override default styles*/
     height: 60px;
     cursor: pointer;
     margin: 5px;
+}
+
+.l-stats {
+    font-size: 14px;
+    color: var(--light);
+    margin-top: -20px;
 }
