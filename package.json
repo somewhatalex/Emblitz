@@ -21,6 +21,7 @@
   "homepage": "https://github.com/bob4koolest/emblitz#readme",
   "dependencies": {
     "body-parser": "^1.20.0",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.8",
     "events": "^3.3.0",

@@ -13,6 +13,7 @@ const credentials = require("./auth.json");
 //const auth = require("./scripts/auth.js");
 const gamehandler = require("./scripts/game.js");
 const emitter = require("events").EventEmitter;
+const compression = require("compression");
 
 //-- configs --
 const authsecret = "average-balls-enjoyer-69";
@@ -106,6 +107,7 @@ app.engine("html", require("ejs").renderFile);
 app.set("views", path.join(__dirname, "./public"));
 app.disable("x-powered-by");
 app.use(requireHTTPS);
+app.use(compression());
 
 //enable req.body to be used
 app.use(bodyParser.urlencoded({

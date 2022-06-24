@@ -5,14 +5,9 @@ You need to set up an sql server and create the `auth.json` file for the databas
 Host should be `127.0.0.1` if testing locally.
 ```
 {
-    "host": "[HOST]",
-    "user": "[USERNAME]",
-    "password": "[PASSWORD]",
-    "port": [PORT NUMBER],
-    "database": "[DATABASE NAME]",
-    
-    "hostname": "[HOSTNAME]",
-    "serverport": [SERVER PORT NUMBER]
+    "hostname": "[hostname/www.emblitz.com]",
+    "serverport": 6969,
+    "production": "[yes/no]"
 }
 ```
 
@@ -28,6 +23,6 @@ npm i jsonwebtoken
 npm i path
 npm i websocket
 npm i ws
-npm i mysql
 npm i events
+npm i compression
 ```
