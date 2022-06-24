@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<HTML>
+<HTML LANG="en">
     <HEAD>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <LINK REL="stylesheet" HREF="./css/style.css">
@@ -15,6 +15,8 @@
             font-family: 'Open Sans', sans-serif;
             margin: 0;
             overflow-x: hidden;
+            background: var(--dark);
+            color: var(--light);
         }
 
         h1 {
@@ -24,10 +26,17 @@
 
         .errordescript {
             font-size: 20px;
+            text-align: center;
+        }
+
+        .errorlogo {
+            width: 320px;
+            margin-top: 20px;
         }
     </STYLE>
     <BODY>
-        <H1>404</H1>
-        <DIV CLASS="errordescript">Page not found</DIV>
+        <A HREF="https://www.emblitz.com"><IMG CLASS="errorlogo" SRC="../images/logo.png"></A>
+        <H1 STYLE="margin-top: 10px;">404</H1>
+        <DIV CLASS="errordescript"><DIV STYLE="max-width: 400px; margin: auto;">We searched through every map and territory but couldn't find the page you were looking for. <A CLASS="nostyle-link" HREF="https://www.emblitz.com">How about going back to the home page?</A></DIV></DIV>
     </BODY>
 </HTML>
