@@ -36,13 +36,17 @@ var alltimeouts = [];
 var mapselectindex = 0;
 var mapselectedvalue = "random";
 
+var showlb = false; //mobile only
+
 //mobile detection
 window.onload = function() {
+    /*
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
         document.getElementsByClassName("mainlogoimg")[0].style.width = "250px";
         document.getElementById("join_input").innerHTML = `
         <DIV STYLE="margin-left: 10px; padding-bottom: 20px; font-size: 20px; color: var(--light);">Sorry, we're still working on the mobile version for the game! Please use a desktop computer or laptop to play Emblitz. Don't worry though, we'll get the mobile version done soon. There could even be an app for it.<BR><BR>This this message is a mistake and you aren't on mobile right now? If so, send us a bug report.</DIV>`
     }
+    */
 
     if(history.scrollRestoration) {
         history.scrollRestoration = "manual";
@@ -131,6 +135,8 @@ function resetAll() {
     alltimeouts = [];
 
     mapselectindex = 0;
+
+    showlb = false;
 }
 
 function getOffset(el) {
@@ -345,13 +351,13 @@ function initializeMap() {
         });
 
         //panning
-        document.addEventListener("mousedown", function(e) {
+        document.addEventListener("pointerdown", function(e) {
             if(document.getElementById("quitconfirm").style.display === "block" && e.target !== document.getElementById("quitconfirm") && e.target !== document.getElementById("leavegamebutton") && !document.getElementById("quitconfirm").contains(e.target) && !document.getElementById("leavegamebutton").contains(e.target)) {
                 document.getElementById("quitconfirm").style.display = "none";
             }
             isMouseDown = 1;
         });
-        document.addEventListener("mouseup", function(e) {
+        document.addEventListener("pointerup", function(e) {
             isMouseDown = 0;
             //delay 1ms to prevent immediate cancelation
             if(isDragging == true) {
@@ -360,34 +366,65 @@ function initializeMap() {
                 }, 1)
             }
         });
-        document.addEventListener("mousemove", function(e) {
-            if(isMouseDown) {
-                if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
-                    if(document.getElementById("player_gui").contains(e.target)) return;
-                    isDragging = true;
-                    let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
-                    let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+        document.addEventListener("pointermove", function(e) {
+            switch(e.pointerType) {
+                case "touch":
+                    if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                        if(document.getElementById("player_gui").contains(e.target)) return;
+                        isDragging = true;
+                        let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
+                        let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
 
-                    let deltaX = e.movementX/1.3;
-                    let deltaY = e.movementY/1.3;
+                        let deltaX = e.movementX/1.3;
+                        let deltaY = e.movementY/1.3;
 
-                    //must check both x and y coords for scrolling
-                    if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
-                        deltaX = 0;
-                    } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
-                        deltaX = 0;
-                    }
+                        //must check both x and y coords for scrolling
+                        if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
+                            deltaX = 0;
+                        } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
+                            deltaX = 0;
+                        }
 
-                    if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
-                        deltaY = 0;
-                    } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
-                        deltaY = 0;
+                        if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
+                            deltaY = 0;
+                        } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
+                            deltaY = 0;
+                        }
+                        if(!mapTranslate[1]) {
+                            mapTranslate[1] = 0;
+                        }
+                        mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
                     }
-                    if(!mapTranslate[1]) {
-                        mapTranslate[1] = 0;
+                    break;
+                default:
+                    if(isMouseDown) {
+                        if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                            if(document.getElementById("player_gui").contains(e.target)) return;
+                            isDragging = true;
+                            let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
+                            let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+
+                            let deltaX = e.movementX/1.3;
+                            let deltaY = e.movementY/1.3;
+
+                            //must check both x and y coords for scrolling
+                            if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
+                                deltaX = 0;
+                            } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
+                                deltaX = 0;
+                            }
+
+                            if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
+                                deltaY = 0;
+                            } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
+                                deltaY = 0;
+                            }
+                            if(!mapTranslate[1]) {
+                                mapTranslate[1] = 0;
+                            }
+                            mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
+                        }
                     }
-                    mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
-                }
             }
         });
     }
@@ -645,7 +682,7 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                                     <BR><DIV CLASS="l-stats"><I CLASS="fa fa-male"></I> <SPAN ID="troops-${response.users[i].id}">0</SPAN> | <I CLASS="fa fa-map-marker"></I> <SPAN ID="territories-${response.users[i].id}">0</SPAN></DIV></DIV>
                                 </DIV>`;
                                 document.getElementById("t-avatar-frame").style.border = "5px solid " + response.users[i].pcolor;
-                                document.getElementById("t-avatar-frame").innerHTML = `<IMG STYLE="width: 90px; height: 90px" SRC="./images/defaultpfp.png">`;
+                                document.getElementById("t-avatar-frame").innerHTML = `<IMG STYLE="width: 100%; height: 100%" SRC="./images/defaultpfp.png">`;
                                 document.getElementById("t-avatar-frame").style.background = colorData[response.users[i].pcolor].normal;
                             } else {
                                 document.getElementById("players_container").innerHTML += `
@@ -1052,4 +1089,18 @@ function showtutorialtt() {
     setTimeout(function() {
         document.getElementById("t-tooltip").style.right = "10px";
     }, 100);
+}
+
+function togglelb() {
+    if(showlb == false) {
+        showlb = true;
+        document.getElementById("togglelb").style.right = "230px";
+        document.getElementsByClassName("leaderboard")[0].style.display = "block";
+        document.getElementById("togglelb-inner").innerHTML = `<I CLASS="fa fa-angle-double-right"></I>`;
+    } else {
+        showlb = false;
+        document.getElementById("togglelb").style.right = "0";
+        document.getElementsByClassName("leaderboard")[0].style.display = "none";
+        document.getElementById("togglelb-inner").innerHTML = `<I CLASS="fa fa-angle-double-left"></I>`;
+    }
 }

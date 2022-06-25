@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <HTML LANG="en">
     <HEAD>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <LINK REL="stylesheet" HREF="./css/style.css">
         <link rel="canonical" href="https://www.emblitz.com">
@@ -112,14 +112,18 @@
                         <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, false)">Play</BUTTON>
                         <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
                         <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
-                            <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game.</DIV>
+                            <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game. If not, use the "Play" button to play a random match.</DIV>
                             <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value, null, false)">Connect</BUTTON>
                         </DIV>
                         <BR><BR>
-                        <BUTTON CLASS="joinbutton jb_gray" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
+                        <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                         <BR>
                     </DIV>
-                    <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link">Learn to Play</A><BR><BR>
+                    <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link">Game Tutorial</A><BR><BR>
+                    <DIV CLASS="mobile-socials">
+                        <DIV CLASS="socials-header">Join our Discord!</DIV>
+                        <A HREF="https://discord.gg/SVcahqGxQD" TARGET="_blank" REL="nofollow"><IMG SRC="./images/discord.png" CLASS="socials-icon"></A><BR><BR>
+                    </DIV>
                 </DIV>
             </DIV>
             <DIV CLASS="gameversion"><%= gameversion %></DIV>
@@ -151,7 +155,7 @@
                 <DIV CLASS="troopscontrol">
                     <DIV CLASS="troopscontrolbg"></DIV>
                     <DIV CLASS="t_avatar-frame" ID="t-avatar-frame"></DIV>
-                    <DIV STYLE="margin-top: -80px; margin-left: 60px;">
+                    <DIV CLASS="tc-control-info" STYLE="margin-top: -80px; margin-left: 60px;">
                         <INPUT TYPE="range" MIN="1" MAX="100" VALUE="75" CLASS="troopslider" ID="troopslider">
                         <BR>
                         <DIV CLASS="controlitem" ID="trooppercentage">75%</DIV><DIV CLASS="controlitem" ID="sendamount">--</DIV>
@@ -187,6 +191,10 @@
                             <BUTTON CLASS="qc-button end-gray" STYLE="margin-right: 8px;" ONCLICK="leavegame()">Yes</BUTTON><BUTTON CLASS="qc-button end-red" ONCLICK='document.getElementById("quitconfirm").style.display = "none"'>Cancel</BUTTON>
                         </DIV>
                     </DIV>
+                </DIV>
+                <DIV CLASS="togglelb" ID="togglelb" ONCLICK="togglelb()">
+                    <DIV CLASS="togglelb-bg"></DIV>
+                    <DIV ID="togglelb-inner"><I CLASS="fa fa-angle-double-left"></I></DIV>
                 </DIV>
                 <DIV CLASS="endscreen" ID="endscreen">
                     <DIV CLASS="endscreen-bg"></DIV>
