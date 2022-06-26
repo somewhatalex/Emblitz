@@ -110,6 +110,40 @@
     .infobar-main {
         font-size: 17px !important;
     }
+
+    .s-title {
+        font-size: 18px !important;
+    }
+
+    .s-troops, .s-territories {
+        font-size: 15px !important;
+    }
+
+    .s-troops {
+        margin-top: 0px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .s-territories-label, .s-territories-bar {
+        display: none !important;
+    }
+
+    .infobar-main {
+        font-size: 17px !important;
+    }
+
+    .s-title {
+        font-size: 18px !important;
+    }
+
+    .s-troops, .s-territories {
+        font-size: 15px !important;
+    }
+
+    .s-troops {
+        margin-top: 0px !important;
+    }
 }
 
 @media (max-width: 370px) {
