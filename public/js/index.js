@@ -38,6 +38,9 @@ var mapselectedvalue = "random";
 
 var showlb = false; //mobile only
 
+var previoustouch;
+var previousmobilezoom;
+
 //mobile detection
 window.onload = function() {
     /*
@@ -101,6 +104,7 @@ function inithomepage() {
 }
 
 function resetAll() {
+    document.body.style.touchAction = "pan-y";
     roomid = "";
     uid = "";
     pnames = [];
@@ -137,6 +141,9 @@ function resetAll() {
     mapselectindex = 0;
 
     showlb = false;
+
+    previoustouch = null;
+    previousmobilezoom = null;
 }
 
 function getOffset(el) {
@@ -366,35 +373,83 @@ function initializeMap() {
                 }, 1)
             }
         });
+        //mobile
+        document.addEventListener("touchend", (e) => {
+            previoustouch = null;
+            previousmobilezoom = null;
+        });
+        document.addEventListener("touchmove", (e) => {
+            //mobile panning
+            if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                if(document.getElementById("player_gui").contains(e.target)) return;
+                isDragging = true;
+                let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
+                let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+
+                let touch = e.touches[0];
+                if(previoustouch) {
+                    e.movementX = touch.pageX - previoustouch.pageX;
+                    e.movementY = touch.pageY - previoustouch.pageY;
+                }
+                previoustouch = touch;
+
+                let deltaX = e.movementX/1.3;
+                let deltaY = e.movementY/1.3;
+
+                //must check both x and y coords for scrolling
+                if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
+                    deltaX = 0;
+                } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
+                    deltaX = 0;
+                }
+
+                if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
+                    deltaY = 0;
+                } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
+                    deltaY = 0;
+                }
+                if(!mapTranslate[1]) {
+                    mapTranslate[1] = 0;
+                }
+                mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
+            }
+
+            //mobile zooming
+            if(zoomElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                if(!e.touches[1]) return;
+                if(document.getElementById("player_gui").contains(e.target)) return;
+
+                let currentzoom = Math.sqrt((e.touches[1].pageX - e.touches[0].pageX)**2 + (e.touches[1].pageY - e.touches[0].pageY)**2);
+                if(previousmobilezoom) {
+                    e.deltaY = currentzoom - previousmobilezoom;
+                }
+                previousmobilezoom = currentzoom;
+
+                let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+                var zoomdelta = (e.deltaY)/200;
+                if(zoomdelta > 0.3) {
+                    zoomdelta = 0.3;
+                } else if (zoomdelta < -0.3) {
+                    zoomdelta = -0.3;
+                }
+                if(elementTransform >= 1.7) {
+                    if(zoomdelta > 0) {
+                        zoomdelta = 0;
+                    }
+                    zoomElement.style.transform = "scale(1.7)";
+                } else if(elementTransform <= 0.5) {
+                    if(zoomdelta < 0) {
+                        zoomdelta = 0;
+                    }
+                    zoomElement.style.transform = "scale(0.5)";
+                }
+
+                zoomElement.style.transform = `scale(${elementTransform += zoomdelta})`;
+            }
+        });
         document.addEventListener("pointermove", function(e) {
             switch(e.pointerType) {
                 case "touch":
-                    if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
-                        if(document.getElementById("player_gui").contains(e.target)) return;
-                        isDragging = true;
-                        let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
-                        let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
-
-                        let deltaX = e.movementX/1.3;
-                        let deltaY = e.movementY/1.3;
-
-                        //must check both x and y coords for scrolling
-                        if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
-                            deltaX = 0;
-                        } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
-                            deltaX = 0;
-                        }
-
-                        if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
-                            deltaY = 0;
-                        } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
-                            deltaY = 0;
-                        }
-                        if(!mapTranslate[1]) {
-                            mapTranslate[1] = 0;
-                        }
-                        mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
-                    }
                     break;
                 default:
                     if(isMouseDown) {
@@ -745,6 +800,7 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                     document.getElementById("gamescreen").style.display = "block";
                     document.getElementById("gamelobby").style.display = "none";
                     document.getElementById("lobbyptable").innerHTML = "";
+                    document.body.style.touchAction = "none";
                     downloadMap().then(function() {
                         inGame = true;
                         initLB();

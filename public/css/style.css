@@ -66,6 +66,9 @@
         width: 100% !important;
     }
 
+    .homemenu-bg {
+        opacity: 0.8 !important;
+    }
 }
 
 @media (max-width: 435px) {
@@ -129,7 +132,12 @@ body {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
     overflow-x: hidden;
-    touch-action: none;
+    touch-action: pan-y;
+    overflow-y: auto;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 /* width */
@@ -267,6 +275,7 @@ input { /*override default styles*/
     border: 3px solid var(--medium);
     background: var(--light);
     margin-right: 0px;
+    border-radius: 0px;
 }
 
 .h_button_options {
@@ -566,6 +575,7 @@ input { /*override default styles*/
 
 .gamelobby {
     display: none;
+    height: calc(100vh - 30px);
 }
 
 .lobby_mapname {
