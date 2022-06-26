@@ -426,7 +426,7 @@ function initializeMap() {
                 previousmobilezoom = currentzoom;
 
                 let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
-                var zoomdelta = (e.deltaY)/200;
+                var zoomdelta = (e.deltaY)/250;
                 if(zoomdelta > 0.3) {
                     zoomdelta = 0.3;
                 } else if (zoomdelta < -0.3) {
