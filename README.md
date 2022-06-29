@@ -1,14 +1,13 @@
 # Emblitz
 Real-time strategy game that's playable online in a browser. We now have a name! 😎
 
-You need to set up an sql server and create the `auth.json` file for the database in the top directory using this format:
+You need to set up a postgresql server and create the `.env` file for the project yourself:
 Host should be `127.0.0.1` if testing locally.
 ```
-{
-    "hostname": "[hostname/www.emblitz.com]",
-    "serverport": 6969,
-    "production": "[yes/no]"
-}
+HOSTNAME=[name here]
+SERVERPORT=[port number here]
+PRODUCTION=[yes/no]
+AUTHSECRET=[your auth secret]
 ```
 
 Required packages (run in cmd in directory):
@@ -25,4 +24,6 @@ npm i websocket
 npm i ws
 npm i events
 npm i compression
+npm i pg
+npm i dotenv
 ```
