@@ -9,18 +9,24 @@ const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 //const mysql = require("mysql");
-const credentials = require("./auth.json");
 //const auth = require("./scripts/auth.js");
 const gamehandler = require("./scripts/game.js");
 const emitter = require("events").EventEmitter;
 const compression = require("compression");
 
+if(process.env.PRODUCTION !== "yes") {
+    console.log("Running in development environment!");
+    require("dotenv").config();
+} else {
+    console.log("Running in production environment!");
+}
+
 //-- configs --
-const authsecret = "average-balls-enjoyer-69";
-var port = credentials.serverport;
+const authsecret = process.env.AUTHSECRET;
+var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "Alpha 1.1.4 | 6/23/2022";
+const gameversion = "Alpha 1.1.5 | 6/28/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6};
@@ -34,9 +40,9 @@ console.log("Using game version " + gameversion);
 const playercoloroptions = ["red", "orange", "yellow", "green", "blue", "purple"];
 //-- end player colors --
 
-var hostname = credentials.hostname + ":" + port;
-if(credentials.production === "yes") {
-    hostname = credentials.hostname;
+var hostname = process.env.HOSTNAME + ":" + port;
+if(process.env.PRODUCTION === "yes") {
+    hostname = process.env.HOSTNAME;
     if(process.env.PORT) {
         port = process.env.PORT;
     }
@@ -96,7 +102,7 @@ function removeFromArray(arr, item) {
 
 function requireHTTPS(req, res, next) {
     //for Heroku only
-    if (!req.secure && req.get('x-forwarded-proto') !== 'https' && credentials.production === "yes") {
+    if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.PRODUCTION === "yes") {
       return res.redirect('https://' + req.get('host') + req.url);
     }
     next();
@@ -165,7 +171,7 @@ app.get("/", (req, res) => {
 
     res.render("index", {
         host_name: hostname,
-        prod: credentials.production,
+        prod: process.env.PRODUCTION,
         gameversion: gameversion
     });
 });
