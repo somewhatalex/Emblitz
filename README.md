@@ -26,4 +26,5 @@ npm i events
 npm i compression
 npm i pg
 npm i dotenv
+npm i express-rate-limit
 ```

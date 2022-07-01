@@ -8,11 +8,13 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-//const mysql = require("mysql");
-//const auth = require("./scripts/auth.js");
+const { Pool } = require("pg");
+const auth = require("./scripts/auth.js");
 const gamehandler = require("./scripts/game.js");
 const emitter = require("events").EventEmitter;
 const compression = require("compression");
+const { resolve } = require("path");
+const { rateLimit } = require("express-rate-limit");
 
 if(process.env.PRODUCTION !== "yes") {
     console.log("Running in development environment!");
@@ -54,27 +56,34 @@ const gameevents = gamehandler.gameevents;
 
 //database -- make it later
 //edit this in auth.json
-/*
-    const db = mysql.createConnection({
-        host: credentials.host,
-        user: credentials.user,
-        password: credentials.password,
-        port: credentials.port,
-        database: credentials.database
-    });
+var dbcredentials = null;
+if(process.env.PRODUCTION === "yes") {
+    dbcredentials = {
+        connectionString: process.env.DATABASE_URL,
+        ssl: true
+    };
+    console.log("Database set to production mode");
+} else {
+    dbcredentials = {
+        host: process.env.DATABASE_URL,
+        user: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        port: process.env.DATABASE_PORT,
+        database: process.env.DATABASE_NAME
+    };
+    console.log("Database set to development mode");
+}
 
-    db.connect(function(err) {
-        if (err) throw err; //literally just give up by this point
+const pool = new Pool(dbcredentials);
+pool.connect(function(err) {
+    if (err) console.log(err);
 
-        //export db configs
-        module.exports.db = db;
+    //export db configs
+    module.exports.db = pool;
 
-        console.log("Connected to database!");
-        auth.getUserInfo("bobux");
-
-
-    });
-*/
+    console.log("Connected to database!");
+    auth.getUserInfo("bobux");
+});
 
 const clients = new Map();
 const rooms = [];
@@ -108,12 +117,30 @@ function requireHTTPS(req, res, next) {
     next();
 }
 
+//-- RATELIMITS --//
+const apiLimiter = rateLimit({
+	windowMs: 1 * 60000, //minutes
+	max: 500,
+    message: JSON.stringify({"error": 429, "message": "You are accessing the api too quickly (500 requests/min)! Try again in a minute. Calm down my guy."}),
+	standardHeaders: true,
+	legacyHeaders: false
+})
+const adminApiLimiter = rateLimit({
+	windowMs: 1 * 60000, //minutes
+	max: 20,
+    message: JSON.stringify({"error": 429, "message": "You are accessing the auth api too quickly (20 requests/min)! Please go and bing chilling, and try again in a minute."}),
+	standardHeaders: true,
+	legacyHeaders: false
+})
+
 app.set("view engine", "html");
 app.engine("html", require("ejs").renderFile);
 app.set("views", path.join(__dirname, "./public"));
 app.disable("x-powered-by");
 app.use(requireHTTPS);
 app.use(compression());
+app.use("/api/", apiLimiter);
+app.use("/authapi/", adminApiLimiter);
 
 //enable req.body to be used
 app.use(bodyParser.urlencoded({
@@ -131,7 +158,7 @@ app.get("/", (req, res) => {
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
     let id = "";
     for(let i=0; i<30; i++) {
-        id += chars.charAt(randomnumber(0, chars.length));
+        id += chars.charAt(randomnumber(0, chars.length-1));
     }
     res.cookie("GID", id);
 
@@ -182,6 +209,10 @@ app.get("/api", (req, res) => {
     res.json({"error": "invalid form body"});
 });
 
+app.get("/authapi", (req, res) => {
+    res.json({"error": "invalid form body"});
+});
+
 app.get("/login", (req, res) => {
     res.render("login", {
         host_name: hostname
@@ -190,6 +221,10 @@ app.get("/login", (req, res) => {
 
 app.get("/tutorial", (req, res) => {
     res.render("tutorial")
+});
+
+app.get("/admin", (req, res) => {
+    res.render("admin");
 });
 
 //id = roomid
@@ -201,10 +236,58 @@ function getroommap(id) {
     }
 }
 
+app.post("/authapi", (req, res) => {
+    //admin functions
+    if(req.body.action === "createpost") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.postAnnouncement(req.body.title, req.body.content, req.body.submittedtime, req.body.image).then(function() {
+            res.json({"result": "post created successfully"});
+        });
+    } else if(req.body.action === "deletepost") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.deleteAnnouncement(req.body.postid).then(function() {
+            res.json({"result": "deleted post"})
+        });
+    } else if(req.body.action === "validatepassword") {
+        if(req.body.auth === process.env.ADMINMASTERPASSWORD) {
+            res.json({"result": true});
+        } else {
+            res.json({"result": false});
+        }
+    }
+});
 
 app.post("/api", (req, res) => {
     try {
-        if(req.body.action === "getmap") {
+        if(req.body.action === "fetchposts") {
+            if(!isNaN(Number(req.body.startindex)) && !isNaN(Number(req.body.amount))) {
+                let startindex = req.body.startindex;
+                let amount = req.body.amount;
+                if(amount > 25) {
+                    amount = 25;
+                } else if(amount < 1) {
+                    amount = 1;
+                }
+
+                if(startindex < 0 || startindex > 99999999) {
+                    startindex = 0
+                }
+                auth.fetchAnnouncements(startindex, amount).then(function(result) {
+                    res.json({"posts": result});
+                });
+            } else {
+                res.status(400);
+                res.json({"error": 400, "message": "Malformed request"});
+            }
+        } else if(req.body.action === "getmap") {
             var roommap = getroommap(req.body.roomid);
             fs.readFile("./mapdata/" + roommap + "/" + roommap + ".txt", "utf8", function(err, data) {
                 fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapdict) {
@@ -267,12 +350,12 @@ function userid() {
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
     let id = "u-";
     for(let i=0; i<20; i++) {
-        id += chars.charAt(randomnumber(0, chars.length));
+        id += chars.charAt(randomnumber(0, chars.length-1));
     }
     while(userids.includes(id)) {
         let id = "u-"
         for(let i=0; i<20; i++) {
-            id += chars.charAt(randomnumber(0, chars.length));
+            id += chars.charAt(randomnumber(0, chars.length-1));
         }
     }
     userids.push(id);
@@ -317,13 +400,13 @@ function joinroom(map, createroom) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
         for(let i=1; i<7; i++) {
-            id += chars.charAt(randomnumber(0, chars.length));
+            id += chars.charAt(randomnumber(0, chars.length-1));
         }
 
         while(checkDupeRoom(id)) {
             id = "r-";
             for(let i=1; i<7; i++) {
-                id += chars.charAt(randomnumber(0, chars.length));
+                id += chars.charAt(randomnumber(0, chars.length-1));
             }
         }
         
@@ -355,13 +438,13 @@ function joinroom(map, createroom) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
         for(let i=1; i<7; i++) {
-            id += chars.charAt(randomnumber(0, chars.length));
+            id += chars.charAt(randomnumber(0, chars.length-1));
         }
 
         while(checkDupeRoom(id)) {
             id = "r-";
             for(let i=1; i<7; i++) {
-                id += chars.charAt(randomnumber(0, chars.length));
+                id += chars.charAt(randomnumber(0, chars.length-1));
             }
         }
 

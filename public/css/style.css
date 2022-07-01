@@ -152,13 +152,50 @@
     }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 1150px) {
     .socials {
         display: none;
     }
 
     .mobile-socials {
         display: block !important;
+    }
+}
+
+@media (min-width: 1150px) {
+    .gn-body {
+        max-height: 502px !important;
+    }
+}
+
+@media (max-width: 840px) {
+    .gamenews {
+        display: none !important;
+        position: fixed !important;
+        width: calc(100% - 30px) !important;
+        left: 0 !important;
+        border-radius: 10px !important;
+        top: 0 !important;
+        max-height: calc(100vh - 50px) !important;
+        height: calc(100vh - 50px) !important;
+        overflow: hidden;
+    }
+
+    .gamenews-bg  {
+        width: 100% !important;
+        max-height: 562px !important;
+    }
+
+    .shownewsbutton {
+        display: block !important;
+    }
+
+    #gn-exit {
+        display: block !important;
+    }
+
+    .gn-body {
+        max-height: calc(100vh - 106px) !important;
     }
 }
 
@@ -742,15 +779,21 @@ input { /*override default styles*/
     }
 }
 
-.homemenu {
+.homeguicontainer {
     position: absolute;
     top: 35px;
     left: 50%;
     transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    z-index: 1000000
+}
+
+.homemenu {
     width: 500px;
     text-align: center;
     color: var(--light);
-    margin-left: -25px;
+    display: inline-block;
 }
 
 .mainlogoimg {
@@ -764,7 +807,7 @@ input { /*override default styles*/
     top: 0;
     bottom: 0;
     opacity: 0.9;
-    width: 100%;
+    width: 490px;
     background: var(--night);
     z-index: -1;
     border-radius: 10px;
@@ -850,7 +893,7 @@ input { /*override default styles*/
 
 #notifications {
     position: fixed;
-    z-index: 999999;
+    z-index: 2999999;
     bottom: 20px;
     right: 0px;
 }
@@ -1326,6 +1369,7 @@ input { /*override default styles*/
     border-top-right-radius: 10px;
     width: 160px;
     text-align: center;
+    z-index: 1999999;
 }
 
 .socials-header {
@@ -1403,4 +1447,216 @@ input { /*override default styles*/
 
 .nostyle-link:visited:hover {
     color: var(--medium);
+}
+
+.gamenews {
+    display: inline-block;
+    width: 300px;
+    z-index: 99999;
+    vertical-align: top;
+    margin-left: 15px;
+    color: var(--light);
+    max-height: 562px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.gamenews-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.9;
+    width: 280px;
+    background: var(--night);
+    z-index: -1;
+    padding: 10px;
+    border-radius: 10px;
+    max-height: 542px;
+}
+
+.gn-header {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.gn-body {
+    overflow: auto;
+    max-height: 502px;
+}
+
+.news-container {
+    background: var(--dark);
+    margin: 10px;
+    text-align: left;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.news-title {
+    font-weight: bold;
+    font-size: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.news-date {
+    color: var(--medium);
+}
+
+.news-content {
+    font-size: 16px;
+    max-height: 100px;
+    min-height: 65px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent);
+}
+
+.gn-loadmore {
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 17px;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.news-readmore {
+    border: none;
+    background: none;
+    text-decoration: underline;
+    color: #5892ff;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0px;
+    transition: 0.3s;
+    padding-top: 5px;
+}
+
+.news-readmore:hover {
+    color: #9dbfff;
+}
+
+.shownewsbutton {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 0;
+    padding: 10px;
+    font-size: 18px;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    border: 0px;
+    cursor: pointer;
+    z-index: 1999999;
+    transition: 0.3s;
+    -webkit-box-shadow: 0px 0px 15px 3px #000000; 
+    box-shadow: 0px 0px 15px 3px #000000;
+}
+
+#gn-exit {
+    position: absolute;
+    padding: 10px;
+    background: none;
+    font-size: 28px;
+    margin: 5px;
+    margin-right: 10px;
+    color: var(--light);
+    border: none;
+    right: 0;
+    cursor: pointer;
+    margin-top: -40px;
+    display: none;
+    transition: 0.3s;
+}
+
+#gn-exit:hover {
+    color: #d4d4d4;
+}
+
+.gn-reader {
+    position: fixed;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    z-index: 9999999;
+    display: none;
+}
+
+.gn-reader-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.9;
+    width: 100%;
+    background: var(--dark);
+    z-index: -1;
+    overflow: hidden;
+}
+
+.gn-reader-area {
+    position: fixed;
+    width: 900px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--light);
+    background: var(--dark);
+    -webkit-box-shadow: 0px 0px 15px 3px #000000; 
+    box-shadow: 0px 0px 15px 3px #000000;
+    margin-top: 40px;
+    padding: 25px;
+    overflow: auto;
+    max-height: calc(100vh - 120px);
+}
+
+#gn-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#gn-date {
+    color: var(--medium) !important;
+}
+
+#gn-content {
+    margin-top: 5px;
+    font-size: 17px;
+}
+
+.gn-reader-exit {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--light);
+    font-size: 30px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.gn-reader-exit:hover {
+    color: #e4e4e4;
+}
+
+.gn-inner {
+    margin-top: 30px;
+    max-height: calc(100vh - 150px);
+    overflow: auto;
+}
+
+@media (max-width: 1000px) {
+    .gn-reader-area {
+        width: 600px !important;
+    }
+}
+
+@media (max-width: 720px) {
+    .gn-reader-area {
+        width: calc(100% - 40px) !important;
+    }
 }

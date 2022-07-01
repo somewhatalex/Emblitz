@@ -41,6 +41,8 @@ var showlb = false; //mobile only
 var previoustouch;
 var previousmobilezoom;
 
+var p_startindex = 0;
+
 //mobile detection
 window.onload = function() {
     /*
@@ -82,6 +84,8 @@ function inithomepage() {
         showtutorialtt();
         localStorage.setItem("hasvisited", true);
     }
+
+    loadPosts("refresh");
 
     for(let i=0; i<mapDescriptions.length; i++) {
         if(mapDescriptions[i][3] === localStorage.getItem("map")) {
@@ -144,6 +148,75 @@ function resetAll() {
 
     previoustouch = null;
     previousmobilezoom = null;
+
+    p_startindex = 0;
+}
+
+function hidegamenews() {
+    document.getElementById("gamenews-container").style.setProperty("display", "none", "important");
+    document.getElementById("shownewsbutton").style.setProperty("display", "block", "important");
+    document.getElementsByClassName("homeguicontainer")[0].style.setProperty("position", "absolute");
+}
+
+function shownewsstory(id) {
+    document.getElementsByClassName("gn-reader")[0].style.display = "block";
+    let title = document.getElementById(id).getElementsByClassName("news-title")[0].innerText;
+    let date = document.getElementById(id).getElementsByClassName("news-date")[0].innerText;
+    let content = document.getElementById(id).getElementsByClassName("news-content")[0].innerHTML;
+
+    document.getElementById("gn-title").innerText = title;
+    document.getElementById("gn-date").innerText = date;
+    document.getElementById("gn-content").innerHTML = content;
+}
+
+function hidenewsreader() {
+    document.getElementsByClassName("gn-reader")[0].style.display = "none";
+    document.getElementById("gn-title").innerText = "Loading...";
+    document.getElementById("gn-date").innerText = "Loading...";
+    document.getElementById("gn-content").innerHTML = "Loading...";
+}
+
+function loadPosts(refresh) {
+    let postarea = document.getElementById("gn-body");
+    let amount = 6;
+
+    if(document.getElementsByClassName("gn-loadmore")[0]) {
+        document.getElementsByClassName("gn-loadmore")[0].remove();
+    }
+
+    if(refresh) {
+        postarea.innerHTML = "Loading...";
+        p_startindex = 0;
+    }
+    fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "fetchposts", startindex: p_startindex, amount: amount})}).then(response => {
+        response.json().then(function(text) {
+            if(text.error == 429) {
+                notification("error", "Too many requests", "You're making too many requests, please slow down!", 8);
+                return;
+            }
+            if(text.posts.length == 0) {
+                postarea.innerHTML += `<DIV STYLE="font-size: 17px; margin-bottom: 20px">No more posts; you're all caught up!</DIV>`
+                return;
+            }
+            if(refresh) {
+                postarea.innerHTML = "";
+            }
+            let trtoappend = "";
+            for(let i=0; i<text.posts.length; i++) {
+                trtoappend += `
+                <DIV CLASS="news-container" ID="${text.posts[i].id}">
+                    <DIV CLASS="news-title">${text.posts[i].title}</DIV>
+                    <DIV CLASS="news-date">${text.posts[i].submittedtime}</DIV>
+                    <DIV CLASS="news-content">${text.posts[i].content}</DIV>
+                    <BUTTON CLASS="news-readmore" ONCLICK=shownewsstory("${text.posts[i].id}")>Read more...</BUTTON>
+                </DIV>`
+            }
+
+            trtoappend += `<BUTTON CLASS="gn-loadmore jb_gray" ONCLICK="loadPosts()">Load more news</BUTTON>`;
+            postarea.innerHTML += trtoappend;
+            p_startindex = p_startindex + 20;
+        });
+    });
 }
 
 function getOffset(el) {
