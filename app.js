@@ -28,7 +28,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "Alpha 1.1.5 | 6/28/2022";
+const gameversion = "1.1.7 | 6/30/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6};
@@ -60,7 +60,7 @@ var dbcredentials = null;
 if(process.env.PRODUCTION === "yes") {
     dbcredentials = {
         connectionString: process.env.DATABASE_URL,
-        ssl: true
+        ssl: { rejectUnauthorized: false }
     };
     console.log("Database set to production mode");
 } else {
