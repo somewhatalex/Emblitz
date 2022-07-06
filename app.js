@@ -15,8 +15,19 @@ const gamehandler = require("./scripts/game.js");
 const emitter = require("events").EventEmitter;
 
 //-- configs --
+<<<<<<< Updated upstream
 const authsecret = "average-balls-enjoyer-69";
 var port = credentials.serverport;
+=======
+const authsecret = process.env.AUTHSECRET;
+var port = process.env.SERVERPORT;
+
+//GAME VERSION
+const gameversion = "1.1.8 | 7/1/2022";
+
+//mapname, maxplayers
+const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
+>>>>>>> Stashed changes
 //-- end configs --
 
 //-- version --
