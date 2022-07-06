@@ -24,13 +24,6 @@ if(process.env.PRODUCTION !== "yes") {
 }
 
 //-- configs --
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-const authsecret = "average-balls-enjoyer-69";
-var port = credentials.serverport;
-=======
-=======
->>>>>>> main
 const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
@@ -38,12 +31,7 @@ var port = process.env.SERVERPORT;
 const gameversion = "1.1.8 | 7/1/2022";
 
 //mapname, maxplayers
-<<<<<<< HEAD
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
->>>>>>> Stashed changes
-=======
-const allmaps = {"miniworld": 3, "michigan": 6};
->>>>>>> main
 //-- end configs --
 
 //-- version --
