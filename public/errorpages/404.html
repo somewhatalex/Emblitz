@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<HTML>
+<HTML LANG="en">
     <HEAD>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <LINK REL="stylesheet" HREF="./css/style.css">
+
+        <link rel="icon" href="../images/icon.png">
+        <TITLE>Emblitz | 404 Not Found</TITLE>
     </HEAD>
     <STYLE>
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans');
@@ -13,6 +16,8 @@
             font-family: 'Open Sans', sans-serif;
             margin: 0;
             overflow-x: hidden;
+            background: #121212;
+            color: #ffffff;
         }
 
         h1 {
@@ -22,10 +27,33 @@
 
         .errordescript {
             font-size: 20px;
+            text-align: center;
+        }
+
+        .errorlogo {
+            width: 320px;
+            margin-top: 20px;
+        }
+
+        .nostyle-link {
+            color: var(--light);
+        }
+
+        .nostyle-link:visited {
+            color: var(--light);
+        }
+
+        .nostyle-link:hover {
+            color: var(--medium);
+        }
+
+        .nostyle-link:visited:hover {
+            color: var(--medium);
         }
     </STYLE>
     <BODY>
-        <H1>404</H1>
-        <DIV CLASS="errordescript">Page not found</DIV>
+        <A HREF="https://www.emblitz.com"><IMG CLASS="errorlogo" SRC="../images/logo.png"></A>
+        <H1 STYLE="margin-top: 10px;">404</H1>
+        <DIV CLASS="errordescript"><DIV STYLE="max-width: 400px; margin: auto;">We searched through every map and territory but couldn't find the page you were looking for. <A CLASS="nostyle-link" HREF="https://www.emblitz.com">How about going back to the home page?</A></DIV></DIV>
     </BODY>
 </HTML>

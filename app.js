@@ -8,17 +8,29 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-//const mysql = require("mysql");
-const credentials = require("./auth.json");
-//const auth = require("./scripts/auth.js");
+const { Pool } = require("pg");
+const auth = require("./scripts/auth.js");
 const gamehandler = require("./scripts/game.js");
 const emitter = require("events").EventEmitter;
+const compression = require("compression");
+const { resolve } = require("path");
+const { rateLimit } = require("express-rate-limit");
+
+if(process.env.PRODUCTION !== "yes") {
+    console.log("Running in development environment!");
+    require("dotenv").config();
+} else {
+    console.log("Running in production environment!");
+}
 
 //-- configs --
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 const authsecret = "average-balls-enjoyer-69";
 var port = credentials.serverport;
 =======
+=======
+>>>>>>> main
 const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
@@ -26,21 +38,25 @@ var port = process.env.SERVERPORT;
 const gameversion = "1.1.8 | 7/1/2022";
 
 //mapname, maxplayers
+<<<<<<< HEAD
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
 >>>>>>> Stashed changes
+=======
+const allmaps = {"miniworld": 3, "michigan": 6};
+>>>>>>> main
 //-- end configs --
 
 //-- version --
-console.log("Using server version 6.18.2022");
+console.log("Using game version " + gameversion);
 //-- end version --
 
 //-- player colors --
 const playercoloroptions = ["red", "orange", "yellow", "green", "blue", "purple"];
 //-- end player colors --
 
-var hostname = credentials.hostname + ":" + port;
-if(credentials.production === "yes") {
-    hostname = credentials.hostname;
+var hostname = process.env.HOSTNAME + ":" + port;
+if(process.env.PRODUCTION === "yes") {
+    hostname = process.env.HOSTNAME;
     if(process.env.PORT) {
         port = process.env.PORT;
     }
@@ -52,27 +68,34 @@ const gameevents = gamehandler.gameevents;
 
 //database -- make it later
 //edit this in auth.json
-/*
-    const db = mysql.createConnection({
-        host: credentials.host,
-        user: credentials.user,
-        password: credentials.password,
-        port: credentials.port,
-        database: credentials.database
-    });
+var dbcredentials = null;
+if(process.env.PRODUCTION === "yes") {
+    dbcredentials = {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+    };
+    console.log("Database set to production mode");
+} else {
+    dbcredentials = {
+        host: process.env.DATABASE_URL,
+        user: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        port: process.env.DATABASE_PORT,
+        database: process.env.DATABASE_NAME
+    };
+    console.log("Database set to development mode");
+}
 
-    db.connect(function(err) {
-        if (err) throw err; //literally just give up by this point
+const pool = new Pool(dbcredentials);
+pool.connect(function(err) {
+    if (err) console.log(err);
 
-        //export db configs
-        module.exports.db = db;
+    //export db configs
+    module.exports.db = pool;
 
-        console.log("Connected to database!");
-        auth.getUserInfo("bobux");
-
-
-    });
-*/
+    console.log("Connected to database!");
+    auth.getUserInfo("bobux");
+});
 
 const clients = new Map();
 const rooms = [];
@@ -96,12 +119,40 @@ function removeFromArray(arr, item) {
     for (var i = arr.length; i--;) {
       if (arr[i] === item) arr.splice(i, 1);
     }
- }
+}
+
+function requireHTTPS(req, res, next) {
+    //for Heroku only
+    if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.PRODUCTION === "yes") {
+      return res.redirect('https://' + req.get('host') + req.url);
+    }
+    next();
+}
+
+//-- RATELIMITS --//
+const apiLimiter = rateLimit({
+	windowMs: 1 * 60000, //minutes
+	max: 500,
+    message: JSON.stringify({"error": 429, "message": "You are accessing the api too quickly (500 requests/min)! Try again in a minute. Calm down my guy."}),
+	standardHeaders: true,
+	legacyHeaders: false
+})
+const adminApiLimiter = rateLimit({
+	windowMs: 1 * 60000, //minutes
+	max: 20,
+    message: JSON.stringify({"error": 429, "message": "You are accessing the auth api too quickly (20 requests/min)! Please go and bing chilling, and try again in a minute."}),
+	standardHeaders: true,
+	legacyHeaders: false
+})
 
 app.set("view engine", "html");
 app.engine("html", require("ejs").renderFile);
 app.set("views", path.join(__dirname, "./public"));
 app.disable("x-powered-by");
+app.use(requireHTTPS);
+app.use(compression());
+app.use("/api/", apiLimiter);
+app.use("/authapi/", adminApiLimiter);
 
 //enable req.body to be used
 app.use(bodyParser.urlencoded({
@@ -119,7 +170,7 @@ app.get("/", (req, res) => {
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
     let id = "";
     for(let i=0; i<30; i++) {
-        id += chars.charAt(randomnumber(0, chars.length));
+        id += chars.charAt(randomnumber(0, chars.length-1));
     }
     res.cookie("GID", id);
 
@@ -159,7 +210,8 @@ app.get("/", (req, res) => {
 
     res.render("index", {
         host_name: hostname,
-        prod: credentials.production
+        prod: process.env.PRODUCTION,
+        gameversion: gameversion
     });
 });
 
@@ -169,10 +221,22 @@ app.get("/api", (req, res) => {
     res.json({"error": "invalid form body"});
 });
 
+app.get("/authapi", (req, res) => {
+    res.json({"error": "invalid form body"});
+});
+
 app.get("/login", (req, res) => {
     res.render("login", {
         host_name: hostname
     });
+});
+
+app.get("/tutorial", (req, res) => {
+    res.render("tutorial")
+});
+
+app.get("/admin", (req, res) => {
+    res.render("admin");
 });
 
 //id = roomid
@@ -184,10 +248,58 @@ function getroommap(id) {
     }
 }
 
+app.post("/authapi", (req, res) => {
+    //admin functions
+    if(req.body.action === "createpost") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.postAnnouncement(req.body.title, req.body.content, req.body.submittedtime, req.body.image).then(function() {
+            res.json({"result": "post created successfully"});
+        });
+    } else if(req.body.action === "deletepost") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.deleteAnnouncement(req.body.postid).then(function() {
+            res.json({"result": "deleted post"})
+        });
+    } else if(req.body.action === "validatepassword") {
+        if(req.body.auth === process.env.ADMINMASTERPASSWORD) {
+            res.json({"result": true});
+        } else {
+            res.json({"result": false});
+        }
+    }
+});
 
 app.post("/api", (req, res) => {
     try {
-        if(req.body.action === "getmap") {
+        if(req.body.action === "fetchposts") {
+            if(!isNaN(Number(req.body.startindex)) && !isNaN(Number(req.body.amount))) {
+                let startindex = req.body.startindex;
+                let amount = req.body.amount;
+                if(amount > 25) {
+                    amount = 25;
+                } else if(amount < 1) {
+                    amount = 1;
+                }
+
+                if(startindex < 0 || startindex > 99999999) {
+                    startindex = 0
+                }
+                auth.fetchAnnouncements(startindex, amount).then(function(result) {
+                    res.json({"posts": result});
+                });
+            } else {
+                res.status(400);
+                res.json({"error": 400, "message": "Malformed request"});
+            }
+        } else if(req.body.action === "getmap") {
             var roommap = getroommap(req.body.roomid);
             fs.readFile("./mapdata/" + roommap + "/" + roommap + ".txt", "utf8", function(err, data) {
                 fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapdict) {
@@ -205,22 +317,24 @@ app.post("/api", (req, res) => {
             if(req.body.preset) {
                 //does room exist?
                 let preset = req.body.preset;
+                let roomfound = false;
                 for(let i=0; i<rooms.length; i++) {
                     if(rooms[i].id === preset) {
                         //is room full?
                         if(rooms[i]["players"] >= rooms[i]["maxplayers"]) {
                             res.json({"error": "room " + preset + " is full"});
                         } else {
-                            rooms[i]["players"]++;
                             res.json({"uid": userid(), "room": preset});
                         }
-                        return;
-                    } else {
-                        res.json({"error": "room " + preset + " does not exist"});
+                        roomfound = true;
+                        break;
                     }
                 }
+                if(!roomfound) {
+                    res.json({"error": "room " + preset + " does not exist"});
+                }
             } else {
-                res.json({"uid": userid(), "room": joinroom()});
+                res.json({"uid": userid(), "room": joinroom(req.body.prefermap, req.body.createnewroom)});
             }
         } else if(req.body.action === "login") {
             // -- WORK ON PROGRESS --
@@ -248,12 +362,12 @@ function userid() {
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
     let id = "u-";
     for(let i=0; i<20; i++) {
-        id += chars.charAt(randomnumber(0, chars.length));
+        id += chars.charAt(randomnumber(0, chars.length-1));
     }
     while(userids.includes(id)) {
         let id = "u-"
         for(let i=0; i<20; i++) {
-            id += chars.charAt(randomnumber(0, chars.length));
+            id += chars.charAt(randomnumber(0, chars.length-1));
         }
     }
     userids.push(id);
@@ -275,25 +389,40 @@ function checkDupeRoom(id) {
     }
 }
 
-function joinroom() {
-    let roommap = "michigan";
-    let maxplayers = 6;
+function joinroom(map, createroom) {
+    let roommap = "";
+    let allmapnames = Object.keys(allmaps);
+    let randommap = false;
+    if(map !== "random" && allmapnames.includes(map)) {
+        roommap = map;
+    } else {
+        roommap = allmapnames[Math.floor(Math.random()*allmapnames.length)];
+        randommap = true;
+    }
+
+    let maxplayers = allmaps[roommap];
     let deploytime = 10;
-    if(rooms.length < 1) {
+
+    let isprivate = false;
+    if(createroom) {
+        isprivate = true;
+    }
+
+    if(rooms.length < 1 || createroom) {
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
         for(let i=1; i<7; i++) {
-            id += chars.charAt(randomnumber(0, chars.length));
+            id += chars.charAt(randomnumber(0, chars.length-1));
         }
 
         while(checkDupeRoom(id)) {
             id = "r-";
             for(let i=1; i<7; i++) {
-                id += chars.charAt(randomnumber(0, chars.length));
+                id += chars.charAt(randomnumber(0, chars.length-1));
             }
         }
         
-        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
             //console.log(result)
         });
@@ -309,25 +438,29 @@ function joinroom() {
             }
 
             //join room if available (and NOT in active game)
-            if(rooms[i]["players"] < rooms[i]["maxplayers"] && rooms[i]["ingame"] == false) {
-                return rooms[i]["id"];
+            if(rooms[i]["players"] < rooms[i]["maxplayers"] && rooms[i]["ingame"] == false && rooms[i]["isprivate"] == false) {
+                if(randommap) {
+                    return rooms[i]["id"];
+                } else if(rooms[i]["map"] === roommap) {
+                    return rooms[i]["id"];
+                }
             }
         }
 
         let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
         let id = "r-";
         for(let i=1; i<7; i++) {
-            id += chars.charAt(randomnumber(0, chars.length));
+            id += chars.charAt(randomnumber(0, chars.length-1));
         }
 
         while(checkDupeRoom(id)) {
             id = "r-";
             for(let i=1; i<7; i++) {
-                id += chars.charAt(randomnumber(0, chars.length));
+                id += chars.charAt(randomnumber(0, chars.length-1));
             }
         }
 
-        rooms.push({"id": id, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
         game.newGame(id, roommap, deploytime).then(function(result) {
             //console.log(result)
         });
@@ -369,7 +502,7 @@ gameevents.on("startAttackPhase", function(result) {
 gameevents.on("startDeployPhase", function(result) {
     sendRoomMsg(result[0], {"startgame": true, "deploytime": result[1]/1000});
     let roomcount = rooms.length;
-    for(let i=0; i<rooms.length; i++) {
+    for(let i=0; i<roomcount; i++) {
         if(rooms[i].id === result[0]) {
             rooms[i]["ingame"] = true;
             break;
@@ -381,8 +514,14 @@ gameevents.on("syncTroopTimer", function(result) {
     sendRoomMsg(result[0], {"syncTroopTimer": result[1]});
 });
 
+gameevents.on("updateLobbyTimer", function(result) {
+    setTimeout(function() {
+        sendRoomMsg(result[0], {"lobbytimer": Math.round(result[1]/1000)-1});
+    }, 1000);
+});
+
 gameevents.on("playerdead", function(result) {
-    sendRoomMsg(result[0], {"playerdead": result[1]});
+    sendRoomMsg(result[0], {"playerdead": result[1], "place": result[2]});
 });
 
 gameevents.on("playerWon", function(result) {
@@ -555,7 +694,7 @@ wss.on("connection", (ws) => {
                         sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
                     }
                 } else if(action === "userlogin") {
-                    sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
+                    sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"], "isprivateroom": rooms[i]["isprivate"]});
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 }

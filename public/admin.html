@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<HTML LANG="en">
+    <HEAD>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <LINK REL="stylesheet" HREF="./css/style.css">
+
+        <link rel="icon" href="../images/icon.png">
+        <TITLE>Emblitz | Admin Panel</TITLE>
+    </HEAD>
+    <BODY>
+        <SCRIPT>
+            var authpassword = null;
+
+            function formattime(input) {
+                var pattern = /(\d{4})\-(\d{2})\-(\d{2})/;
+                if (!input || !input.match(pattern)) {
+                    return null;
+                }
+                return input.replace(pattern, "$2/$3/$1");
+            };
+
+            function submitpost() {
+                return new Promise((resolve, reject) => {
+                    let auth = authpassword;
+                    let title = document.getElementById("title").value;
+                    let image = document.getElementById("image").value;
+                    let content = document.getElementById("content").value.replace(/(?:\r\n|\r|\n)/g, "<br>");
+                    let submittedtime = document.getElementById("date").value;
+
+                    if(!title) {
+                        alert("Title id cannot be empty!");
+                        return;
+                    } else if (!content) {
+                        alert("Content cannot be empty!");
+                        return;
+                    } else if (!submittedtime) {
+                        alert("Date cannot be empty! Use today's date unless referencing a prior post.");
+                        return;
+                    }
+
+                    submittedtime = formattime(submittedtime);
+
+                    fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "createpost", auth: auth, title: title, content: content, submittedtime: submittedtime, image: image})}).then(response => {
+                        response.json().then(function(text) {
+                            if(text.error == 429) {
+                                alert("Too many requests, please slow down! Also, please don't try to hack!");
+                                return;
+                            } else if(text.error == 403) {
+                                alert("Error: invalid credentials");
+                            }
+                            if(text.result == "post created successfully") {
+                                alert("Post created successfully! You may reload the page to log out or submit a new post.");
+                            }
+                            resolve("ok");
+                        });
+                    });
+                });
+            }
+
+            function deletepost() {
+                let postid = document.getElementById("postid").value;
+                if(!postid) {
+                    alert("Post id cannot be empty!");
+                    return;
+                }
+                return new Promise((resolve, reject) => {
+                    fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "deletepost", auth: authpassword, postid: postid})}).then(response => {
+                        response.json().then(function(text) {
+                            if(text.error == 429) {
+                                alert("Too many requests, please slow down! Also, please don't try to hack!");
+                                return;
+                            } else if(text.error == 403) {
+                                alert("Error: invalid credentials");
+                            }
+                            if(text.result == "deleted post") {
+                                alert("Post deleted successfully! You may reload the page to log out or delete another post.");
+                            }
+                            resolve("ok");
+                        });
+                    });
+                });
+            }
+
+            //to the user looking at this -- the password is checked again on the server once you submit so don't bother trying to hack it by removing this step
+            function verifyPassword() {
+                return new Promise((resolve, reject) => {
+                    let password = document.getElementById("password").value;
+                    fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "validatepassword", auth: password})}).then(response => {
+                        response.json().then(function(text) {
+                            if(text.error == 429) {
+                                alert("Too many requests, please slow down! Also, please don't try to hack!");
+                                return;
+                            }
+                            if(text.result == false) {
+                                alert("Incorrect password");
+                                return;
+                            }
+                            document.getElementById("admin_loginpage").style.display = "none";
+                            document.getElementById("admin_mainpage").style.display = "block";
+                            authpassword = password;
+                            resolve("ok");
+                        });
+                    });
+                });
+            }
+
+            function showtab(tab) {
+                if(tab === "newpost") {
+                    document.getElementById("newpost").style.display = "block";
+                    document.getElementById("deletepost").style.display = "none";
+                    document.getElementById("viewposts").style.display = "none";
+                } else if(tab === "delete") {
+                    document.getElementById("newpost").style.display = "none";
+                    document.getElementById("deletepost").style.display = "block";
+                    document.getElementById("viewposts").style.display = "none";
+                } else if(tab === "viewposts") {
+                    document.getElementById("newpost").style.display = "none";
+                    document.getElementById("deletepost").style.display = "none";
+                    document.getElementById("viewposts").style.display = "block";
+                    getposts("refresh");
+                }
+            }
+
+            var startindex = 0;
+            var amount = 20;
+
+            function getposts(refresh) {
+                let posttable = document.getElementById("posttablebody");
+                if(refresh) {
+                    posttable.innerHTML = "";
+                    startindex = 0;
+                }
+                fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "fetchposts", startindex: startindex, amount: amount})}).then(response => {
+                    response.json().then(function(text) {
+                        if(text.error == 429) {
+                            alert("Too many requests, please slow down!");
+                            return;
+                        }
+                        if(text.posts.length == 0) {
+                            alert("No more posts");
+                            return;
+                        }
+                        let trtoappend = "";
+                        for(let i=0; i<text.posts.length; i++) {
+                            trtoappend += `<TR><TD>${text.posts[i].submittedtime}</TD><TD>${text.posts[i].title}</TD><TD>${text.posts[i].id}</TD></TR>`
+                        }
+                        posttable.innerHTML += trtoappend;
+                        startindex = startindex + 20;
+                    });
+                });
+            }
+        </SCRIPT>
+        <STYLE>
+            .auth_main {
+                margin: 20px;
+            }
+
+            input, textarea {
+                border: 1px solid gray;
+                padding: 5px;
+                font-size: 17px;
+                background: #f7f7f7;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                font-family: 'Open Sans', sans-serif;
+            }
+
+            button {
+                border: 1px solid gray;
+                padding: 5px;
+                font-size: 17px;
+                background: #cecece;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+            button:hover {
+                background: #e7e7e7;
+            }
+
+            input:focus, textarea:focus {
+                outline: none;
+            }
+
+            .divider {
+                width: 100%;
+                border-bottom: 1px solid black;
+                margin-bottom: 10px;
+            }
+
+            #posttable {
+                max-width: 750px;
+            }
+
+            #posttable, #posttable th, #posttable td {
+                border: 1px solid black;
+                border-collapse: collapse;
+            }
+
+            #posttable th, #posttable td {
+                padding: 5px;
+            }
+
+            #posttable tr {
+                background: white;
+            }
+
+            #posttable tr:nth-child(even) {
+                background: #d8d8d8;
+            }
+        </STYLE>
+        <DIV CLASS="auth_main">
+            <DIV ID="admin_loginpage" STYLE="display: block">
+                <DIV STYLE="font-size: 17px; margin-bottom: 10px;">This is the admin management/login page. If you're not an admin, please leave. Thanks!</DIV>
+                <INPUT MAXLENGTH="100" ID="password" STYLE="width: 300px" TYPE="password" PLACEHOLDER="Type the admin password...">
+                <BUTTON ONCLICK="verifyPassword()">Admin Login</BUTTON>
+            </DIV>
+            <DIV ID="admin_mainpage" STYLE="display: none;">
+                <BUTTON ONCLICK="showtab('newpost')" STYLE="margin-right: 5px;">Create Post</BUTTON>
+                <BUTTON ONCLICK="showtab('delete')" STYLE="margin-right: 5px;">Delete Post</BUTTON>
+                <BUTTON ONCLICK="showtab('viewposts')">View Posts</BUTTON>
+                <DIV CLASS="divider"></DIV>
+                <DIV ID="newpost" STYLE="display: block">
+                    <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Make a new post:</DIV>
+                    <INPUT MAXLENGTH="300" ID="title" STYLE="width: 400px" TYPE="text" PLACEHOLDER="Name of post..."><BR>
+                    <INPUT MAXLENGTH="1000" ID="image" STYLE="width: 400px" TYPE="text" PLACEHOLDER="[DOES NOT WORK YET] Optional thumbnail image url here..."><BR>
+                    <INPUT MAXLENGTH="1000" ID="date" STYLE="width: 400px" TYPE="date" PLACEHOLDER="Date here..."><BR>
+                    <TEXTAREA MAXLENGTH="30000" ID="content" STYLE="width: 500px; height: 50vh" TYPE="text" PLACEHOLDER="Content here here..."></TEXTAREA>
+                    <BR><BUTTON ONCLICK="submitpost()">Submit Post</BUTTON>
+                </DIV>
+                <DIV ID="deletepost" STYLE="display: none">
+                    <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Delete a post:</DIV>
+                    <INPUT MAXLENGTH="10000" ID="postid" STYLE="width: 400px" TYPE="text" PLACEHOLDER="ID of post..."><BR>
+                    <BR><BUTTON ONCLICK="deletepost()">Delete Post</BUTTON>
+                </DIV>
+                <DIV ID="viewposts" STYLE="display: none">
+                    <DIV STYLE="font-size: 17px;">Most recent post titles and ids:</DIV>
+                    <BR><BUTTON ONCLICK="getposts('refresh')" STYLE="margin-bottom: 20px">Refresh list</BUTTON>
+                    <TABLE ID="posttable">
+                        <THEAD>
+                            <TR>
+                                <TH>Date</TH>
+                                <TH>Title</TH>
+                                <TH>ID</TH>
+                            </TR>
+                        </THEAD>
+                        <TBODY ID="posttablebody">
+
+                        </TBODY>
+                    </TABLE>
+                    <BR><BUTTON ID="loadmoreposts" ONCLICK="getposts()">Load More Posts</BUTTON>
+                </DIV>
+            </DIV>
+        </DIV>
+    </BODY>
+</HTML>
