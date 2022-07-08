@@ -109,6 +109,7 @@ function inithomepage() {
 
 function resetAll() {
     document.body.style.touchAction = "pan-y";
+    document.getElementById("eventstimer").style.width = "0%";
     roomid = "";
     uid = "";
     pnames = [];
@@ -882,8 +883,10 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                         infobar("show");
                         let deploytime = response.deploytime;
                         document.getElementById("eventstimer").style.width = "0%";
-                        document.getElementById("eventstimer").style.transitionDuration = deploytime + "s";
-                        document.getElementById("eventstimer").style.width = "100%";
+                        document.getElementById("eventstimer").style.transitionDuration = deploytime-1 + "s";
+                        setTimeout(function() {
+                            document.getElementById("eventstimer").style.width = "100%";
+                        }, 10)
                         alltimeouts.push(setTimeout(function() {
                             infobar("hide");
                         }, deploytime*1000));
