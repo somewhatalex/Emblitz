@@ -38,6 +38,7 @@
         <SCRIPT TYPE="text/javascript" SRC="./js/mapnames.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/index.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/mapper.js"></SCRIPT>
+        <SCRIPT TYPE="text/javascript" SRC="./js/tutorialslide.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/mapdescriptions.js"></SCRIPT>
 
         <TITLE>Emblitz | Multiplayer Strategy Game</TITLE>
@@ -48,7 +49,20 @@
         </DIV>
         <DIV CLASS="lobbyscreen" ID="lobbyscreen">
             <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
-            <DIV CLASS="tutorial-tooltip" ID="t-tooltip">Hello there! Thanks for playing our game. Would you like to check out the tutorial? It's always accessible through the "Learn to Play" button on the bottom of the page as well.<A HREF="./tutorial" ONCLICK="hidetutorialtt()" TARGET="_blank" CLASS="tooltip-link">Sure!</A><BUTTON ONCLICK="hidetutorialtt();" CLASS="tooltip-link-second">No thanks</BUTTON></DIV>
+            <DIV CLASS="tutorial-tooltip" ID="t-tooltip">Hello! Would you like a quick tutorial of the game? You can also access it through the "game tutorial" button on this page.<A HREF="./tutorial" ONCLICK="hidetutorialtt()" STYLE="font-size: 20px" TARGET="_blank" CLASS="tooltip-link">Sure!</A><BUTTON ONCLICK="hidetutorialtt();" CLASS="tooltip-link-second">No thanks</BUTTON></DIV>
+            <!-- WORK IN PROGRESS! Sorry!
+            <DIV CLASS="tutorial-area">
+                <DIV CLASS="ta-bg"></DIV>
+                <DIV CLASS="ta-inner">
+                    <DIV CLASS="ta-img"><IMG ID="ta-img" SRC="./images/simpletutorial/2.png"></DIV>
+                    <DIV CLASS="ta-text" ID="ta-text">
+                        <DIV CLASS="ta-pbar"><DIV CLASS="ta-pbar-inner"></DIV></DIV>
+                        <DIV CLASS="ta-text-content">The deploy phase is the first game phase and lasts 10 seconds. You'll be able to claim any unselected territory and change it if needed until the timer runs out. All players begin with 10 troops.</DIV>
+                        <BUTTON CLASS="ta-ctrl-right">Next Slide <I CLASS="fa fa-chevron-right"></I></BUTTON>
+                    </DIV>
+                </DIV>
+            </DIV>
+            -->
             <DIV CLASS="socials">
                 <DIV CLASS="socials-bg"></DIV>
                 <DIV CLASS="socials-discord">
@@ -120,7 +134,22 @@
                             <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                             <BR>
                         </DIV>
-                        <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link">Game Tutorial</A><BR><BR>
+
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6720539950929131"
+                            crossorigin="anonymous"></script>
+                        <!-- right banner ad 1 -->
+                        <ins class="adsbygoogle"
+                            style="display:block"
+                            data-ad-client="ca-pub-6720539950929131"
+                            data-ad-slot="1363505131"
+                            data-ad-format="auto"
+                            data-full-width-responsive="true">
+                        </ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        
+                        <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Game Tutorial</A><BR><BR>
                         <DIV CLASS="mobile-socials">
                             <DIV CLASS="socials-header">Join our Discord!</DIV>
                             <A HREF="https://discord.gg/SVcahqGxQD" TARGET="_blank" REL="nofollow"><IMG SRC="./images/discord.png" CLASS="socials-icon"></A><BR><BR>

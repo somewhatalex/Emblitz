@@ -15,6 +15,9 @@ const emitter = require("events").EventEmitter;
 const compression = require("compression");
 const { resolve } = require("path");
 const { rateLimit } = require("express-rate-limit");
+/*Don't do it yourself, instead, be lazy and find a package that does it for you.
+    -Sun Tzu, The Art of War
+*/
 
 if(process.env.PRODUCTION !== "yes") {
     console.log("Running in development environment!");
@@ -28,7 +31,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.0 | 7/8/2022";
+const gameversion = "1.2.1 | 7/11/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
