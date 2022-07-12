@@ -183,7 +183,7 @@
 
     .gamenews-bg  {
         width: 100% !important;
-        max-height: 562px !important;
+        max-height: calc(100vh - 90px) !important;
     }
 
     .shownewsbutton {
@@ -195,7 +195,7 @@
     }
 
     .gn-body {
-        max-height: calc(100vh - 155px) !important;
+        max-height: calc(100vh - 150px) !important;
     }
 }
 
