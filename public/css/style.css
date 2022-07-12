@@ -176,14 +176,14 @@
         left: 0 !important;
         border-radius: 10px !important;
         top: 0 !important;
-        max-height: calc(100vh - 90px) !important;
         height: calc(100vh - 90px) !important;
         overflow: hidden;
+        max-height: calc(100vh - 90px) !important;
     }
 
     .gamenews-bg  {
         width: 100% !important;
-        max-height: calc(100vh - 90px) !important;
+        max-height: 100% !important;
     }
 
     .shownewsbutton {
@@ -195,7 +195,8 @@
     }
 
     .gn-body {
-        max-height: calc(100vh - 150px) !important;
+        max-height: calc(100vh - 235px) !important;
+        padding-bottom: 80px;
     }
 }
 
@@ -205,10 +206,12 @@ body {
     overflow-x: hidden;
     touch-action: pan-y;
     overflow-y: auto;
+    min-height: 100%;
 }
 
 html {
     overflow-x: hidden;
+    height: 100%;
 }
 
 /* width */
@@ -1598,7 +1601,7 @@ input { /*override default styles*/
 }
 
 .gn-body {
-    overflow: auto;
+    overflow-y: auto !important;
     max-height: 502px;
 }
 
