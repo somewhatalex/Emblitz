@@ -176,8 +176,8 @@
         left: 0 !important;
         border-radius: 10px !important;
         top: 0 !important;
-        max-height: calc(100vh - 50px) !important;
-        height: calc(100vh - 50px) !important;
+        max-height: calc(100vh - 90px) !important;
+        height: calc(100vh - 90px) !important;
         overflow: hidden;
     }
 
@@ -195,7 +195,7 @@
     }
 
     .gn-body {
-        max-height: calc(100vh - 106px) !important;
+        max-height: calc(100vh - 155px) !important;
     }
 }
 
