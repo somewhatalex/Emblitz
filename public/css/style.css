@@ -83,7 +83,7 @@
     }
 }
 
-@media (max-width: 490px) {
+@media (max-width: 775px) {
     .leaderboard {
         display: none;
         z-index: 99999 !important;
@@ -1319,6 +1319,121 @@ input { /*override default styles*/
     z-index: 69696969;
     width: 300px;
     display: none;
+}
+
+.tutorial-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 9999999;
+    overflow-y: hidden;
+}
+
+.ta-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.85;
+    width: 100%;
+    background: var(--dark);
+    z-index: -1;
+}
+
+.ta-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    color: var(--light);
+    width: 70%;
+    max-height: 90vh;
+    max-width: 1500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@media (max-width: 700px) {
+    .ta-inner {
+        width: calc(100% - 20px);
+    }
+}
+
+.ta-img {
+    aspect-ratio: 14/9;
+    overflow: hidden;
+    background: var(--dark);
+}
+
+#ta-img {
+    width: 100%;
+}
+
+.ta-text {
+    position: sticky;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    background: var(--night);
+    font-size: 18px;
+    -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.85); 
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.85);
+}
+
+.ta-ctrl-right {
+    font-size: 18px;
+    color: var(--light);
+    background: var(--night);
+    padding: 8px;
+    border: 2px solid var(--light);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 12px;
+    margin-top: 0px;
+}
+
+.ta-ctrl-right:hover {
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+.ta-pbar {
+    width: 100%;
+    height: 10px;
+    background: var(--medium);
+    overflow: hidden;
+}
+
+.ta-pbar-inner {
+    position: relative;
+    height: 100%;
+    width: 90%;
+    background-size: 100% 100%;
+    overflow: hidden;
+    background: #05b50e;
+    transition: width 1s;
+    transition-timing-function: linear;
+}
+
+.ta-pbar-inner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: rgb(5,181,14);
+    background: linear-gradient(90deg, rgba(5,181,14,1) 0%, rgba(0,255,13,1) 50%, rgba(5,181,14,1) 100%);
+    animation: flashloadingline 2s ease infinite;
+    overflow: hidden;
+}
+
+.ta-text-content {
+    padding: 12px;
+    padding-top: 8px;
 }
 
 .tooltip-link {

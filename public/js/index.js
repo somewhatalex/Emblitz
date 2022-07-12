@@ -1236,3 +1236,7 @@ function togglelb() {
         document.getElementById("togglelb-inner").innerHTML = `<I CLASS="fa fa-angle-double-left"></I>`;
     }
 }
+
+function gameTutorial() {
+    
+}
