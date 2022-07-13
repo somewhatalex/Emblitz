@@ -230,6 +230,10 @@ app.get("/admin", (req, res) => {
     res.render("admin");
 });
 
+app.get("/privacy", (req, res) => {
+    res.render("privacy");
+});
+
 //id = roomid
 function getroommap(id) {
     for(let i=0; i<rooms.length; i++) {
