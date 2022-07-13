@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 Disallow: /admin
+Disallow: /privacy
+Disallow: /privacy.html
