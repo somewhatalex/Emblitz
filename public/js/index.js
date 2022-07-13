@@ -1238,5 +1238,5 @@ function togglelb() {
 }
 
 function gameTutorial() {
-    
+
 }
