@@ -307,6 +307,13 @@ input { /*override default styles*/
     }
 }
 
+.wideadcontainer {
+    width: 100%;
+    min-height: 100px;
+    text-align: center;
+    min-width: 100vw;
+}
+
 #mapl2 {
     float: left;
     grid-area: 1/1;
