@@ -8,6 +8,14 @@ HOSTNAME=[name here]
 SERVERPORT=[port number here]
 PRODUCTION=[yes/no]
 AUTHSECRET=[your auth secret]
+DATABASE_URL=[db url]
+DATABASE_USER=[db username]
+DATABASE_PASSWORD=[db password]
+DATABASE_NAME=[db name]
+DATABASE_PORT=[db port]
+ADMINMASTERPASSWORD=[master admin password]
+MAILUSER=[dm me for mail user]
+MAILPASSWORD=[dm me for mail user password]
 ```
 
 Required packages (run in cmd in directory):
@@ -27,4 +35,6 @@ npm i compression
 npm i pg
 npm i dotenv
 npm i express-rate-limit
+npm i nodemailer
+npm i password-hash
 ```

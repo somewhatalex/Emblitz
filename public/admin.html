@@ -99,25 +99,24 @@
                             document.getElementById("admin_mainpage").style.display = "block";
                             authpassword = password;
                             resolve("ok");
+                            refreshstatus();
+                            setInterval(function() {
+                                refreshstatus();
+                            }, 60000);
                         });
                     });
                 });
             }
 
             function showtab(tab) {
-                if(tab === "newpost") {
-                    document.getElementById("newpost").style.display = "block";
-                    document.getElementById("deletepost").style.display = "none";
-                    document.getElementById("viewposts").style.display = "none";
-                } else if(tab === "delete") {
-                    document.getElementById("newpost").style.display = "none";
-                    document.getElementById("deletepost").style.display = "block";
-                    document.getElementById("viewposts").style.display = "none";
-                } else if(tab === "viewposts") {
-                    document.getElementById("newpost").style.display = "none";
-                    document.getElementById("deletepost").style.display = "none";
-                    document.getElementById("viewposts").style.display = "block";
+                for(let i=0; i<document.getElementsByClassName("posttab").length; i++) {
+                    document.getElementsByClassName("posttab")[i].style.display = "none";
+                }
+                document.getElementById(tab).style.display = "block";
+                if(tab === "viewposts") {
                     getposts("refresh");
+                } else if(tab === "status") {
+                    refreshstatus();
                 }
             }
 
@@ -146,6 +145,16 @@
                         }
                         posttable.innerHTML += trtoappend;
                         startindex = startindex + 20;
+                    });
+                });
+            }
+
+            function refreshstatus() {
+                fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getdevstats", auth: authpassword})}).then(response => {
+                    response.json().then(function(text) {
+                        document.getElementById("server_upsince").innerText = text.starttime;
+                        document.getElementById("server_upfor").innerText = ((Date.now() - text.startms)/(3600000)).toFixed(2) + " hrs";
+                        document.getElementById("server_emails").innerText = text.emailssent;
                     });
                 });
             }
@@ -188,24 +197,24 @@
                 margin-bottom: 10px;
             }
 
-            #posttable {
+            table {
                 max-width: 750px;
             }
 
-            #posttable, #posttable th, #posttable td {
+            table, table th, table td {
                 border: 1px solid black;
                 border-collapse: collapse;
             }
 
-            #posttable th, #posttable td {
+            table th, table td {
                 padding: 5px;
             }
 
-            #posttable tr {
+            table tr {
                 background: white;
             }
 
-            #posttable tr:nth-child(even) {
+            table tr:nth-child(even) {
                 background: #d8d8d8;
             }
         </STYLE>
@@ -216,11 +225,23 @@
                 <BUTTON ONCLICK="verifyPassword()">Admin Login</BUTTON>
             </DIV>
             <DIV ID="admin_mainpage" STYLE="display: none;">
+                <BUTTON ONCLICK="showtab('status')" STYLE="margin-right: 5px;">Server Status</BUTTON>
                 <BUTTON ONCLICK="showtab('newpost')" STYLE="margin-right: 5px;">Create Post</BUTTON>
-                <BUTTON ONCLICK="showtab('delete')" STYLE="margin-right: 5px;">Delete Post</BUTTON>
+                <BUTTON ONCLICK="showtab('deletepost')" STYLE="margin-right: 5px;">Delete Post</BUTTON>
                 <BUTTON ONCLICK="showtab('viewposts')">View Posts</BUTTON>
                 <DIV CLASS="divider"></DIV>
-                <DIV ID="newpost" STYLE="display: block">
+                <DIV CLASS="posttab" ID="status" STYLE="display: block">
+                    <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Server Status</DIV>
+                    <BUTTON ONCLICK="refreshstatus()" STYLE="margin-bottom: 20px">Refresh table</BUTTON>
+                    <TABLE>
+                        <TBODY>
+                            <TR><TD>Server up since</TD><TD ID="server_upsince">--</TD></TR>
+                            <TR><TD>Server up for</TD><TD ID="server_upfor">--</TD></TR>
+                            <TR><TD>Emails sent since server is up</TD><TD ID="server_emails">--</TD></TR>
+                        </TBODY>
+                    </TABLE>
+                </DIV>
+                <DIV CLASS="posttab" ID="newpost" STYLE="display: none">
                     <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Make a new post:</DIV>
                     <INPUT MAXLENGTH="300" ID="title" STYLE="width: 400px" TYPE="text" PLACEHOLDER="Name of post..."><BR>
                     <INPUT MAXLENGTH="1000" ID="image" STYLE="width: 400px" TYPE="text" PLACEHOLDER="[DOES NOT WORK YET] Optional thumbnail image url here..."><BR>
@@ -228,12 +249,12 @@
                     <TEXTAREA MAXLENGTH="30000" ID="content" STYLE="width: 500px; height: 50vh" TYPE="text" PLACEHOLDER="Content here here..."></TEXTAREA>
                     <BR><BUTTON ONCLICK="submitpost()">Submit Post</BUTTON>
                 </DIV>
-                <DIV ID="deletepost" STYLE="display: none">
+                <DIV CLASS="posttab" ID="deletepost" STYLE="display: none">
                     <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Delete a post:</DIV>
                     <INPUT MAXLENGTH="10000" ID="postid" STYLE="width: 400px" TYPE="text" PLACEHOLDER="ID of post..."><BR>
                     <BR><BUTTON ONCLICK="deletepost()">Delete Post</BUTTON>
                 </DIV>
-                <DIV ID="viewposts" STYLE="display: none">
+                <DIV CLASS="posttab" ID="viewposts" STYLE="display: none">
                     <DIV STYLE="font-size: 17px;">Most recent post titles and ids:</DIV>
                     <BR><BUTTON ONCLICK="getposts('refresh')" STYLE="margin-bottom: 20px">Refresh list</BUTTON>
                     <TABLE ID="posttable">

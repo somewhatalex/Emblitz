@@ -15,8 +15,15 @@ const emitter = require("events").EventEmitter;
 const compression = require("compression");
 const { resolve } = require("path");
 const { rateLimit } = require("express-rate-limit");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+const { initDB } = require("./scripts/auth.js");
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
+
+Update 7/27/22: passport.js creates a lot of hosting compatibility issues
+and requires a separate db so I'll have to ignore this advice just for this
+one time.
 */
 
 if(process.env.PRODUCTION !== "yes") {
@@ -31,7 +38,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.2 | 7/13/2022";
+const gameversion = "1.2.4 | 7/27/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -45,6 +52,13 @@ console.log("Using game version " + gameversion);
 const playercoloroptions = ["red", "orange", "yellow", "green", "blue", "purple"];
 //-- end player colors --
 
+//-- DEV SERVER MONITOR VARS --//
+var dev_emails = 0;
+var dev_server_starttime = new Date();
+dev_server_starttime = dev_server_starttime.toString();
+var dev_server_abs_starttime = Date.now();
+//-- end dev server monitor vars --//
+
 var hostname = process.env.HOSTNAME + ":" + port;
 if(process.env.PRODUCTION === "yes") {
     hostname = process.env.HOSTNAME;
@@ -57,8 +71,7 @@ const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
 
-//database -- make it later
-//edit this in auth.json
+//database
 var dbcredentials = null;
 if(process.env.PRODUCTION === "yes") {
     dbcredentials = {
@@ -85,7 +98,18 @@ pool.connect(function(err) {
     module.exports.db = pool;
 
     console.log("Connected to database!");
-    auth.getUserInfo("bobux");
+    auth.initDB().then(function() {
+        console.log("Finished initializing database")
+    });
+});
+
+//--MAILER--
+const mailTransport = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.MAILUSER,
+        pass: process.env.MAILPASSWORD
+    }
 });
 
 const clients = new Map();
@@ -123,15 +147,15 @@ function requireHTTPS(req, res, next) {
 //-- RATELIMITS --//
 const apiLimiter = rateLimit({
 	windowMs: 1 * 60000, //minutes
-	max: 500,
+	max: 400,
     message: JSON.stringify({"error": 429, "message": "You are accessing the api too quickly (500 requests/min)! Try again in a minute. Calm down my guy."}),
 	standardHeaders: true,
 	legacyHeaders: false
 })
 const adminApiLimiter = rateLimit({
 	windowMs: 1 * 60000, //minutes
-	max: 20,
-    message: JSON.stringify({"error": 429, "message": "You are accessing the auth api too quickly (20 requests/min)! Please go and bing chilling, and try again in a minute."}),
+	max: 10,
+    message: JSON.stringify({"error": 429, "message": "You are accessing the auth api too quickly (5 requests/min)! Please go and bing chilling, and try again in a minute."}),
 	standardHeaders: true,
 	legacyHeaders: false
 })
@@ -152,8 +176,8 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-    let gettoken = req.cookies.auth;
+app.all("/", (req, res) => {
+    let getuuid = req.cookies.uuid;
 
     //for now, create a new game id (GID) every time a page loads for security
     //this way, leaking the game id won't compromise a player's "account"
@@ -161,49 +185,47 @@ app.get("/", (req, res) => {
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
     let id = "";
     for(let i=0; i<30; i++) {
-        id += chars.charAt(randomnumber(0, chars.length-1));
+        id += chars.charAt(crypto.randomInt(0, chars.length-1));
     }
     res.cookie("GID", id);
 
-    //-- USER AUTH (work in progress) --
-    //does user have a token?
+    if(!getuuid) {
+        let guestuuid = "";
+        for(let i=0; i<50; i++) {
+            guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
+        }
 
-    //TODO: ADD USER REGISTRATION
-    let u_info = [{user: "bobux"}]; //user info
-    let userid = "69420666"; //user id
-    let issuer = "bobux man" //issuer of token
-    if(!gettoken) {
-        //no token found... generate one
-        let token = jwt.sign({
-            data: u_info,
-            sub: userid,
-            iss: issuer
-        }, authsecret);
+        res.cookie("uuid", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
 
-        res.cookie("auth", token);
-    } else {
-        jwt.verify(gettoken, authsecret, function(err, decoded) {
-            //invalid token, generate new one
-            if(err || decoded.iss != issuer) {
-                let token = jwt.sign({
-                    data: u_info,
-                    sub: userid,
-                    iss: issuer
-                }, authsecret);
+        res.render("index", {
+            host_name: hostname,
+            prod: process.env.PRODUCTION,
+            gameversion: gameversion
+        });
+    } else if (!getuuid.startsWith("guest-")) {
+        auth.getUserInfo(getuuid).then(function(userinfo) {
+            if(!userinfo) {
+                let guestuuid = "";
+                for(let i=0; i<50; i++) {
+                    guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
+                }
 
-                res.cookie("auth", token);
-            } else {
-                //do something with a valid token
-                //console.log(decoded);
+                res.cookie("uuid", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
             }
+
+            res.render("index", {
+                host_name: hostname,
+                prod: process.env.PRODUCTION,
+                gameversion: gameversion
+            });
+        });
+    } else {
+        res.render("index", {
+            host_name: hostname,
+            prod: process.env.PRODUCTION,
+            gameversion: gameversion
         });
     }
-
-    res.render("index", {
-        host_name: hostname,
-        prod: process.env.PRODUCTION,
-        gameversion: gameversion
-    });
 });
 
 httpserver.on("request", app);
@@ -217,9 +239,28 @@ app.get("/authapi", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-    res.render("login", {
-        host_name: hostname
-    });
+    let uuid = req.cookies.uuid;
+        
+    if(uuid) {
+        auth.getUserInfo(uuid).then(function(userinfo) {
+            if(!userinfo) {
+                res.render("login", {
+                    host_name: hostname,
+                    currentuser: ""
+                });
+                return;
+            }
+            res.render("login", {
+                host_name: hostname,
+                currentuser: `<DIV CLASS="lg_headertext_acct">You're already logged in as <B>${userinfo.username}</B>, but you can log into a different account.</DIV>`
+            });
+        });
+    } else {
+        res.render("login", {
+            host_name: hostname,
+            currentuser: ""
+        });
+    }
 });
 
 app.get("/tutorial", (req, res) => {
@@ -232,6 +273,41 @@ app.get("/admin", (req, res) => {
 
 app.get("/privacy", (req, res) => {
     res.render("privacy");
+});
+
+app.get("/verify", (req, res) => {
+    let gettoken = req.query.token;
+    let outputresult = ``;
+    jwt.verify(gettoken, authsecret, function(err, decoded) {
+        //invalid token
+        if(err || decoded.iss != "dr. defario's grandson samuel") {
+            outputresult = `Oops... an error occured. Your link might've expired or broke; try getting another verification email. Sorry about that.  <A CLASS="lg_register jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`
+            res.render("verify", {
+                result: outputresult
+            });
+        } else {
+            pool.query(`SELECT * FROM users WHERE publickey=$1 AND email=$2 AND verified=$3`, [decoded.data[0].publickey, decoded.data[0].email, false], function(err, result) {
+                if(err || result.rows.length == 0) {
+                    outputresult = `Oops... an error occured. Your link might've expired, been used, or broke; try getting another verification email. Sorry about that. <A CLASS="lg_register jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`;
+                    res.render("verify", {
+                        result: outputresult
+                    });
+                } else {
+                    let getusername = result.rows[0].username;
+                    pool.query(`UPDATE users SET verified=$1 WHERE publickey=$2 AND email=$3`, [true, decoded.data[0].publickey, decoded.data[0].email], function(err, result) {
+                        let outputresult = `Thanks for verifying your account! You can now login through the login page using your username and password. Enjoy the game!<DIV STYLE="display: block; margin-top: 20px;">Your username: <B>${getusername}</B></DIV><A CLASS="lg_register jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://emblitz.com">To Emblitz!</A>`;
+                        res.render("verify", {
+                            result: outputresult
+                        });
+                    });
+                }
+            });
+        }
+    });
+});
+
+app.post("/verify", (req, res) => {
+    res.json({"error": "please use GET"});
 });
 
 //id = roomid
@@ -269,12 +345,130 @@ app.post("/authapi", (req, res) => {
         } else {
             res.json({"result": false});
         }
+    } else if(req.body.action === "registeruser") {
+        let errors = [];
+        let emailformatted = req.body.email.match(
+            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+        
+        if(req.body.username.length < 2) {
+            errors.push("u1");
+        } else if(req.body.username.length > 18) {
+            errors.push("u2")
+        }
+        if(!req.body.email) {
+            errors.push("e1");
+        } else if(!emailformatted) {
+            errors.push("e2");
+        }
+        if(!req.body.password) {
+            errors.push("p1")
+        } else if(req.body.password.length < 8 || req.body.password.length > 30) {
+            errors.push("p2");
+        }
+
+        auth.checkUserConflicts(req.body.username, req.body.email).then(function(conflicts) {
+            errors = errors.concat(conflicts);
+            if(errors.length > 0) {
+                res.json({"errors": errors});
+                return;
+            }
+
+
+            //passed all checks...
+            //add user to database
+            auth.registerUser(req.body.username, req.body.email, req.body.password).then(function(tokens) {
+                var mail = {
+                    from: "'Emblitz Team' <emblitz@emblitz.com>",
+                    to: req.body.email,
+                    subject: "Please verify your new account!",
+                    html: ` <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                                <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; margin: auto; padding: 20px;">
+                                    <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                                    <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;"><DIV STYLE="display: block; margin-bottom: 5px;">Dear ${req.body.username},</DIV>Thanks for registering for an Emblitz account! Please verify your email first to finish setting up your account by clicking the button below. This email is valid for the next 10 minutes. Please note that unverified accounts will be deleted after an hour. If you didn't make this request, simply ignore this email.<A HREF="emblitz.com/verify?token=${tokens[1]}" TARGET="_blank" STYLE="display: block; margin-top: 30px; margin-bottom: 30px; -webkit-appearance: none; -moz-appearance: none; appearance: none; border: none; border-radius: 10px; font-size: 18px; padding: 10px; width: 120px; text-align: center; text-decoration: none; color: #ffffff; background: #00b00f; cursor: pointer">Verify Email</A>Thanks,<BR>-The Emblitz Team<DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV></DIV>
+                                </DIV>
+                            </BODY>              
+                            `
+                };
+                
+                mailTransport.sendMail(mail);
+                dev_emails++;
+                res.cookie("uuid", tokens[0], { expires: new Date(Date.now() + (2*24*3600000))}); //2 days expiry bc temporary and account isn't verified yet
+                res.cookie("publickey", tokens[2], { expires: new Date(Date.now() + (2*24*3600000))});
+                res.json({"ok": true});
+            });
+        });
+    } else if(req.body.action === "resendemail") {
+        let uuid = req.cookies.uuid;
+        
+        if(uuid) {
+            auth.verifyUUID(uuid).then(function(data) {
+                var mail = {
+                    from: "'Emblitz Team' <emblitz@emblitz.com>",
+                    to: data[0],
+                    subject: "Please verify your new account!",
+                    html: ` <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                                <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; margin: auto; padding: 20px;">
+                                    <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                                    <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;"><DIV STYLE="display: block; margin-bottom: 5px;">Dear ${data[1]},</DIV>Thanks for registering for an Emblitz account! Please verify your email first to finish setting up your account by clicking the button below. This email is valid for the next 10 minutes. Please note that unverified accounts will be deleted after an hour. If you didn't make this request, simply ignore this email.<A HREF="emblitz.com/verify?token=${data[2]}" TARGET="_blank" STYLE="display: block; margin-top: 30px; margin-bottom: 30px; -webkit-appearance: none; -moz-appearance: none; appearance: none; border: none; border-radius: 10px; font-size: 18px; padding: 10px; width: 120px; text-align: center; text-decoration: none; color: #ffffff; background: #00b00f; cursor: pointer">Verify Email</A>Thanks,<BR>-The Emblitz Team<DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV></DIV>
+                                </DIV>
+                            </BODY>              
+                            `
+                };
+                
+                mailTransport.sendMail(mail);
+                dev_emails++;
+
+                res.json({"email": data[0]});
+            }).catch(function(error) {
+                res.json({"error": "lookup_1"});
+            });
+        } else {
+            res.json({"error": "lookup_2"})
+        }
+    } else if(req.body.action === "login") {
+        if(req.body.username && req.body.password) {
+            auth.userLogin(req.body.username, req.body.password).then(function(userdata) {
+                userdata = userdata[0];
+                res.cookie("publickey", userdata.publickey);
+                res.cookie("uuid", userdata.token);
+                res.json({
+                    "username": userdata.username,
+                    "email": userdata.email,
+                    "wins": userdata.wins,
+                    "losses": userdata.losses,
+                    "medals": userdata.medals,
+                    "badges": userdata.badges,
+                    "pfp": userdata.pfp,
+                    "tournamentprogress": userdata.tournamentprogress,
+                    "verified": userdata.verified,
+                    "timecreated": userdata.timecreated,
+                    "playercolor": userdata.playercolor,
+                    "playersettings": userdata.playersettings
+                });
+            }).catch(function(error) {
+                res.json({"error": error});
+            });
+        } else if(!req.body.username) {
+            res.json({"error": "missing username"});
+        } else if(!req.body.password) {
+            res.json({"error": "missing password"});
+        } else {
+            res.json({"error": "missing username and password"})
+        }
     }
 });
 
 app.post("/api", (req, res) => {
     try {
-        if(req.body.action === "fetchposts") {
+        if(req.body.action === "getdevstats") {
+            if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+                res.status(403);
+                res.json({"error": "403", "message": "You are not authorized to make this call!"});
+                return;
+            }
+            res.json({"starttime": dev_server_starttime, "startms": dev_server_abs_starttime, "emailssent": dev_emails});
+        } else if(req.body.action === "fetchposts") {
             if(!isNaN(Number(req.body.startindex)) && !isNaN(Number(req.body.amount))) {
                 let startindex = req.body.startindex;
                 let amount = req.body.amount;
@@ -331,11 +525,6 @@ app.post("/api", (req, res) => {
             } else {
                 res.json({"uid": userid(), "room": joinroom(req.body.prefermap, req.body.createnewroom)});
             }
-        } else if(req.body.action === "login") {
-            // -- WORK ON PROGRESS --
-            auth.getUserInfo("bobux").then(function(result) {
-                res.json({"response": result})
-            })
         } else {
             res.json({"error": "invalid form body"});
             res.end();

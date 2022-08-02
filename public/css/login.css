@@ -1,0 +1,148 @@
+.lg_content {
+    position: absolute;
+    top: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 1000000;
+    padding-bottom: 80px;
+    width: 500px;
+}
+
+#mainarea {
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.lg_bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.85;
+    width: 100%;
+    background: var(--dark);
+    border-radius: 10px;
+    z-index: -1;
+    margin-bottom: 40px;
+}
+
+.lg_container {
+    padding: 15px;
+}
+
+.lg_input {
+    border: 3px solid var(--medium);
+    max-width: 350px;
+    width: calc(80% - 87px);
+    font-size: 18px;
+    padding: 8px;
+}
+
+.lg_container_title {
+    text-align: left;
+    margin-left: 80px;
+    color: var(--light);
+    margin-bottom: 5px;
+    font-size: 18px;
+    margin-top: 20px;
+    margin-right: 80px;
+}
+
+.lg_submit {
+    max-width: 350px;
+    width: calc(80% - 65px);
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 18px;
+    background: var(--green);
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+    border-radius: 10px;
+}
+
+.lg_divider {
+    position: relative;
+    width: calc(80% - 35px);
+    height: 2px;
+    background: var(--medium);
+    display: block;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 20px;
+}
+
+.lg_logo {
+    width: calc(80% - 70px);
+    margin-bottom: -30px;
+    margin-top: 10px;
+}
+
+.lg_register_text {
+    font-size: 18px;
+    color: var(--light);
+    text-align: left;
+    margin-left: 94px;
+    margin-top: 10px;
+}
+
+.lg_register {
+    max-width: 350px;
+    width: calc(80% - 87px);
+    padding: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+
+.lg_headertext {
+    max-width: 350px;
+    width: calc(80% - 65px);
+    font-size: 16px;
+    color: var(--light);
+    margin-top: 15px;
+    margin-bottom: -10px;
+    text-align: left;
+    margin-left: 80px
+}
+
+.lb_password_check {
+    text-align: left;
+    margin-top: 5px;
+    margin-bottom: -5px;
+    font-size: 17px;
+    color: var(--light);
+    margin-left: 80px;
+}
+
+.pswd_check {
+    color: rgb(255, 59, 59);
+}
+
+.lb_form_error {
+    color: rgb(255, 108, 108);
+    display: none;
+}
+
+.lb_form_error:before {
+    content: "-- ";
+}
+
+.lg_resulttext {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 18px;
+    color: var(--light);
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.lg_headertext_acct {
+    margin-top: 10px;
+    padding: 10px;
+    background: #3e7afa;
+    border-radius: 5px;
+}
