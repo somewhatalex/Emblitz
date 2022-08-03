@@ -281,7 +281,15 @@ app.get("/privacy", (req, res) => {
 });
 
 app.get("/user/*", (req, res) => {
-    res.render("profile")
+    let username = req.path.split("/")[2];
+
+    auth.getPublicUserInfo(username).then(function() {
+        res.render("user", {
+            username: username
+        });
+    }).catch(function() {
+        res.render("./errorpages/404")
+    })
 });
 
 app.get("/verify", (req, res) => {
@@ -552,6 +560,22 @@ app.post("/api", (req, res) => {
                     "playercolor": userdata.playercolor,
                     "playersettings": userdata.playersettings,
                     "metadata": userdata.metadata
+                });
+            }).catch(function(error) {
+                res.json({"error": "no user found"})
+            });
+        } else if(req.body.action === "getuserprofile") {
+            auth.getPublicUserInfo(req.body.username).then(function(userdata) {
+                res.json({
+                    "username": userdata.username,
+                    "wins": userdata.wins,
+                    "losses": userdata.losses,
+                    "medals": userdata.medals,
+                    "badges": userdata.badges,
+                    "pfp": userdata.pfp,
+                    "tournamentprogress": userdata.tournamentprogress,
+                    "timecreated": userdata.timecreated,
+                    "playercolor": userdata.playercolor
                 });
             }).catch(function(error) {
                 res.json({"error": "no user found"})

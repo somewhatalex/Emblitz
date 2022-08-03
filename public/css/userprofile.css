@@ -1,0 +1,22 @@
+body {
+    background: var(--dark);
+}
+
+.u-banner-container {
+    height: 250px;
+}
+
+.u-banner {
+    background: url(../images/background1.JPG);
+    filter: blur(2px);
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+.u-banner-content {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    color: var(--light)
+}

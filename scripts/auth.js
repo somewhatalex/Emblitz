@@ -36,6 +36,18 @@ function getUserInfo(token) {
     });
 }
 
+function getPublicUserInfo(username) {
+    return new Promise((resolve, reject) => {
+        app.db.query(`SELECT * FROM users WHERE username=$1`, [username], function (err, result) {
+            if(result.rows.length != 0) {
+                resolve(result.rows[0]);
+            } else {
+                reject("user not found");
+            }
+        });
+    });
+}
+
 function getUserInfoNoReject(token) {
     return new Promise((resolve) => {
         app.db.query(`SELECT * FROM users WHERE token=$1`, [token], function (err, result) {
@@ -238,5 +250,6 @@ module.exports = {
     verifyUUID: verifyUUID,
     initDB: initDB,
     userLogin: userLogin,
-    getUserInfoNoReject: getUserInfoNoReject
+    getUserInfoNoReject: getUserInfoNoReject,
+    getPublicUserInfo: getPublicUserInfo
 };
