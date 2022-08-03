@@ -121,7 +121,11 @@ function escapestring(str) {
 }
 
 function escapeHTML(text) {
-    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    try {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    } catch {
+        return "";
+    }
  }
 
 function randomnumber(min, max) {
@@ -204,15 +208,18 @@ app.all("/", (req, res) => {
         });
     } else if (!getuuid.startsWith("guest-")) {
         auth.getUserInfo(getuuid).then(function(userinfo) {
-            if(!userinfo) {
-                let guestuuid = "";
-                for(let i=0; i<50; i++) {
-                    guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
-                }
-
-                res.cookie("uuid", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
+            res.render("index", {
+                host_name: hostname,
+                prod: process.env.PRODUCTION,
+                gameversion: gameversion
+            });
+        }).catch(function() {
+            let guestuuid = "";
+            for(let i=0; i<50; i++) {
+                guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
             }
 
+            res.cookie("uuid", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
             res.render("index", {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
@@ -243,16 +250,14 @@ app.get("/login", (req, res) => {
         
     if(uuid) {
         auth.getUserInfo(uuid).then(function(userinfo) {
-            if(!userinfo) {
-                res.render("login", {
-                    host_name: hostname,
-                    currentuser: ""
-                });
-                return;
-            }
             res.render("login", {
                 host_name: hostname,
                 currentuser: `<DIV CLASS="lg_headertext_acct">You're already logged in as <B>${userinfo.username}</B>, but you can log into a different account.</DIV>`
+            });
+        }).catch(function() {
+            res.render("login", {
+                host_name: hostname,
+                currentuser: ""
             });
         });
     } else {
@@ -273,6 +278,10 @@ app.get("/admin", (req, res) => {
 
 app.get("/privacy", (req, res) => {
     res.render("privacy");
+});
+
+app.get("/user/*", (req, res) => {
+    res.render("profile")
 });
 
 app.get("/verify", (req, res) => {
@@ -430,8 +439,8 @@ app.post("/authapi", (req, res) => {
         if(req.body.username && req.body.password) {
             auth.userLogin(req.body.username, req.body.password).then(function(userdata) {
                 userdata = userdata[0];
-                res.cookie("publickey", userdata.publickey);
-                res.cookie("uuid", userdata.token);
+                res.cookie("publickey", userdata.publickey, { expires: new Date(Date.now() + (30*24*3600000))});
+                res.cookie("uuid", userdata.token, { expires: new Date(Date.now() + (30*24*3600000))});
                 res.json({
                     "username": userdata.username,
                     "email": userdata.email,
@@ -444,14 +453,15 @@ app.post("/authapi", (req, res) => {
                     "verified": userdata.verified,
                     "timecreated": userdata.timecreated,
                     "playercolor": userdata.playercolor,
-                    "playersettings": userdata.playersettings
+                    "playersettings": userdata.playersettings,
+                    "metadata": userdata.metadata
                 });
             }).catch(function(error) {
                 res.json({"error": error});
             });
-        } else if(!req.body.username) {
+        } else if(!req.body.username && req.body.password) {
             res.json({"error": "missing username"});
-        } else if(!req.body.password) {
+        } else if(!req.body.password && req.body.username) {
             res.json({"error": "missing password"});
         } else {
             res.json({"error": "missing username and password"})
@@ -525,6 +535,27 @@ app.post("/api", (req, res) => {
             } else {
                 res.json({"uid": userid(), "room": joinroom(req.body.prefermap, req.body.createnewroom)});
             }
+        } else if (req.body.action === "getmyinfo") {
+            let getuuid = req.cookies.uuid;
+            auth.getUserInfo(getuuid).then(function(userdata) {
+                res.json({
+                    "username": userdata.username,
+                    "email": userdata.email,
+                    "wins": userdata.wins,
+                    "losses": userdata.losses,
+                    "medals": userdata.medals,
+                    "badges": userdata.badges,
+                    "pfp": userdata.pfp,
+                    "tournamentprogress": userdata.tournamentprogress,
+                    "verified": userdata.verified,
+                    "timecreated": userdata.timecreated,
+                    "playercolor": userdata.playercolor,
+                    "playersettings": userdata.playersettings,
+                    "metadata": userdata.metadata
+                });
+            }).catch(function(error) {
+                res.json({"error": "no user found"})
+            });
         } else {
             res.json({"error": "invalid form body"});
             res.end();
@@ -776,58 +807,70 @@ wss.on("connection", (ws) => {
                 ws.send(JSON.stringify({"error": "roomfull"}));
             }
 
-            let pname = escapeHTML(userinfo.pname).substring(0, 18);
-            let pcolor = escapeHTML(userinfo.pcolor);
-            //player name not set, assign a random one
-            if(pname === "") {
-                pname = genPname();
-            }
+            let pname = null;
+            let pcolor = null;
 
-            //no player color set? assign red
-            if(pcolor === "") {
-                pcolor = "red";
-            }
+            auth.getUserInfoNoReject(userinfo.uuid).then(function(userdata) {
+                if(!userdata) {
+                    pname = genPname();
+                    pcolor = "red";
+                } else {
+                    pname = userdata.username;
+                    pcolor = userdata.playercolor;
+                }
 
-            //give players their preferred color; if taken, assign a different random color
-            for(let i=0; i < rooms.length; i++) {
-                if (rooms[i].id === room) {
-                    let takencolors = [];
-                    let availablecolors = playercoloroptions;
-                    let playerliststring = rooms[i]["playerslist"];
-                    for(let i=0; i<playerliststring.length; i++) {
-                        takencolors.push(playerliststring[i]["pcolor"]);
-                    }
-                    
-                    if(takencolors.includes(pcolor)) {
-                        for(let i=0; i<takencolors.length; i++) {
-                            availablecolors = availablecolors.filter(function(item) {
-                                return item !== takencolors[i];
-                            });
+                //give players their preferred color; if taken, assign a different random color
+                for(let i=0; i < rooms.length; i++) {
+                    if (rooms[i].id === room) {
+                        let takencolors = [];
+                        let availablecolors = playercoloroptions;
+                        let playerliststring = rooms[i]["playerslist"];
+                        for(let i=0; i<playerliststring.length; i++) {
+                            takencolors.push(playerliststring[i]["pcolor"]);
                         }
-                        pcolor = availablecolors[(Math.random() * availablecolors.length) | 0];
+                        
+                        if(takencolors.includes(pcolor)) {
+                            for(let i=0; i<takencolors.length; i++) {
+                                availablecolors = availablecolors.filter(function(item) {
+                                    return item !== takencolors[i];
+                                });
+                            }
+                            pcolor = availablecolors[(Math.random() * availablecolors.length) | 0];
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
-            
-            var metadata = {uid, room, pname, pcolor, gid};
-            clients.set(ws, metadata);
+                
+                var metadata = {uid, room, pname, pcolor, gid};
+                clients.set(ws, metadata);
 
-            ws.send(JSON.stringify({"setcolor": pcolor}));
+                ws.send(JSON.stringify({"setcolor": pcolor}));
 
-            //add pname to room list
-            let tclient = clients.get(ws);
-            for (var i=0; i < rooms.length; i++) {
-                if (rooms[i].id === tclient.room) {
-                    rooms[i]["playerslist"].push({"id": uid, "name": pname, "pcolor": pcolor});
-                    game.addPlayer(tclient.room, uid).then(function(result) {
-                        //console.log(result);
-                    })
-                    break;
+                //add pname to room list
+                let tclient = clients.get(ws);
+                for (var i=0; i < rooms.length; i++) {
+                    if (rooms[i].id === tclient.room) {
+                        rooms[i]["playerslist"].push({"id": uid, "name": pname, "pcolor": pcolor});
+                        game.addPlayer(tclient.room, uid).then(function(result) {
+                            //console.log(result);
+                        })
+                        break;
+                    }
                 }
-            }
 
-            ws.send(JSON.stringify({"mapname": getroommap(tclient.room)}));
+                ws.send(JSON.stringify({"mapname": getroommap(tclient.room)}));
+                [...clients.keys()].forEach((client) => {
+                    let clientdata = clients.get(client);
+        
+                    if(clientdata["room"] === JSON.parse(message).roomid) {
+                        //copied over
+                        function sendmsg(message) {
+                            client.send(JSON.stringify(message));
+                        }
+                        sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"], "isprivateroom": rooms[i]["isprivate"]});
+                    }
+                });
+            });
         } else if (action === "mapready") {
             let tclient = clients.get(ws);
             for (var i=0; i < rooms.length; i++) {
@@ -877,8 +920,6 @@ wss.on("connection", (ws) => {
                         sendmsg({"message": "all users loaded"});
                         sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"]});
                     }
-                } else if(action === "userlogin") {
-                    sendmsg({"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"], "isprivateroom": rooms[i]["isprivate"]});
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 }

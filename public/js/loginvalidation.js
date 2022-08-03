@@ -218,23 +218,73 @@ function login() {
     document.getElementById("i-loginbtn").value = "Please wait...";
     document.getElementById("i-loginbtn").style.cursor = "no-drop";
     document.getElementById("i-loginbtn").setAttribute("disabled", "disabled");
-    fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "login", username: document.getElementById("login-username").value, password: document.getElementById("login-password").value})}).then(response => {
-        response.json().then(function(text) {
-            if(text.error) {
-                if(text.error === "password is incorrect") {
-                    
-                } else if(text.error === "username does not exist") {
+    document.getElementById("i-registerbtn").style.cursor = "no-drop";
+    document.getElementById("i-registerbtn").setAttribute("disabled", "disabled");
 
-                } else if(text.error === "missing username") {
+    let errors = false;
+    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+        document.getElementsByClassName("lb_form_error")[i].style.display = "none";
+    }
 
-                } else if(text.error === "missing password") {
+    if(!document.getElementById("login-username").value) {
+        document.getElementById("error-login-username").style.display = "inline";
+        document.getElementById("error-login-username").innerText = "username is required";
+        errors = true;
+    }
 
-                } else if(text.error === "missing username and password") {
+    if(!document.getElementById("login-password").value) {
+        document.getElementById("error-login-password").style.display = "inline";
+        document.getElementById("error-login-password").innerText = "password is required";
+        errors = true;
+    }
 
+    if(!errors) {
+        fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "login", username: document.getElementById("login-username").value, password: document.getElementById("login-password").value})}).then(response => {
+            response.json().then(function(text) {
+                if(text.error) {
+                    if(text.error === "password is incorrect") {
+                        document.getElementById("error-login-password").style.display = "inline";
+                        document.getElementById("error-login-password").innerText = "incorrect password";
+                        errors = true;
+                    } else if(text.error === "username does not exist") {
+                        document.getElementById("error-login-username").style.display = "inline";
+                        document.getElementById("error-login-username").innerText = "username doesn't exist";
+                        errors = true;
+                    } else if(text.error === "missing username") {
+                        document.getElementById("error-login-username").style.display = "inline";
+                        document.getElementById("error-login-username").innerText = "username is required";
+                        errors = true;
+                    } else if(text.error === "missing password") {
+                        document.getElementById("error-login-password").style.display = "inline";
+                        document.getElementById("error-login-password").innerText = "password is required";
+                        errors = true;
+                    } else if(text.error === "missing username and password") {
+                        document.getElementById("error-login-username").style.display = "inline";
+                        document.getElementById("error-login-username").innerText = "username is required";
+                        document.getElementById("error-login-password").style.display = "inline";
+                        document.getElementById("error-login-password").innerText = "password is required";
+                        errors = true;
+                    }
                 }
-                return;
-            }
 
+                if(!errors) {
+                    window.location.href = "https://www.emblitz.com";
+                    return;
+                }
+
+                document.getElementById("i-loginbtn").removeAttribute("disabled");
+                document.getElementById("i-registerbtn").removeAttribute("disabled");
+                document.getElementById("i-loginbtn").style.cursor = "pointer";
+                document.getElementById("i-registerbtn").style.cursor = "pointer";
+                document.getElementById("i-loginbtn").value = "Login";
+                return;
+            });
         });
-    });
+    } else {
+        document.getElementById("i-loginbtn").removeAttribute("disabled");
+        document.getElementById("i-registerbtn").removeAttribute("disabled");
+        document.getElementById("i-loginbtn").style.cursor = "pointer";
+        document.getElementById("i-registerbtn").style.cursor = "pointer";
+        document.getElementById("i-loginbtn").value = "Login";
+    }
 }

@@ -1859,3 +1859,21 @@ input { /*override default styles*/
         opacity: 0
     }
 }
+
+.pf-badge {
+    width: 60px;
+    height: auto;
+    cursor: pointer;
+}
+
+.profile-outline {
+    background-color: #de4343;
+    height: 70px;
+    position: relative;
+    margin: auto;
+    max-width: 370px;
+    width: calc(100% - 20px);
+    border-radius: 10px;
+    padding: 10px;
+    text-align: left;
+}

@@ -12,7 +12,7 @@ function randomnumber(min, max) {
 
 function initDB() {
     return new Promise((resolve, reject) => {
-        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins VARCHAR(255), losses VARCHAR(255), medals VARCHAR(255), badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000))", function (err, result) {
+        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins VARCHAR(255), losses VARCHAR(255), medals VARCHAR(255), badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000), metadata VARCHAR(10000))", function (err, result) {
             if (err) console.log(err);
             console.log("User data table initiated");
             app.db.query("CREATE TABLE IF NOT EXISTS devinfo (title VARCHAR(255), image VARCHAR(1000), content VARCHAR(10000), submittedtime VARCHAR(255), timestamp VARCHAR(255), id VARCHAR(255))", function (err, result) {
@@ -27,10 +27,22 @@ function initDB() {
 function getUserInfo(token) {
     return new Promise((resolve, reject) => {
         app.db.query(`SELECT * FROM users WHERE token=$1`, [token], function (err, result) {
-            resolve(result.rows[0]);
+            if(result.rows.length != 0) {
+                resolve(result.rows[0]);
+            } else {
+                reject("guest user");
+            }
         });
     });
 }
+
+function getUserInfoNoReject(token) {
+    return new Promise((resolve) => {
+        app.db.query(`SELECT * FROM users WHERE token=$1`, [token], function (err, result) {
+            resolve(result.rows[0]);
+        });
+    });
+};
 
 function userLogin(username, password) {
     return new Promise((resolve, reject) => {
@@ -123,8 +135,8 @@ function registerUser(username, email, password) {
         createUUID().then(function(token) {
             createPublicKey().then(function(publickey) {
                 let hashedpassword = passwordHash.generate(password);
-                app.db.query(`INSERT INTO users (token, wins, losses, medals, badges, pfp, tournamentprogress, verified, timecreated, username, email, password, publickey, playercolor, playersettings)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`, [token, 0, 0, 0, null, null, null, false, Date.now(), username, email, hashedpassword, publickey, "red", null], function (err, result) {
+                app.db.query(`INSERT INTO users (token, wins, losses, medals, badges, pfp, tournamentprogress, verified, timecreated, username, email, password, publickey, playercolor, playersettings, metadata)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`, [token, 0, 0, 0, [{"name": "betatester"}], null, null, false, Date.now(), username, email, hashedpassword, publickey, "red", null, {"type": "user"}], function (err, result) {
                     genJWT(publickey).then(function(jwttoken) {
                         resolve([token, jwttoken, publickey]);
                     });
@@ -225,5 +237,6 @@ module.exports = {
     checkUserConflicts: checkUserConflicts,
     verifyUUID: verifyUUID,
     initDB: initDB,
-    userLogin: userLogin
+    userLogin: userLogin,
+    getUserInfoNoReject: getUserInfoNoReject
 };

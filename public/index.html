@@ -75,6 +75,11 @@
                     <DIV CLASS="homemenu-bg"></DIV>
                     <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
                     <DIV CLASS="join_input" ID="join_input">
+                        <DIV CLASS="profile-outline">
+                            <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                            <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">GamerChair</DIV></DIV>
+                        </DIV>
+                        <!--
                         <DIV CLASS="ji-area">
                             <DIV CLASS="ji-header">Enter your username and preferred player color.</DIV>
                             <INPUT ID="p_name" ONKEYUP='localStorage.setItem("username", this.value);' CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Username here...">
@@ -87,6 +92,7 @@
                                 <OPTION VALUE="purple">purple</OPTION>
                             </SELECT>
                         </DIV>
+                        -->
                         <DIV CLASS="mapselect">
                             <DIV CLASS="mapselecttitle">Current map selection:</DIV>
                             <TABLE CLASS="mapnav">
@@ -124,14 +130,14 @@
                             </TABLE>
                         </DIV>
                         <DIV CLASS="h_button_options">
-                            <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, false)">Play</BUTTON>
+                            <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, false)">Play</BUTTON>
                             <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
                             <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
                                 <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game. If not, use the "Play" button to play a random match.</DIV>
-                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value, null, false)">Connect</BUTTON>
+                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect('r-' + document.getElementById('room_id').value, null, false)">Connect</BUTTON>
                             </DIV>
                             <BR><BR>
-                            <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
+                            <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                             <BR>
                         </DIV>
                         <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Game Tutorial</A> | <A HREF="./privacy" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Privacy Policy</A><BR><BR>

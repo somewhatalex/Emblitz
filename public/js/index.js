@@ -66,18 +66,8 @@ window.onload = function() {
 }
 
 function inithomepage() {
-    if(!localStorage.getItem("color")) {
-        localStorage.setItem("color", "red");
-    } else {
-        document.getElementById("framecolor").value = localStorage.getItem("color");
-    }
-
     if(!localStorage.getItem("map")) {
         localStorage.setItem("map", "random");
-    }
-
-    if(localStorage.getItem("username")) {
-        document.getElementById("p_name").value = localStorage.getItem("username");
     }
 
     if(!localStorage.getItem("hasvisited")) {
@@ -85,6 +75,7 @@ function inithomepage() {
         localStorage.setItem("hasvisited", true);
     }
 
+    getMyInfo();
     loadPosts("refresh");
 
     for(let i=0; i<mapDescriptions.length; i++) {
@@ -105,6 +96,13 @@ function inithomepage() {
             break;
         }
     }
+}
+
+function getMyInfo() {
+    fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmyinfo"})}).then(response => {
+        response.json().then(function(text) {
+        });
+    });
 }
 
 function resetAll() {
@@ -778,7 +776,7 @@ function tickLobbyTimer() {
     }, 1000);
 }
 
-function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
+function gameConnect(inputroomid, pmap, createnewroom) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
     document.getElementById("gamelobby").style.display = "block";
@@ -787,7 +785,7 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
             document.getElementById("invitecode").innerText = roomid.replace("r-", "");
             tickLobbyTimer();
             websocket = ws;
-            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "pcolor": pcolor, "gid": gid}));
+            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "uuid": getCookie("uuid"), "gid": gid}));
             confirmJoinGame().then(function() {
                 ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
             });
