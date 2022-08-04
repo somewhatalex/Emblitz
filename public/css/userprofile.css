@@ -18,5 +18,64 @@ body {
     position: absolute;
     top: 50px;
     left: 50px;
-    color: var(--light)
+    width: 500px;
+    text-align: center;
+    color: var(--light);
+    display: inline-block;
+}
+
+.user_body{
+    color: white;
+    padding: 20px;
+}
+
+/*Stuff for badges array*/
+.user_avatar-frame {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 5px solid #fc0320;
+    display: inline-block;
+    -webkit-box-shadow: 0px 0px 4px 2px #3B3B3B; 
+    box-shadow: 0px 0px 4px 2px #3B3B3B;
+    overflow: hidden;
+}
+
+.badges{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    min-height: 100vh;
+    background: #dcdcdc;
+}
+
+.container{
+    position: relative;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 20px;
+    padding: 20px;
+}
+
+.container .card{
+    width: 100%;
+    background: #fff;
+}
+
+.container .card .imgBx{
+    position: relative;
+    width: 100%;
+    height: 310px;
+    overflow: hidden;
+}
+
+.container .card .imgBx img{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.5s ease-in-out
 }

@@ -5,3 +5,7 @@ window.addEventListener("load", function() {
         });
     });
 });
+
+const userWins = document.createElement("div");
+
+ubody.append(userWins);
