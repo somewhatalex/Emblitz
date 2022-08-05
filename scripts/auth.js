@@ -36,9 +36,9 @@ function getUserInfo(token) {
     });
 }
 
-function getPublicUserInfo(username) {
+function getPublicUserInfo(username) { //case insensitive search
     return new Promise((resolve, reject) => {
-        app.db.query(`SELECT * FROM users WHERE username=$1`, [username], function (err, result) {
+        app.db.query(`SELECT * FROM users WHERE lower(username)=$1`, [username.toLowerCase()], function (err, result) {
             if(result.rows.length != 0) {
                 resolve(result.rows[0]);
             } else {
@@ -148,7 +148,7 @@ function registerUser(username, email, password) {
             createPublicKey().then(function(publickey) {
                 let hashedpassword = passwordHash.generate(password);
                 app.db.query(`INSERT INTO users (token, wins, losses, medals, badges, pfp, tournamentprogress, verified, timecreated, username, email, password, publickey, playercolor, playersettings, metadata)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`, [token, 0, 0, 0, [{"name": "betatester"}], null, null, false, Date.now(), username, email, hashedpassword, publickey, "red", null, {"type": "user"}], function (err, result) {
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`, [token, 0, 0, 0, {"betatester": {"awarded": Date.now()}}, null, null, false, Date.now(), username, email, hashedpassword, publickey, "red", null, {"type": "user"}], function (err, result) {
                     genJWT(publickey).then(function(jwttoken) {
                         resolve([token, jwttoken, publickey]);
                     });
@@ -196,6 +196,10 @@ function verifyUUID(key) {
             }
         });
     });
+}
+
+function awardBadge(uuid, name) {
+    
 }
 
 function postAnnouncement(title, content, submittedtime, image) {
@@ -251,5 +255,6 @@ module.exports = {
     initDB: initDB,
     userLogin: userLogin,
     getUserInfoNoReject: getUserInfoNoReject,
-    getPublicUserInfo: getPublicUserInfo
+    getPublicUserInfo: getPublicUserInfo,
+    awardBadge, awardBadge
 };

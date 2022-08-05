@@ -18,6 +18,7 @@ const { rateLimit } = require("express-rate-limit");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const { initDB } = require("./scripts/auth.js");
+const badges = require("./scripts/badges.js");
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
 
@@ -283,13 +284,13 @@ app.get("/privacy", (req, res) => {
 app.get("/user/*", (req, res) => {
     let username = req.path.split("/")[2];
 
-    auth.getPublicUserInfo(username).then(function() {
+    auth.getPublicUserInfo(username).then(function(result) {
         res.render("user", {
-            username: username
+            username: result.username
         });
     }).catch(function() {
         res.render("./errorpages/404")
-    })
+    });
 });
 
 app.get("/verify", (req, res) => {
@@ -580,6 +581,8 @@ app.post("/api", (req, res) => {
             }).catch(function(error) {
                 res.json({"error": "no user found"})
             });
+        } else if(req.body.action === "badgedata") {
+            res.json(badges);
         } else {
             res.json({"error": "invalid form body"});
             res.end();

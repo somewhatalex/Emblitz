@@ -34,16 +34,20 @@
         <DIV CLASS="u-banner-container">
             <DIV CLASS="u-banner"></DIV>
             <DIV CLASS="u-banner-content">
-                <DIV CLASS="profile-outline">
-                    <DIV CLASS="user_avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 60px; height: 60px" SRC="../images/defaultpfp.png"></DIV>
-                    <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">WWWWWWWWWWWWWWWWWW</DIV></DIV>
-                </DIV>
+                <DIV CLASS="u-avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 150px; height: 150px" SRC="../images/defaultpfp.png"></DIV>
+                <DIV CLASS="u-username-big"><%- username %></DIV>
             </DIV>
         </DIV>
-        <DIV CLASS="user_body">
-            <p>Account created: placeholder</p>
-            <p>Wins: placeholder</p>
-            <p>Losses: placeholder</p>
+        <DIV CLASS="u-body">
+            <DIV CLASS="u-playerstats">
+                <DIV CLASS="u-playerstats-stat"><SPAN ID="wins-amount">--</SPAN> Wins</DIV>
+                <DIV CLASS="u-playerstats-stat"><SPAN ID="losses-amount">--</SPAN> Losses</DIV>
+                <DIV CLASS="u-playerstats-stat">Joined on <SPAN ID="join-date">--/--/--</SPAN></DIV>
+            </DIV>
+            <DIV CLASS="u-badge-title">Badges</DIV>
+            <DIV CLASS="u-container" ID="badge-container">
+                
+            </DIV>
         </DIV>
     </BODY>
 </HTML>
