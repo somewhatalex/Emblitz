@@ -105,13 +105,31 @@ pool.connect(function(err) {
 });
 
 //--MAILER--
-const mailTransport = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.MAILUSER,
-        pass: process.env.MAILPASSWORD
-    }
-});
+var mailTransport = null;
+if(process.env.PRODUCTION !== "yes") {
+    console.log("Using development mail server (Gmail)");
+    mailTransport = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.MAILUSER,
+            pass: process.env.MAILPASSWORD
+        }
+    });
+} else {
+    //ADD IN CORRECT CREDENTIALS! (work on cloudmailin integration later)
+    console.log("Using production mail server");
+    mailTransport = nodemailer.createTransport({
+        host: hostname,
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+            user: username,
+            pass: password,
+        },
+        logger: true
+    });
+}
 
 const clients = new Map();
 const rooms = [];

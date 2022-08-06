@@ -163,3 +163,10 @@ body {
     overflow: auto;
     height: 140px;
 }
+
+.medal-img {
+    width: 30px;
+    height: auto;
+    margin-bottom: -10px;
+    margin-right: 5px;
+}
