@@ -71,6 +71,9 @@ if(process.env.PRODUCTION === "yes") {
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
+setInterval(function() {
+    auth.deleteUnusedAccounts();
+}, 36000000);
 
 //database
 var dbcredentials = null;
