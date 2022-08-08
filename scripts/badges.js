@@ -11,6 +11,12 @@ const badges = {
         "level": "Bronze",
         "description": "Create an Emblitz account and verify it.",
         "image": "verifiedaccount.png"
+    },
+    "firstwin": {
+        "name": "First Win",
+        "level": "Bronze",
+        "description": "Win your first Emblitz battle in a public multiplayer room!",
+        "image": "firstwin.png"
     }
 }
 

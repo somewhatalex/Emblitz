@@ -785,7 +785,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
             document.getElementById("invitecode").innerText = roomid.replace("r-", "");
             tickLobbyTimer();
             websocket = ws;
-            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "uuid": getCookie("uuid"), "gid": gid}));
+            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "uuid": getCookie("uuid"), "gid": gid, "pubkey": getCookie("publickey")}));
             confirmJoinGame().then(function() {
                 ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
             });

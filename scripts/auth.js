@@ -198,16 +198,38 @@ function verifyUUID(key) {
     });
 }
 
-function awardBadge(uuid, name) {
-    //Incomplete
-    return new Promise((resolve, reject) => {
-        app.db.query(`INSERT INTO users WHERE uuid=$1 (badges) VALUES {"$2": {"awarded": $3} {"level": $4} {"description": $5} {"image": $6}}`, [uuid, name, Date.now(), level, description, image])
-    }.then(function(result) {
-        console.log(`Successfully created badge $name`);
+function deleteUnusedAccounts() {
+    let expiredtime = Date.now() - 36000000;
+    app.db.query(`SELECT * FROM users WHERE timecreated<$1 AND verified=$2`, [expiredtime, false]).then(function(result) {
+        console.log(`Deleted ${result.rows.length} unverified accounts`);
     }).catch(function(error) {
-        console.log("Error adding badge: " + error);
+        console.log("Error deleting accounts: " + error);
+    });
+}
+
+function awardBadge(pubkey, name) {
+    return new Promise((resolve) => {
+        if(pubkey.startsWith("guest-")) {
+            resolve("ok");
+        }
+
+        app.db.query(`SELECT * FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
+            let badgedata = JSON.parse(result.rows[0].badges);
+
+            //badge already awarded
+            if(badgedata[name]) {
+                resolve("ok");
+            }
+            
+            badgedata[name] = {"awarded": Date.now()}
+            app.db.query(`UPDATE users SET badges=$1 WHERE publickey=$2`, [badgedata, pubkey]).then(function() {
+                resolve("ok");
+            })
+        });
     })
 }
+
+//--ANNOUNCEMENTS PANEL--
 
 function postAnnouncement(title, content, submittedtime, image) {
     return new Promise((resolve, reject) => {
@@ -249,15 +271,6 @@ function fetchAnnouncements(start, amount) {
             resolve(result.rows);
         });
     });
-}
-
-function deleteUnusedAccounts() {
-    let expiredtime = Date.now() - 36000000;
-    app.db.query(`SELECT * FROM users WHERE timecreated<$1 AND verified=$2`, [expiredtime, false]).then(function(result) {
-        console.log(`Deleted ${result.rows.length} accounts`);
-    }).catch(function(error) {
-        console.log("Error deleting accounts: " + error);
-    })
 }
 
 module.exports = {

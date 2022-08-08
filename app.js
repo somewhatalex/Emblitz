@@ -39,7 +39,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.4 | 7/27/2022";
+const gameversion = "1.2.4 | 8/8/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -71,10 +71,6 @@ if(process.env.PRODUCTION === "yes") {
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
-setInterval(function() {
-    auth.deleteUnusedAccounts();
-}, 36000000);
-
 //database
 var dbcredentials = null;
 if(process.env.PRODUCTION === "yes") {
@@ -103,7 +99,11 @@ pool.connect(function(err) {
 
     console.log("Connected to database!");
     auth.initDB().then(function() {
-        console.log("Finished initializing database")
+        console.log("Finished initializing database");
+        
+        setInterval(function() {
+            auth.deleteUnusedAccounts();
+        }, 36000000);
     });
 });
 
@@ -222,13 +222,19 @@ app.all("/", (req, res) => {
         }
 
         res.cookie("uuid", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
+        
+        guestuuid = "";
+        for(let i=0; i<50; i++) {
+            guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
+        }
+        res.cookie("publickey", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
 
         res.render("index", {
             host_name: hostname,
             prod: process.env.PRODUCTION,
             gameversion: gameversion
         });
-    } else if (!getuuid.startsWith("guest-")) {
+    } else if(!getuuid.startsWith("guest-")) {
         auth.getUserInfo(getuuid).then(function(userinfo) {
             res.render("index", {
                 host_name: hostname,
@@ -242,6 +248,13 @@ app.all("/", (req, res) => {
             }
 
             res.cookie("uuid", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
+            
+            guestuuid = "";
+            for(let i=0; i<50; i++) {
+                guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
+            }
+            res.cookie("publickey", "guest-" + guestuuid, { expires: new Date(Date.now() + (10*24*3600000))});
+            
             res.render("index", {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
@@ -334,6 +347,8 @@ app.get("/verify", (req, res) => {
                 } else {
                     let getusername = result.rows[0].username;
                     pool.query(`UPDATE users SET verified=$1 WHERE publickey=$2 AND email=$3`, [true, decoded.data[0].publickey, decoded.data[0].email], function(err, result) {
+                        auth.awardBadge(decoded.data[0].publickey, "verifiedaccount");
+                        
                         let outputresult = `Thanks for verifying your account! You can now login through the login page using your username and password. Enjoy the game!<DIV STYLE="display: block; margin-top: 20px;">Your username: <B>${getusername}</B></DIV><A CLASS="lg_register jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://emblitz.com">To Emblitz!</A>`;
                         res.render("verify", {
                             result: outputresult
@@ -828,6 +843,7 @@ wss.on("connection", (ws) => {
         if(action === "userlogin") {
             let userinfo = JSON.parse(message);
             let uid = escapeHTML(userinfo.uid);
+            let pubkey = userinfo.pubkey;
             let room = escapeHTML(userinfo.roomid);
             let gid = userinfo.gid;
 
@@ -889,7 +905,7 @@ wss.on("connection", (ws) => {
                     }
                 }
                 
-                var metadata = {uid, room, pname, pcolor, gid};
+                var metadata = {uid, room, pname, pcolor, gid, pubkey};
                 clients.set(ws, metadata);
 
                 ws.send(JSON.stringify({"setcolor": pcolor}));
@@ -899,7 +915,7 @@ wss.on("connection", (ws) => {
                 for (var i=0; i < rooms.length; i++) {
                     if (rooms[i].id === tclient.room) {
                         rooms[i]["playerslist"].push({"id": uid, "name": pname, "pcolor": pcolor});
-                        game.addPlayer(tclient.room, uid).then(function(result) {
+                        game.addPlayer(tclient.room, uid, pubkey).then(function(result) {
                             //console.log(result);
                         })
                         break;

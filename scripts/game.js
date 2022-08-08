@@ -2,10 +2,11 @@ const emitter = require("events").EventEmitter;
 const fs = require("fs");
 const self = new emitter();
 const games = new Map();
+const auth = require("./auth.js");
 var attackIntervals = {};
 var gameLobbyTimers = {};
 var gameLobbyTimerHandlers = {};
-var gameDeployTimers = {}
+var gameDeployTimers = {};
 
 function game() {
     this.newGame = function(roomid, roommap, deploytime) {
@@ -270,6 +271,7 @@ function game() {
         }
 
         if(totalplayersinroom.length == 1) {
+            auth.awardBadge(idToPubkey(roomid, totalplayersinroom[0]), "firstwin");
             self.emit("playerWon", [roomid, totalplayersinroom[0]]);
         }
     }
@@ -308,11 +310,16 @@ function game() {
         self.emit("removePlayer" + roomid, id);
     }
 
-    this.addPlayer = function(roomid, id) {
+    this.addPlayer = function(roomid, id, pubkey) {
         return new Promise(function(resolve, reject) {
-            games.get(roomid).playerstate.push({"id": id});
+            games.get(roomid).playerstate.push({"id": id, "pubkey": pubkey});
             resolve("ok");
         });
+    }
+
+    function idToPubkey(roomid, id) {
+        let foundplayer = games.get(roomid).playerstate.find(item => item.id === id);
+        return foundplayer.pubkey;
     }
 }
 
