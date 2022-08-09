@@ -15,7 +15,7 @@ const badges = {
     "firstwin": {
         "name": "First Win",
         "level": "Bronze",
-        "description": "Win your first Emblitz battle in a public multiplayer room!",
+        "description": "Win your first Emblitz battle in a public multiplayer room! Defeat all other players and place 1st to receive this badge.",
         "image": "firstwin.png"
     }
 }

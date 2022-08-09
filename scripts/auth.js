@@ -199,9 +199,9 @@ function verifyUUID(key) {
 }
 
 function deleteUnusedAccounts() {
-    let expiredtime = Date.now() - 36000000;
-    app.db.query(`SELECT * FROM users WHERE timecreated<$1 AND verified=$2`, [expiredtime, false]).then(function(result) {
-        console.log(`Deleted ${result.rows.length} unverified accounts`);
+    let expiredtime = Date.now() - 3600000;
+    app.db.query(`DELETE FROM users WHERE timecreated<$1 AND verified=$2`, [expiredtime, false]).then(function(result) {
+        console.log(`Deleted unverified accounts`);
     }).catch(function(error) {
         console.log("Error deleting accounts: " + error);
     });
@@ -220,7 +220,7 @@ function awardBadge(pubkey, name) {
             if(badgedata[name]) {
                 resolve("ok");
             }
-            
+
             badgedata[name] = {"awarded": Date.now()}
             app.db.query(`UPDATE users SET badges=$1 WHERE publickey=$2`, [badgedata, pubkey]).then(function() {
                 resolve("ok");

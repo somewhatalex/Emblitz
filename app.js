@@ -103,7 +103,7 @@ pool.connect(function(err) {
         
         setInterval(function() {
             auth.deleteUnusedAccounts();
-        }, 36000000);
+        }, 900000);
     });
 });
 

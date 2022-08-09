@@ -19,7 +19,7 @@ function game() {
                 for(let [key, value] of Object.entries(mapdict)) {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000});
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0});
                 resolve("ok");
             });
         });
@@ -84,6 +84,7 @@ function game() {
             }
 
             games.get(roomid).phase = "deploy";
+            games.get(roomid).totalplayers = games.get(roomid).playerstate.length;
             self.emit("startDeployPhase", [roomid, deploytime, "ok"]);
             gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
         };
