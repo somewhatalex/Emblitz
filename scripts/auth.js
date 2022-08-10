@@ -12,7 +12,7 @@ function randomnumber(min, max) {
 
 function initDB() {
     return new Promise((resolve, reject) => {
-        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins VARCHAR(255), losses VARCHAR(255), medals VARCHAR(255), badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000), metadata VARCHAR(10000))", function (err, result) {
+        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins INT, losses INT, medals INT, badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000), metadata VARCHAR(10000), xp INT)", function (err, result) {
             if (err) console.log(err);
             console.log("User data table initiated");
             app.db.query("CREATE TABLE IF NOT EXISTS devinfo (title VARCHAR(255), image VARCHAR(1000), content VARCHAR(10000), submittedtime VARCHAR(255), timestamp VARCHAR(255), id VARCHAR(255))", function (err, result) {
@@ -20,6 +20,18 @@ function initDB() {
                 console.log("Dev log data table initiated");
                 resolve("ok");
             });
+        });
+    });
+}
+
+function runSQLQuery(query) {
+    return new Promise((resolve) => {
+        app.db.query(query, function (err, result) {
+            if(err) {
+                resolve(err);
+            }
+
+            resolve(result);
         });
     });
 }
@@ -229,6 +241,54 @@ function awardBadge(pubkey, name) {
     })
 }
 
+function checkForWinBadge(wins, pubkey) {
+    if(wins >= 50) {
+        awardBadge(pubkey, "50wins");
+    } else if(wins >= 20) {
+        awardBadge(pubkey, "20wins");
+    } else if(wins >= 10) {
+        awardBadge(pubkey, "10wins");
+    } else if(wins >= 5) {
+        awardBadge(pubkey, "5wins");
+    } else if(wins >= 1) {
+        awardBadge(pubkey, "firstwin");
+    }
+}
+
+function editPlayerGameStats(place, totalplayers, pubkey) {
+    return new Promise((resolve) => {
+        if(!pubkey) {
+            resolve("ok");
+        }
+
+        if(pubkey.startsWith("guest-")) {
+            resolve("ok");
+        }
+
+        //the medal change calculation algorithm
+        let medalchange = ((totalplayers-1)/2 - (place-1)) * (totalplayers+1) * 2
+        if(medalchange < 0) {
+            medalchange = Math.round(medalchange*0.7);
+        }
+
+
+        if(place == 1) {
+            app.db.query(`UPDATE users SET wins=wins+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
+                app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
+                    checkForWinBadge(result.rows[0].wins, pubkey);
+                    resolve("ok");
+                });
+            });
+        } else {
+            app.db.query(`UPDATE users SET losses=losses+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
+                app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
+                    resolve("ok")
+                });
+            });
+        }
+    });
+}
+
 //--ANNOUNCEMENTS PANEL--
 
 function postAnnouncement(title, content, submittedtime, image) {
@@ -286,5 +346,7 @@ module.exports = {
     getUserInfoNoReject: getUserInfoNoReject,
     getPublicUserInfo: getPublicUserInfo,
     deleteUnusedAccounts: deleteUnusedAccounts,
-    awardBadge, awardBadge
+    awardBadge, awardBadge,
+    editPlayerGameStats, editPlayerGameStats,
+    runSQLQuery, runSQLQuery
 };

@@ -158,6 +158,43 @@
                     });
                 });
             }
+
+            function submitSQLquery() {
+                if(!document.getElementById("sql_query").value) {
+                    alert("Please enter an SQL query!");
+                    return;
+                }
+                fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "runsqlquery", query: document.getElementById("sql_query").value, auth: authpassword})}).then(response => {
+                    response.json().then(function(text) {
+                        if(text.error) {
+                            document.getElementById("sql_result").innerText = "You're making SQL queries too quickly, please wait 1 min and slow down!";
+                            return;
+                        }
+
+                        let data = text.result;
+                        if(!data || data.length == 0) {
+                            document.getElementById("sql_result").innerText = "0 results returned, try checking your syntax or running another query.";
+                            return;
+                        }
+
+                        let tablecontent = "<TABLE>"
+                        for (key in data[0]) {
+                            tablecontent += '<td>' + key + '</td>';
+                        }
+                        tablecontent += "</tr>";
+                        for (var i = 0; i < data.length; i++) {
+                            tablecontent +='<tr>';
+                            for (key in data[i]) {
+                                tablecontent += '<td>' + data[i][key] + '</td>';
+                            }
+                            tablecontent +='</tr>';
+                        }
+                        tablecontent += "</TABLE>";
+
+                        document.getElementById("sql_result").innerHTML = tablecontent;
+                    });
+                });
+            }
         </SCRIPT>
         <STYLE>
             .auth_main {
@@ -217,6 +254,17 @@
             table tr:nth-child(even) {
                 background: #d8d8d8;
             }
+
+            #sql_result {
+                padding: 10px;
+                width: calc(100% - 20px);
+                font-size: 17px;
+                background: #f7f7f7;
+                border: 1px solid #7e7e7e;
+                color: black;
+                margin-top: 2px;
+                overflow: auto;
+            }
         </STYLE>
         <DIV CLASS="auth_main">
             <DIV ID="admin_loginpage" STYLE="display: block">
@@ -228,7 +276,8 @@
                 <BUTTON ONCLICK="showtab('status')" STYLE="margin-right: 5px;">Server Status</BUTTON>
                 <BUTTON ONCLICK="showtab('newpost')" STYLE="margin-right: 5px;">Create Post</BUTTON>
                 <BUTTON ONCLICK="showtab('deletepost')" STYLE="margin-right: 5px;">Delete Post</BUTTON>
-                <BUTTON ONCLICK="showtab('viewposts')">View Posts</BUTTON>
+                <BUTTON ONCLICK="showtab('viewposts')" STYLE="margin-right: 5px;">View Posts</BUTTON>
+                <BUTTON ONCLICK="showtab('databasemanagement')">Database Management</BUTTON>
                 <DIV CLASS="divider"></DIV>
                 <DIV CLASS="posttab" ID="status" STYLE="display: block">
                     <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Server Status</DIV>
@@ -246,7 +295,7 @@
                     <INPUT MAXLENGTH="300" ID="title" STYLE="width: 400px" TYPE="text" PLACEHOLDER="Name of post..."><BR>
                     <INPUT MAXLENGTH="1000" ID="image" STYLE="width: 400px" TYPE="text" PLACEHOLDER="[DOES NOT WORK YET] Optional thumbnail image url here..."><BR>
                     <INPUT MAXLENGTH="1000" ID="date" STYLE="width: 400px" TYPE="date" PLACEHOLDER="Date here..."><BR>
-                    <TEXTAREA MAXLENGTH="30000" ID="content" STYLE="width: 500px; height: 50vh" TYPE="text" PLACEHOLDER="Content here here..."></TEXTAREA>
+                    <TEXTAREA MAXLENGTH="30000" ID="content" STYLE="width: 500px; height: 50vh" TYPE="text" PLACEHOLDER="Content here..."></TEXTAREA>
                     <BR><BUTTON ONCLICK="submitpost()">Submit Post</BUTTON>
                 </DIV>
                 <DIV CLASS="posttab" ID="deletepost" STYLE="display: none">
@@ -270,6 +319,17 @@
                         </TBODY>
                     </TABLE>
                     <BR><BUTTON ID="loadmoreposts" ONCLICK="getposts()">Load More Posts</BUTTON>
+                </DIV>
+                <DIV CLASS="posttab" ID="databasemanagement" STYLE="display: none">
+                    <DIV STYLE="font-size: 17px;">Database Management</DIV>
+                    <DIV STYLE="font-size: 17px; margin-top: 10px; margin-bottom: 5px;">Frequently used commands:</DIV>
+                    <BUTTON ONCLICK="document.getElementById('sql_query').value = 'SELECT * FROM users WHERE username=\'[username]\''">User lookup by name</BUTTON>
+                    <BUTTON ONCLICK="document.getElementById('sql_query').value = 'ALTER TABLE users ADD [column_name] [datatype]'">Insert column into users table</BUTTON>
+                    <BUTTON ONCLICK="document.getElementById('sql_query').value = 'DELETE FROM users WHERE username=\'[username]\''">Delete user account</BUTTON>
+                    <TEXTAREA MAXLENGTH="100000" ID="sql_query" STYLE="width: calc(100% - 10px); height: 10vh; min-height: 150px;" SPELLCHECK="false" TYPE="text" PLACEHOLDER="SQL query here..."></TEXTAREA>
+                    <BUTTON ONCLICK="submitSQLquery()">Run SQL Query</BUTTON>
+                    <DIV STYLE="font-size: 17px; margin-top: 15px;">Result:</DIV>
+                    <DIV ID="sql_result">Run a query to see the result.</DIV>
                 </DIV>
             </DIV>
         </DIV>

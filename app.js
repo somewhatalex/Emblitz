@@ -399,6 +399,15 @@ app.post("/authapi", (req, res) => {
         } else {
             res.json({"result": false});
         }
+    } if(req.body.action === "runsqlquery") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.runSQLQuery(req.body.query).then(function(result) {
+            res.json({"result": result.rows});
+        });
     } else if(req.body.action === "registeruser") {
         let errors = [];
         let emailformatted = req.body.email.match(
