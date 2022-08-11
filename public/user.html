@@ -8,7 +8,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="language" content="en">
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="initial-scale=1.0, width=device-width">
         <LINK REL="stylesheet" HREF="../css/style.css">
         <LINK REL="stylesheet" HREF="../css/userprofile.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -31,22 +31,31 @@
         <SCRIPT TYPE="text/javascript" SRC="../js/userprofile.js"></SCRIPT>
     </HEAD>
     <BODY>
+        <BUTTON CLASS="u-back" ONCLICK="window.location.href='../'"><I CLASS="fa fa-chevron-left"></I></BUTTON>
         <DIV CLASS="u-banner-container">
             <DIV CLASS="u-banner"></DIV>
             <DIV CLASS="u-banner-content">
-                <DIV CLASS="u-avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 150px; height: 150px" SRC="../images/defaultpfp.png"></DIV>
+                <DIV CLASS="u-avatar-frame" STYLE="border: 5px solid red"><IMG CLASS="u-avatar-img" SRC="../images/defaultpfp.png"></DIV>
                 <DIV CLASS="u-username-big"><%- username %></DIV>
             </DIV>
         </DIV>
         <DIV CLASS="u-body">
             <DIV CLASS="u-playerstats">
-                <DIV CLASS="u-playerstats-stat"><IMG CLASS="medal-img" SRC="../images/medal.png"><SPAN ID="wins-amount">--</SPAN> medals</DIV>
-                <DIV CLASS="u-playerstats-stat"><SPAN ID="gamesplayed-amount">--</SPAN> games played</DIV>
-                <DIV CLASS="u-playerstats-stat">Joined on <SPAN ID="join-date">--/--/--</SPAN></DIV>
+                <DIV CLASS="u-playerstats-stat up1"><IMG CLASS="medal-img" SRC="../images/medal.png"><SPAN ID="wins-amount">--</SPAN> medals</DIV>
+                <DIV CLASS="u-playerstats-stat up2"><SPAN ID="gamesplayed-amount">--</SPAN> games played</DIV>
+                <DIV CLASS="u-playerstats-stat up3">Joined on <SPAN ID="join-date">--/--/--</SPAN></DIV>
             </DIV>
-            <DIV CLASS="u-badge-title">Badges</DIV>
-            <DIV CLASS="u-container" ID="badge-container">
-                
+            <DIV CLASS="u-pstats-card">
+                <DIV STYLE="font-weight: bold; font-size: 22px;">Player Stats</DIV>
+                <DIV CLASS="u-pc-line">Wins: <SPAN ID="up-wins">--</SPAN><BR></DIV>
+                <DIV CLASS="u-pc-line">Losses: <SPAN ID="up-losses">--</SPAN><BR></DIV>
+                <DIV CLASS="u-pc-line">Win rate: <SPAN ID="up-rate">--</SPAN>%<BR></DIV>
+            </DIV>
+            <DIV CLASS="u-badge-area">
+                <DIV CLASS="u-badge-title">Badges (<SPAN ID="u-badge-count">--</SPAN>)</DIV>
+                <DIV CLASS="u-container" ID="badge-container">
+                    
+                </DIV>
             </DIV>
         </DIV>
     </BODY>

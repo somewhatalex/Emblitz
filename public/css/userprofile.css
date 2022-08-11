@@ -18,7 +18,6 @@ body {
     position: absolute;
     top: 40px;
     left: 100px;
-    width: 500px;
     text-align: left;
     color: var(--light);
     display: inline-block;
@@ -49,6 +48,7 @@ body {
     font-size: 22px;
     padding-bottom: 30px;
     border-bottom: 2px solid var(--medium);
+    min-width: 250px;
 }
 
 .u-playerstats-stat {
@@ -169,4 +169,156 @@ body {
     height: auto;
     margin-bottom: -10px;
     margin-right: 5px;
+}
+
+.u-pstats-card {
+    padding: 20px;
+    background: #474747;
+    -webkit-box-shadow: 0px 0px 12px 2px #0A0A0A; 
+    box-shadow: 0px 0px 12px 2px #0A0A0A;
+    border-radius: 10px;
+    float: center;
+    margin-left: 100px;
+    font-size: 18px;
+    margin-top: 30px;
+    width: calc(100% - 250px);
+    max-width: 400px;
+    min-width: 210px;
+}
+
+.u-badge-area {
+    margin-top: 30px;
+}
+
+.u-pc-line {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.u-avatar-img {
+    width: 150px;
+    height: 150px;
+}
+
+@media (max-width: 930px) {
+    .up2 {
+        border: none !important;
+    }
+
+    .up3 {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: -10px;
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 750px) {
+    .u-username-big {
+        font-size: 40px;
+    }
+
+    .u-avatar-frame {
+        width: 100px;
+        height: 100px;
+    }
+
+    .u-avatar-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .u-banner-container {
+        height: 200px;
+    }
+}
+
+@media (max-width: 700px) {
+    .up1, .up2 {
+        display: block;
+        border: none !important;
+        margin-bottom: 10px !important;
+    }
+
+    .up3 {
+        margin-top: 5px !important;
+        margin-bottom: -15px !important;
+    }
+}
+
+@media (max-width: 550px) {
+    .u-username-big {
+        font-size: 30px;
+    }
+
+    .u-banner-content {
+        top: 60px;
+    }
+
+    .u-avatar-frame {
+        width: 70px;
+        height: 70px;
+    }
+
+    .u-avatar-img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .u-body {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .u-banner-container {
+        height: 170px;
+    }
+
+    .u-banner-content {
+        left: 20px;
+    }
+
+    .u-container {
+        overflow: visible;
+    }
+}
+
+@media (max-width: 470px) {
+    .u-badge-title, .u-pstats-card {
+        margin-left: 40px;
+    }
+
+    .u-container {
+        padding-left: 40px;
+    }
+    
+    .u-playerstats {
+        margin-left: 40px;
+    }
+}
+
+@media (max-width: 420px) {
+    .u-username-big {
+        font-size: 25px;
+    }
+}
+
+.u-back {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 696969;
+    padding: 5px;
+    font-size: 20px;
+    background: var(--light-darker);
+    border: 1px solid var(--medium);
+    padding-left: 10px;
+    padding-right: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.u-back:hover {
+    background: var(--light);
+    border-radius: 10px;
 }

@@ -24,8 +24,14 @@ function loadProfile(info) {
 
     document.getElementById("join-date").innerText = epochToDate(info.timecreated);
 
+    document.getElementById("up-wins").innerText = info.wins;
+    document.getElementById("up-losses").innerText = info.losses;
+    document.getElementById("up-rate").innerText = ((info.wins/(info.wins + info.losses)) * 100).toFixed(2);
+
     let userbadges = JSON.parse(info.badges);
     let userbadgenames = Object.keys(userbadges);
+
+    document.getElementById("u-badge-count").innerText = userbadgenames.length;
 
     for(let i=0; i<userbadgenames.length; i++) {
         let levelcolor = null;

@@ -43,7 +43,7 @@ const badges = {
     },
 
     "50wins": {
-        "name": "40 Wins",
+        "name": "50 Wins",
         "level": "Ruby",
         "description": "Win 50 Emblitz battles in public multiplayer rooms!",
         "image": "firstwin.png"

@@ -61,7 +61,7 @@ window.onload = function() {
         }
     }
 
-
+    getUserInfo();
     inithomepage();
 }
 
@@ -75,8 +75,8 @@ function inithomepage() {
         localStorage.setItem("hasvisited", true);
     }
 
-    getMyInfo();
     loadPosts("refresh");
+    getUserInfo();
 
     for(let i=0; i<mapDescriptions.length; i++) {
         if(mapDescriptions[i][3] === localStorage.getItem("map")) {
@@ -96,13 +96,6 @@ function inithomepage() {
             break;
         }
     }
-}
-
-function getMyInfo() {
-    fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmyinfo"})}).then(response => {
-        response.json().then(function(text) {
-        });
-    });
 }
 
 function resetAll() {
@@ -774,6 +767,15 @@ function tickLobbyTimer() {
             document.getElementById("timeramount").innerText = lobbycountdown;
         }
     }, 1000);
+}
+
+function getUserInfo() {
+    fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmyinfo"})}).then(response => {
+        response.json().then(function(result) {
+            document.getElementById("ms_medals").innerText = result.medals;
+            document.getElementById("ms_badges").innerText = Object.keys(JSON.parse(result.badges)).length;
+        });
+    });
 }
 
 function gameConnect(inputroomid, pmap, createnewroom) {

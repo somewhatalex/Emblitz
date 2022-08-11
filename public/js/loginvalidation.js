@@ -123,7 +123,7 @@ function submitRegister() {
                         errors = true;
                     } else if(text.errors.includes("u2")) {
                         document.getElementById("error-username").style.display = "inline";
-                        document.getElementById("error-username").innerText = "must be less than 18 characters long";
+                        document.getElementById("error-username").innerText = "must be less than 12 characters long";
                         errors = true;
                     }
 

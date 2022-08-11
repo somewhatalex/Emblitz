@@ -75,24 +75,7 @@
                     <DIV CLASS="homemenu-bg"></DIV>
                     <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
                     <DIV CLASS="join_input" ID="join_input">
-                        <DIV CLASS="profile-outline">
-                            <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                            <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">GamerChair</DIV></DIV>
-                        </DIV>
-                        <!--
-                        <DIV CLASS="ji-area">
-                            <DIV CLASS="ji-header">Enter your username and preferred player color.</DIV>
-                            <INPUT ID="p_name" ONKEYUP='localStorage.setItem("username", this.value);' CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Username here...">
-                            <SELECT ONCHANGE='localStorage.setItem("color", this.value);' CLASS="framecolorselect" ID="framecolor">
-                                <OPTION VALUE="red">red</OPTION>
-                                <OPTION VALUE="orange">orange</OPTION>
-                                <OPTION VALUE="yellow">yellow</OPTION>
-                                <OPTION VALUE="green">green</OPTION>
-                                <OPTION VALUE="blue">blue</OPTION>
-                                <OPTION VALUE="purple">purple</OPTION>
-                            </SELECT>
-                        </DIV>
-                        -->
+                        <%- profile_output %>
                         <DIV CLASS="mapselect">
                             <DIV CLASS="mapselecttitle">Current map selection:</DIV>
                             <TABLE CLASS="mapnav">

@@ -109,7 +109,7 @@ pool.connect(function(err) {
 
 //--MAILER--
 var mailTransport = null;
-if(process.env.PRODUCTION !== "yes") {
+//if(process.env.PRODUCTION !== "yes") {
     console.log("Using development mail server (Gmail)");
     mailTransport = nodemailer.createTransport({
         service: "gmail",
@@ -118,7 +118,7 @@ if(process.env.PRODUCTION !== "yes") {
             pass: process.env.MAILPASSWORD
         }
     });
-} else {
+/*} else {
     //ADD IN CORRECT CREDENTIALS! (work on cloudmailin integration later)
     console.log("Using production mail server");
     mailTransport = nodemailer.createTransport({
@@ -127,12 +127,13 @@ if(process.env.PRODUCTION !== "yes") {
         secure: false,
         requireTLS: true,
         auth: {
-            user: username,
-            pass: password,
+            user: process.env.CLOUDMAILIN_USERNAME,
+            pass: provess.env.CLOUDMAILIN_PASSWORD,
         },
         logger: true
     });
 }
+*/
 
 const clients = new Map();
 const rooms = [];
@@ -216,6 +217,7 @@ app.all("/", (req, res) => {
     res.cookie("GID", id);
 
     if(!getuuid) {
+        //guest user
         let guestuuid = "";
         for(let i=0; i<50; i++) {
             guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
@@ -232,16 +234,34 @@ app.all("/", (req, res) => {
         res.render("index", {
             host_name: hostname,
             prod: process.env.PRODUCTION,
-            gameversion: gameversion
+            gameversion: gameversion,
+            profile_output: ``
         });
     } else if(!getuuid.startsWith("guest-")) {
         auth.getUserInfo(getuuid).then(function(userinfo) {
+            //logged in user
+            res.cookie("publickey", userinfo.publickey, { expires: new Date(Date.now() + (100*24*3600000))});
             res.render("index", {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
-                gameversion: gameversion
+                gameversion: gameversion,
+                profile_output: `
+                <DIV CLASS="profile-outline">
+                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                    <DIV CLASS="glb_p_info">
+                        <DIV ID="p_name" CLASS="lb_p_name">${userinfo.username}</DIV>
+                        <A CLASS="my_profile" HREF="./user/${userinfo.username}"><SPAN STYLE="text-decoration: underline">My profile</SPAN> <I CLASS="fa fa-external-link-square"></I></A>
+                        <A CLASS="my_profile mp_settings" HREF="./settings"><SPAN STYLE="text-decoration: underline">Settings</SPAN> <I CLASS="fa fa-gear"></I></A>
+                    </DIV>
+                </DIV>
+                <DIV CLASS="my_stats">
+                    <SPAN CLASS="ms_stat ms_stat_one"><IMG CLASS="ms_medals" SRC="./images/medal.png"><SPAN ID="ms_medals">--</SPAN> Medals</SPAN>
+                    <SPAN CLASS="ms_stat"><IMG CLASS="ms_badges" SRC="./images/badgeicon.png"><SPAN ID="ms_badges">--</SPAN> Badges</SPAN>
+                </DIV>
+                `
             });
         }).catch(function() {
+            //guest user bc uuid is invalid
             let guestuuid = "";
             for(let i=0; i<50; i++) {
                 guestuuid += chars.charAt(crypto.randomInt(0, chars.length-1));
@@ -258,14 +278,17 @@ app.all("/", (req, res) => {
             res.render("index", {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
-                gameversion: gameversion
+                gameversion: gameversion,
+                profile_output: ``
             });
         });
     } else {
+        //guest user
         res.render("index", {
             host_name: hostname,
             prod: process.env.PRODUCTION,
-            gameversion: gameversion
+            gameversion: gameversion,
+            profile_output: ``
         });
     }
 });
@@ -416,7 +439,7 @@ app.post("/authapi", (req, res) => {
         
         if(req.body.username.length < 2) {
             errors.push("u1");
-        } else if(req.body.username.length > 18) {
+        } else if(req.body.username.length > 12) {
             errors.push("u2")
         }
         if(!req.body.email) {
@@ -605,7 +628,8 @@ app.post("/api", (req, res) => {
                     "timecreated": userdata.timecreated,
                     "playercolor": userdata.playercolor,
                     "playersettings": userdata.playersettings,
-                    "metadata": userdata.metadata
+                    "metadata": userdata.metadata,
+                    "xp": userdata.xp
                 });
             }).catch(function(error) {
                 res.json({"error": "no user found"})
@@ -621,7 +645,8 @@ app.post("/api", (req, res) => {
                     "pfp": userdata.pfp,
                     "tournamentprogress": userdata.tournamentprogress,
                     "timecreated": userdata.timecreated,
-                    "playercolor": userdata.playercolor
+                    "playercolor": userdata.playercolor,
+                    "xp": userdata.xp
                 });
             }).catch(function(error) {
                 res.json({"error": "no user found"})
