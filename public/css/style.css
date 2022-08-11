@@ -30,6 +30,15 @@
     }
 }
 
+@media (max-width: 440px) {
+    .mp_settings {
+        margin-left: 0px !important;
+        border: none !important;
+        display: block;
+        padding-left: 0px !important;
+    }
+}
+
 /*small screens*/
 @media (max-width: 700px) {
     .troopscontrol {
