@@ -9,7 +9,7 @@ var gameLobbyTimerHandlers = {};
 var gameDeployTimers = {};
 
 function game() {
-    this.newGame = function(roomid, roommap, deploytime) {
+    this.newGame = function(roomid, roommap, deploytime, isprivate) {
         return new Promise(function(resolve, reject) {
             gameTimingEvents(roomid, deploytime);
             fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapterritorynames) {
@@ -19,7 +19,7 @@ function game() {
                 for(let [key, value] of Object.entries(mapdict)) {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0});
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate});
                 resolve("ok");
             });
         });
@@ -251,9 +251,11 @@ function game() {
                         }
                     }
 
-                    auth.editPlayerGameStats(totalplayersinroom.length+1, games.get(roomid).totalplayers, idToPubkey(roomid, targetedplayer)).then(function() {
-                        games.get(roomid).playerstate.find(item => item.id === targetedplayer).isaccounted = true;
-                    });
+                    if(!games.get(roomid).isprivate) {
+                        auth.editPlayerGameStats(totalplayersinroom.length+1, games.get(roomid).totalplayers, idToPubkey(roomid, targetedplayer)).then(function() {
+                            games.get(roomid).playerstate.find(item => item.id === targetedplayer).isaccounted = true;
+                        });
+                    }
                     self.emit("playerdead", [roomid, targetedplayer, totalplayersinroom.length+1]);
                 }
             }
@@ -275,9 +277,11 @@ function game() {
         }
 
         if(totalplayersinroom.length == 1) {
-            auth.editPlayerGameStats(1, games.get(roomid).totalplayers, idToPubkey(roomid, totalplayersinroom[0])).then(function() {
-                games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
-            });
+            if(!games.get(roomid).isprivate) {
+                auth.editPlayerGameStats(1, games.get(roomid).totalplayers, idToPubkey(roomid, totalplayersinroom[0])).then(function() {
+                    games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
+                });
+            }
             self.emit("playerWon", [roomid, totalplayersinroom[0]]);
         }
     }
@@ -324,7 +328,7 @@ function game() {
                     }
                 }
 
-                if(!isplayeraccounted) {
+                if(!isplayeraccounted && !games.get(roomid).isprivate) {
                     auth.editPlayerGameStats(totalplayersinroom.length+1, games.get(roomid).totalplayers, playerpubkey);
                 }
                 self.emit("updateMap", [roomid, games.get(roomid).mapstate]);

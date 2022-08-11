@@ -683,6 +683,12 @@ input { /*override default styles*/
     height: 70px;
     position: relative;
     width: 100%;
+    cursor: pointer;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
 }
 
 .glb_avatar-frame {
@@ -973,7 +979,7 @@ input { /*override default styles*/
 }
 
 .endscreen-bg {
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     opacity: 0.9;
@@ -1051,6 +1057,7 @@ input { /*override default styles*/
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    overflow-y: auto;
 }
 
 .e-header {
@@ -1058,6 +1065,21 @@ input { /*override default styles*/
     font-weight: bold;
     font-size: 28px;
     margin-bottom: 10px;
+}
+
+.e-medal-change {
+    text-align: left;
+    color: var(--light);
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.e-medal-icon {
+    width: 30px;
+    height: auto;
+    margin-bottom: -10px;
+    margin-right: 2px;
 }
 
 .e-stats {

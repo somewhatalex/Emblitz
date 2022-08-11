@@ -735,7 +735,7 @@ function joinroom(map, createroom) {
         }
         
         rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
-        game.newGame(id, roommap, deploytime).then(function(result) {
+        game.newGame(id, roommap, deploytime, isprivate).then(function(result) {
             //console.log(result)
         });
         return id;
@@ -773,7 +773,7 @@ function joinroom(map, createroom) {
         }
 
         rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
-        game.newGame(id, roommap, deploytime).then(function(result) {
+        game.newGame(id, roommap, deploytime, isprivate).then(function(result) {
             //console.log(result)
         });
         return id;
