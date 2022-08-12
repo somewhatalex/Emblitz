@@ -39,6 +39,23 @@
     }
 }
 
+@media (max-width: 404px) {
+    .ms_stat_two {
+        margin-left: 0px !important;
+        display: block;
+        padding-left: 0px !important;
+        margin-top: 4px;
+    }
+
+    .ms_stat_one {
+        border: none !important;
+    }
+
+    .ms_stat {
+        text-align: center;
+    }
+}
+
 /*small screens*/
 @media (max-width: 700px) {
     .troopscontrol {
@@ -683,7 +700,6 @@ input { /*override default styles*/
     height: 70px;
     position: relative;
     width: 100%;
-    cursor: pointer;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -1964,4 +1980,18 @@ input { /*override default styles*/
     padding-left: 8px;
     margin-left: 5px;
     border-left: 2px solid var(--light);
+}
+
+.po-container {
+    background: #3f3f3f;
+    margin: auto;
+    max-width: 370px;
+    border-radius: 10px;
+    padding: 10px;
+    width: calc(100% - 100px);
+    font-size: 17px;
+}
+
+.po-description {
+    font-size: 17px;
 }

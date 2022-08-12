@@ -275,6 +275,9 @@ function editPlayerGameStats(place, totalplayers, pubkey) {
         if(place == 1) {
             app.db.query(`UPDATE users SET wins=wins+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
                 app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
+                    if(result.rows.length == 0) {
+                        resolve("ok");
+                    }
                     checkForWinBadge(result.rows[0].wins, pubkey);
                     resolve("ok");
                 });
@@ -282,6 +285,9 @@ function editPlayerGameStats(place, totalplayers, pubkey) {
         } else {
             app.db.query(`UPDATE users SET losses=losses+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
                 app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
+                    if(result.rows.length == 0) {
+                        resolve("ok");
+                    }
                     resolve("ok")
                 });
             });

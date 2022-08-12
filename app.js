@@ -216,6 +216,13 @@ app.all("/", (req, res) => {
     }
     res.cookie("GID", id);
 
+    let profileoutput = `
+    <DIV CLASS="po-container">
+        <DIV CLASS="po-description">Login or register to set a username, earn medals, see stats, and more! Only takes about 30 seconds!</DIV>
+        <BUTTON CLASS="joinbutton jb_green" ONCLICK="window.location.href='./login?action=register'" STYLE="font-size: 18px; min-width: 150px; margin-top: 10px;">Register</BUTTON><BUTTON ONCLICK="window.location.href='./login'" STYLE="font-size: 18px; min-width: 150px; margin-top: 10px;" CLASS="joinbutton jb_gray">Login</BUTTON>
+    </DIV>
+    `
+
     if(!getuuid) {
         //guest user
         let guestuuid = "";
@@ -235,30 +242,45 @@ app.all("/", (req, res) => {
             host_name: hostname,
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
-            profile_output: ``
+            profile_output: profileoutput
         });
     } else if(!getuuid.startsWith("guest-")) {
         auth.getUserInfo(getuuid).then(function(userinfo) {
             //logged in user
             res.cookie("publickey", userinfo.publickey, { expires: new Date(Date.now() + (100*24*3600000))});
+            
+            let profileoutput = `
+            <DIV CLASS="po-container" STYLE="margin-bottom: 20px">
+                <DIV CLASS="po-description" STYLE="text-align: left">
+                    <A CLASS="my_profile" HREF="./login?action=verify">Please verify your account by <U>clicking here</U>. Note that unverified accounts will be deleted in an hour.</A>
+                </DIV>
+            </DIV>
+            `;
+
+            if(userinfo.verified === "true") {
+                profileoutput = "";
+            }
+
+            profileoutput += `
+            <DIV CLASS="profile-outline">
+                <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                <DIV CLASS="glb_p_info">
+                    <DIV ID="p_name" CLASS="lb_p_name">${userinfo.username}</DIV>
+                    <A CLASS="my_profile" HREF="./user/${userinfo.username}"><SPAN STYLE="text-decoration: underline">My profile</SPAN> <I CLASS="fa fa-external-link-square"></I></A>
+                    <A CLASS="my_profile mp_settings" HREF="./settings"><SPAN STYLE="text-decoration: underline">Settings</SPAN> <I CLASS="fa fa-gear"></I></A>
+                </DIV>
+            </DIV>
+            <DIV CLASS="my_stats">
+                <SPAN CLASS="ms_stat ms_stat_one"><IMG CLASS="ms_medals" SRC="./images/medal.png"><SPAN ID="ms_medals">--</SPAN> Medals</SPAN>
+                <SPAN CLASS="ms_stat ms_stat_two"><IMG CLASS="ms_badges" SRC="./images/badgeicon.png"><SPAN ID="ms_badges">--</SPAN> Badges</SPAN>
+            </DIV>
+            `
+
             res.render("index", {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
-                profile_output: `
-                <DIV CLASS="profile-outline">
-                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                    <DIV CLASS="glb_p_info">
-                        <DIV ID="p_name" CLASS="lb_p_name">${userinfo.username}</DIV>
-                        <A CLASS="my_profile" HREF="./user/${userinfo.username}"><SPAN STYLE="text-decoration: underline">My profile</SPAN> <I CLASS="fa fa-external-link-square"></I></A>
-                        <A CLASS="my_profile mp_settings" HREF="./settings"><SPAN STYLE="text-decoration: underline">Settings</SPAN> <I CLASS="fa fa-gear"></I></A>
-                    </DIV>
-                </DIV>
-                <DIV CLASS="my_stats">
-                    <SPAN CLASS="ms_stat ms_stat_one"><IMG CLASS="ms_medals" SRC="./images/medal.png"><SPAN ID="ms_medals">--</SPAN> Medals</SPAN>
-                    <SPAN CLASS="ms_stat"><IMG CLASS="ms_badges" SRC="./images/badgeicon.png"><SPAN ID="ms_badges">--</SPAN> Badges</SPAN>
-                </DIV>
-                `
+                profile_output: profileoutput
             });
         }).catch(function() {
             //guest user bc uuid is invalid
@@ -279,7 +301,7 @@ app.all("/", (req, res) => {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
-                profile_output: ``
+                profile_output: profileoutput
             });
         });
     } else {
@@ -288,7 +310,7 @@ app.all("/", (req, res) => {
             host_name: hostname,
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
-            profile_output: ``
+            profile_output: profileoutput
         });
     }
 });
