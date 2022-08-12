@@ -33,9 +33,9 @@ function loadProfile(info) {
 
     document.getElementById("u-badge-count").innerText = userbadgenames.length;
 
-    for(let i=0; i < 4; i++){
-        let currentBadgeType = "Uranium";
-        switch(i){
+    for(let i=0; i < 6; i++) {
+        let currentBadgeType;
+        switch(i) {
             case 0:
                 currentBadgeType = "Uranium";
                 break;
@@ -57,7 +57,7 @@ function loadProfile(info) {
         }
         
         for(let i=0; i<userbadgenames.length; i++) {
-            if(badges[userbadgenames[i]].level == currentBadgeType){
+            if(badges[userbadgenames[i]].level == currentBadgeType) {
                 let levelcolor = null;
                 let badgelevel = badges[userbadgenames[i]].level;
                 if(badgelevel === "Uranium") {
