@@ -1110,16 +1110,21 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                 } else if(response.lobbytimer) {
                     lobbycountdown = response.lobbytimer;
                     document.getElementById("timeramount").innerText = lobbycountdown;
-                } else if(response.medalchange && response.medalchange === uid) {
-                    let medalPlurality = '';
-                    let medalSign = '+';
-                    if(response.amount == 1){
-                        medalPlurality = '';
+                } else if(response.playermedalchange && response.playermedalchange === uid) {
+                    if(response.amount === "none") {
+                        document.getElementById("e-medal-change").style.display = "none";
+                    } else {
+                        document.getElementById("e-medal-change").style.display = "block";
+                        let medalPlurality = 's';
+                        let medalSign = '+';
+                        if(response.amount == 1){
+                            medalPlurality = '';
+                        }
+                        if(response.amount < 0){
+                            medalSign = '';
+                        }
+                        document.getElementById("e-medals").innerText = `${medalSign}${response.amount} medal${medalPlurality}`;
                     }
-                    if(response.amount < 0){
-                        medalSign = '';
-                    }
-                    document.getElementById("e-medals").innerText = `${response.amount} medal${medalPlurality}`;
                 }
             }
         });
