@@ -258,11 +258,11 @@ function checkForWinBadge(wins, pubkey) {
 function editPlayerGameStats(place, totalplayers, pubkey) {
     return new Promise((resolve) => {
         if(!pubkey) {
-            resolve("ok");
+            resolve("none");
         }
 
         if(pubkey.startsWith("guest-")) {
-            resolve("ok");
+            resolve("none");
         }
 
         //the medal change calculation algorithm
@@ -276,19 +276,19 @@ function editPlayerGameStats(place, totalplayers, pubkey) {
             app.db.query(`UPDATE users SET wins=wins+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
                 app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
                     if(result.rows.length == 0) {
-                        resolve("ok");
+                        resolve("none");
                     }
                     checkForWinBadge(result.rows[0].wins, pubkey);
-                    resolve("ok");
+                    resolve(medalchange);
                 });
             });
         } else {
             app.db.query(`UPDATE users SET losses=losses+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
                 app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
                     if(result.rows.length == 0) {
-                        resolve("ok");
+                        resolve("none");
                     }
-                    resolve("ok")
+                    resolve(medalchange)
                 });
             });
         }
