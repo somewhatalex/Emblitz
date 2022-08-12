@@ -1110,6 +1110,9 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                 } else if(response.lobbytimer) {
                     lobbycountdown = response.lobbytimer;
                     document.getElementById("timeramount").innerText = lobbycountdown;
+                } else if(response.medalchange) {
+                    //wyatt enter code here (your uid is stored as the variable uid)
+                    //response.amount = medal change --> if not logged in it'll = "none"
                 }
             }
         });
