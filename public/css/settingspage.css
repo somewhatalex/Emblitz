@@ -73,7 +73,7 @@ body {
     white-space: nowrap;
 }
 
-.s-cs-frame {
+.s-cs-red, .s-cs-orange, .s-cs-yellow, .s-cs-green, .s-cs-blue, .s-cs-purple {
     width: 55px;
     height: 55px;
     border-radius: 50%;
@@ -83,3 +83,17 @@ body {
     margin-right: 10px;
     margin-bottom: 10px;
 }
+
+.selected-button {
+    width: 75px !important;
+    height: 75px !important;
+}
+
+.save-button {
+    background-color: lightblue;
+    width: 150px;
+    height: 50px;
+    margin-top: 20px;
+    border-radius: 8px;
+}
+

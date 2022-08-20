@@ -42,14 +42,15 @@
             <DIV CLASS="s-colorselect">
                 <DIV CLASS="s-area-header">Player color:</DIV>
                 <DIV CLASS="s-color-selectbar">
-                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid red; background: #de4343" TITLE="red"></DIV>
-                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid orange; background: #e38d24" TITLE="orange"></DIV>
-                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid yellow; background: #dec433" TITLE="yellow"></DIV>
-                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid green; background: #41b037" TITLE="green"></DIV>
-                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid blue; background: #4367ab" TITLE="blue"></DIV>
-                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid purple; background: #b240b8" TITLE="purple"></DIV>
+                    <BUTTON CLASS="s-cs-red" STYLE="border: 5px solid red; background: #de4343" TITLE="red" onclick="setColor('Red')">Red</BUTTON>
+                    <BUTTON CLASS="s-cs-orange" STYLE="border: 5px solid orange; background: #e38d24" TITLE="orange" onclick="setColor('orange')">Orange</BUTTON>
+                    <BUTTON CLASS="s-cs-yellow" STYLE="border: 5px solid yellow; background: #dec433" TITLE="yellow" onclick="setColor('yellow')">Yellow</BUTTON>
+                    <BUTTON CLASS="s-cs-green" STYLE="border: 5px solid green; background: #41b037" TITLE="green" onclick="setColor('green')">Green</BUTTON>
+                    <BUTTON CLASS="s-cs-blue" STYLE="border: 5px solid blue; background: #4367ab" TITLE="blue" onclick="setColor('blue')">Blue</BUTTON>
+                    <BUTTON CLASS="s-cs-purple" STYLE="border: 5px solid purple; background: #b240b8" TITLE="purple" onclick="setColor('purple')">Purple</BUTTON>
                 </DIV>
             </DIV>
+            <BUTTON CLASS="save-button" onclick="callSave()">Save Changes</BUTTON>
         </DIV>
     </BODY>
 </HTML>
