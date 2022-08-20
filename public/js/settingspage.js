@@ -7,6 +7,12 @@ function setAvatarColor() {
     document.getElementById("avatar-frame").style.background = colorData[playercolor].normal;
 }
 
+function test(){
+    console.log("Testing!")
+}
+
+document.getElementById("s-cs-frame").addEventListener("click", test)
+
 function editPlayerColor(color) {
     fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "editplayercolor", color: color})}).then(response => {
         response.json().then(function(result) {

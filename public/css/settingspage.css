@@ -41,13 +41,13 @@ body {
 }
 
 .s-player-name {
-    font-size: 30px;
+    font-size: 60px;
     display: inline-block;
     position: absolute;
-    top: 50%;
+    top: 23%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
-    margin-left: 20px;
+    margin-left: 25px;
     margin-right: 10px;
     font-weight: bold;
     text-shadow: 0px 0px 12px #0f0f0f;
