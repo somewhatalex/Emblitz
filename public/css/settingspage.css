@@ -1,0 +1,85 @@
+body {
+    background: #212121;
+}
+
+.s-main {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    margin-top: 50px;
+    color: var(--light);
+    background: var(--dark);
+    -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.8); 
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.8);
+}
+
+.s-avatar-frame {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid red;
+    display: inline-block;
+    -webkit-box-shadow: 0px 0px 12px 4px #292929;
+    box-shadow: 0px 0px 12px 4px #292929;
+    overflow: hidden;
+    background: #de4343;
+}
+
+.s-avatar-img {
+    width: 150px;
+    height: 150px;
+}
+
+.s-user-profile {
+    display: inline-block;
+}
+
+.s-header {
+    font-weight: bold;
+    font-size: 35px;
+    padding-bottom: 20px;
+}
+
+.s-player-name {
+    font-size: 30px;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: 20px;
+    margin-right: 10px;
+    font-weight: bold;
+    text-shadow: 0px 0px 12px #0f0f0f;
+    margin-top: -90px;
+}
+
+.s-divider {
+    border: 1px solid var(--light);
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.s-area-header {
+    font-size: 20px;
+}
+
+.s-color-selectbar {
+    width: 100%;
+    overflow-x: auto;
+    margin-right: 50px;
+    border: 2px solid var(--light);
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.s-cs-frame {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}

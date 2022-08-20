@@ -219,6 +219,19 @@ function deleteUnusedAccounts() {
     });
 }
 
+//FUNCTION MUST USE PRIVATE KEY (token/uuid) BECAUSE IT CHANGES USER DATA
+function changePlayerColor(uuid, color) {
+    return new Promise((resolve, reject) => {
+        if(uuid.startsWith("guest-")) {
+            reject("ok");
+        }
+
+        app.db.query(`UPDATE users SET playercolor=$1 WHERE token=$2`, [color, uuid]).then(function() {
+            resolve("ok");
+        });
+    })
+}
+
 function awardBadge(pubkey, name) {
     return new Promise((resolve) => {
         if(pubkey.startsWith("guest-")) {
@@ -354,5 +367,6 @@ module.exports = {
     deleteUnusedAccounts: deleteUnusedAccounts,
     awardBadge, awardBadge,
     editPlayerGameStats, editPlayerGameStats,
-    runSQLQuery, runSQLQuery
+    runSQLQuery, runSQLQuery,
+    changePlayerColor, changePlayerColor
 };

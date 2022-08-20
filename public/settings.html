@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+        <TITLE>Emblitz | Settings</TITLE>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="language" content="en">
+
+        <meta name="viewport" content="initial-scale=1.0, width=device-width">
+        <LINK REL="stylesheet" HREF="../css/style.css">
+        <LINK REL="stylesheet" HREF="../css/settingspage.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="icon" href="./images/icon.png">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QNCVLQXQCJ"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-QNCVLQXQCJ');
+        </script>
+
+        <!-- server-returned player settings and configs -->
+        <SCRIPT>
+            var playercolor = "<%= playercolor %>";
+        </SCRIPT>
+
+        <SCRIPT TYPE="text/javascript" SRC="./js/settingspage.js"></SCRIPT>
+        <SCRIPT TYPE="text/javascript" SRC="./js/colorData.js"></SCRIPT>
+    </HEAD>
+    <BODY>
+        <DIV CLASS="s-main">
+            <DIV CLASS="s-header"><I CLASS="fa fa-gear"></I> Settings</DIV>
+            <DIV CLASS="s-user-profile">
+                <DIV CLASS="s-avatar-frame" ID="avatar-frame"><IMG ID="avatar-img" CLASS="s-avatar-img" SRC="../images/defaultpfp.png"></DIV>
+                <DIV CLASS="s-player-name" ID="player-name"><%= playername %></DIV>
+            </DIV>
+            <DIV CLASS="s-divider"></DIV>
+            <DIV CLASS="s-colorselect">
+                <DIV CLASS="s-area-header">Player color:</DIV>
+                <DIV CLASS="s-color-selectbar">
+                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid red; background: #de4343" TITLE="red"></DIV>
+                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid orange; background: #e38d24" TITLE="orange"></DIV>
+                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid yellow; background: #dec433" TITLE="yellow"></DIV>
+                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid green; background: #41b037" TITLE="green"></DIV>
+                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid blue; background: #4367ab" TITLE="blue"></DIV>
+                    <DIV CLASS="s-cs-frame" STYLE="border: 5px solid purple; background: #b240b8" TITLE="purple"></DIV>
+                </DIV>
+            </DIV>
+        </DIV>
+    </BODY>
+</HTML>

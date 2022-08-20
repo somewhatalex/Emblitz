@@ -19,6 +19,7 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const { initDB } = require("./scripts/auth.js");
 const badges = require("./scripts/badges.js");
+const { response } = require("express");
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
 
@@ -173,9 +174,9 @@ function requireHTTPS(req, res, next) {
 
 //-- RATELIMITS --//
 const apiLimiter = rateLimit({
-	windowMs: 1 * 60000, //minutes
-	max: 400,
-    message: JSON.stringify({"error": 429, "message": "You are accessing the api too quickly (500 requests/min)! Try again in a minute. Calm down my guy."}),
+	windowMs: 0.5 * 60000, //minutes
+	max: 40,
+    message: JSON.stringify({"error": 429, "message": "You are accessing the api too quickly (40 requests/30 sec)! Try again in a minute. Calm down my guy."}),
 	standardHeaders: true,
 	legacyHeaders: false
 })
@@ -354,6 +355,21 @@ app.get("/tutorial", (req, res) => {
 
 app.get("/admin", (req, res) => {
     res.render("admin");
+});
+
+app.get("/settings", (req, res) => {
+    let uuid = req.cookies.uuid;
+        
+    if(uuid) {
+        auth.getUserInfo(uuid).then(function(userinfo) {
+            res.render("settings", {
+                playercolor: userinfo.playercolor,
+                playername: userinfo.username
+            });
+        }).catch(function() {
+            res.redirect("./login");
+        })
+    }
 });
 
 app.get("/privacy", (req, res) => {
@@ -577,6 +593,17 @@ app.post("/api", (req, res) => {
                 return;
             }
             res.json({"starttime": dev_server_starttime, "startms": dev_server_abs_starttime, "emailssent": dev_emails});
+        } else if (req.body.action === "editplayercolor") {
+            let getuuid = req.cookies.uuid;
+            if(res.body.color && getuuid && playercoloroptions.includes(res.body.color)) {
+                auth.changePlayerColor(getuuid, color).then(function() {
+                    res.json({"success": "colorchanged"});
+                }).catch(function() {
+                    res.json({"error": "not logged in"});
+                });
+            } else {
+                res.json({"error": "invalid parameters provided"});
+            }
         } else if(req.body.action === "fetchposts") {
             if(!isNaN(Number(req.body.startindex)) && !isNaN(Number(req.body.amount))) {
                 let startindex = req.body.startindex;

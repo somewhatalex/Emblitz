@@ -6,3 +6,5 @@ Disallow: /privacy
 Disallow: /privacy.html
 Disallow: /verify
 Disallow: /verify.html
+Disallow: /settings
+Disallow: /settings.html
