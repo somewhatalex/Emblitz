@@ -181,14 +181,21 @@ const apiLimiter = rateLimit({
     message: JSON.stringify({"error": 429, "message": "You are accessing the api too quickly (40 requests/30 sec)! Try again in a minute. Calm down my guy."}),
 	standardHeaders: true,
 	legacyHeaders: false
-})
+});
 const adminApiLimiter = rateLimit({
 	windowMs: 1 * 60000, //minutes
 	max: 10,
-    message: JSON.stringify({"error": 429, "message": "You are accessing the auth api too quickly (5 requests/min)! Please go and bing chilling, and try again in a minute."}),
+    message: JSON.stringify({"error": 429, "message": "You are accessing the auth api too quickly (10 requests/min)! Please go and bing chilling, and try again in a minute."}),
 	standardHeaders: true,
 	legacyHeaders: false
-})
+});
+const mailApiLimiter = rateLimit({
+	windowMs: 5 * 60000, //minutes
+	max: 5,
+    message: JSON.stringify({"error": 429, "message": "You are accessing the auth 2 api too quickly (3 requests/5 min)! Please go and bing chilling, and try again in 5 minutes."}),
+	standardHeaders: true,
+	legacyHeaders: false
+});
 
 app.set("view engine", "html");
 app.engine("html", require("ejs").renderFile);
@@ -198,6 +205,7 @@ app.use(requireHTTPS);
 app.use(compression());
 app.use("/api/", apiLimiter);
 app.use("/authapi/", adminApiLimiter);
+app.use("/auth2/", mailApiLimiter);
 
 /*
 App can't have pages caching because too much of it is dynamic
@@ -445,42 +453,8 @@ function getroommap(id) {
     }
 }
 
-app.post("/authapi", (req, res) => {
-    //admin functions
-    if(req.body.action === "createpost") {
-        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
-            res.status(403);
-            res.json({"error": "403", "message": "You are not authorized to make this call!"});
-            return;
-        }
-        auth.postAnnouncement(req.body.title, req.body.content, req.body.submittedtime, req.body.image).then(function() {
-            res.json({"result": "post created successfully"});
-        });
-    } else if(req.body.action === "deletepost") {
-        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
-            res.status(403);
-            res.json({"error": "403", "message": "You are not authorized to make this call!"});
-            return;
-        }
-        auth.deleteAnnouncement(req.body.postid).then(function() {
-            res.json({"result": "deleted post"})
-        });
-    } else if(req.body.action === "validatepassword") {
-        if(req.body.auth === process.env.ADMINMASTERPASSWORD) {
-            res.json({"result": true});
-        } else {
-            res.json({"result": false});
-        }
-    } if(req.body.action === "runsqlquery") {
-        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
-            res.status(403);
-            res.json({"error": "403", "message": "You are not authorized to make this call!"});
-            return;
-        }
-        auth.runSQLQuery(req.body.query).then(function(result) {
-            res.json({"result": result.rows});
-        });
-    } else if(req.body.action === "registeruser") {
+app.post("/auth2", (req, res) => {
+    if(req.body.action === "registeruser") {
         let errors = [];
         let emailformatted = req.body.email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -561,6 +535,46 @@ app.post("/authapi", (req, res) => {
         } else {
             res.json({"error": "lookup_2"})
         }
+    } else if(req.body.action === "resetpassword") {
+        
+    }
+})
+
+app.post("/authapi", (req, res) => {
+    //admin functions
+    if(req.body.action === "createpost") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.postAnnouncement(req.body.title, req.body.content, req.body.submittedtime, req.body.image).then(function() {
+            res.json({"result": "post created successfully"});
+        });
+    } else if(req.body.action === "deletepost") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.deleteAnnouncement(req.body.postid).then(function() {
+            res.json({"result": "deleted post"})
+        });
+    } else if(req.body.action === "validatepassword") {
+        if(req.body.auth === process.env.ADMINMASTERPASSWORD) {
+            res.json({"result": true});
+        } else {
+            res.json({"result": false});
+        }
+    } if(req.body.action === "runsqlquery") {
+        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            res.status(403);
+            res.json({"error": "403", "message": "You are not authorized to make this call!"});
+            return;
+        }
+        auth.runSQLQuery(req.body.query).then(function(result) {
+            res.json({"result": result.rows});
+        });
     } else if(req.body.action === "login") {
         if(req.body.username && req.body.password) {
             auth.userLogin(req.body.username, req.body.password).then(function(userdata) {

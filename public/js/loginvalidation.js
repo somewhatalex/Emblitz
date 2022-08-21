@@ -67,9 +67,11 @@ function submitRegister() {
         errors = true;
     }
 
-    if(!document.getElementById("i-password").value) {
+    if(document.getElementById("i-password").value !== document.getElementById("i-password-confirm").value) {
         document.getElementById("error-password").style.display = "inline";
-        document.getElementById("error-password").innerText = "password is required";
+        document.getElementById("error-password").innerText = "passwords must match";
+        document.getElementById("error-passwordconfirm").style.display = "inline";
+        document.getElementById("error-passwordconfirm").innerText = "passwords must match";
         errors = true;
     }
 
@@ -97,13 +99,19 @@ function submitRegister() {
         errors = true;
     }
 
+    if(!document.getElementById("i-password").value) {
+        document.getElementById("error-password").style.display = "inline";
+        document.getElementById("error-password").innerText = "password is required";
+        errors = true;
+    }
+
     if(!errors) {
         document.getElementById("i-submit").value = "Please wait...";
         document.getElementById("i-submit").style.cursor = "no-drop";
         document.getElementById("i-submit").setAttribute("disabled", "disabled");
         document.getElementById("backtologin").setAttribute("disabled", "disabled");
         document.getElementById("backtologin").style.cursor = "no-drop";
-        fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "registeruser", email: document.getElementById("i-email").value, username: document.getElementById("i-username").value, password: document.getElementById("i-password").value})}).then(response => {
+        fetch("/auth2", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "registeruser", email: document.getElementById("i-email").value, username: document.getElementById("i-username").value, password: document.getElementById("i-password").value})}).then(response => {
             response.json().then(function(text) {
                 if(text.errors) {
                     document.getElementById("i-submit").removeAttribute("disabled");
@@ -164,7 +172,7 @@ function submitRegister() {
                     document.getElementById("i-submit").style.cursor = "pointer";
                     document.getElementById("backtologin").style.cursor = "pointer";
                     document.getElementById("i-submit").value = "Register";
-                    alert("You're trying to make an account too quickly! Please try again in a minute.");
+                    alert("You're trying to make an account too quickly! Please try again in 5 minutes.");
                 } else {
                     document.getElementById("mainarea").style.opacity = "0";
                     setTimeout(function() {
@@ -189,7 +197,7 @@ function resendemail() {
     document.getElementById("i-resendemail").style.cursor = "no-drop";
     document.getElementById("i-resendemail").setAttribute("disabled", "disabled");
 
-    fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "resendemail"})}).then(response => {
+    fetch("/auth2", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "resendemail"})}).then(response => {
         response.json().then(function(text) {
             if(text.email) {
                 document.getElementById("i-resendemail").removeAttribute("disabled");
@@ -241,6 +249,11 @@ function login() {
     if(!errors) {
         fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "login", username: document.getElementById("login-username").value, password: document.getElementById("login-password").value})}).then(response => {
             response.json().then(function(text) {
+                if(text.error == 429) {
+                    alert("You're trying to log in too quickly! Please try again in a minute.");
+                    errors = true;
+                }
+
                 if(text.error) {
                     if(text.error === "password is incorrect") {
                         document.getElementById("error-login-password").style.display = "inline";
