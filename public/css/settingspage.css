@@ -62,6 +62,7 @@ body {
 
 .s-area-header {
     font-size: 20px;
+    margin-bottom: 5px;
 }
 
 .s-color-selectbar {
@@ -69,31 +70,43 @@ body {
     overflow-x: auto;
     margin-right: 50px;
     border: 2px solid var(--light);
-    border-radius: 10px;
+    border-radius: 5px;
     white-space: nowrap;
 }
 
-.s-cs-red, .s-cs-orange, .s-cs-yellow, .s-cs-green, .s-cs-blue, .s-cs-purple {
+.s-cs-inner {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    display: inline-block;
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
 }
 
-.selected-button {
-    width: 75px !important;
-    height: 75px !important;
+.s-cs-button {
+    display: inline-block;
+    border-radius: 50%;
+    padding: 3px;
+    margin: 7px;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+.s-cs-button:focus {
+    outline: none;
+}
+
+.cs-selected {
+    border: 3px solid var(--light)
 }
 
 .save-button {
-    background-color: lightblue;
-    width: 150px;
-    height: 50px;
-    margin-top: 20px;
-    border-radius: 8px;
+    min-width: 180px;
+    font-size: 20px;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 10px;
+    margin-top: 25px;
 }
-

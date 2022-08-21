@@ -24,7 +24,10 @@
 
         <!-- server-returned player settings and configs -->
         <SCRIPT>
-            var playercolor = "<%= playercolor %>";
+            //or = original
+            var or_playercolor = "<%= playercolor %>";
+
+            var playercolor = or_playercolor;
         </SCRIPT>
 
         <SCRIPT TYPE="text/javascript" SRC="./js/settingspage.js"></SCRIPT>
@@ -42,15 +45,19 @@
             <DIV CLASS="s-colorselect">
                 <DIV CLASS="s-area-header">Player color:</DIV>
                 <DIV CLASS="s-color-selectbar">
-                    <BUTTON CLASS="s-cs-red" STYLE="border: 5px solid red; background: #de4343" TITLE="red" onclick="setColor('Red')">Red</BUTTON>
-                    <BUTTON CLASS="s-cs-orange" STYLE="border: 5px solid orange; background: #e38d24" TITLE="orange" onclick="setColor('orange')">Orange</BUTTON>
-                    <BUTTON CLASS="s-cs-yellow" STYLE="border: 5px solid yellow; background: #dec433" TITLE="yellow" onclick="setColor('yellow')">Yellow</BUTTON>
-                    <BUTTON CLASS="s-cs-green" STYLE="border: 5px solid green; background: #41b037" TITLE="green" onclick="setColor('green')">Green</BUTTON>
-                    <BUTTON CLASS="s-cs-blue" STYLE="border: 5px solid blue; background: #4367ab" TITLE="blue" onclick="setColor('blue')">Blue</BUTTON>
-                    <BUTTON CLASS="s-cs-purple" STYLE="border: 5px solid purple; background: #b240b8" TITLE="purple" onclick="setColor('purple')">Purple</BUTTON>
+                    <BUTTON TITLE="red" ID="red-colorselect" onclick="setColor('red', this)" CLASS="s-cs-button cs-selected"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid red; background: #de4343"></DIV></BUTTON>
+                    <BUTTON TITLE="orange" ID="orange-colorselect" onclick="setColor('orange', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid orange; background: #e38d24"></DIV></BUTTON>
+                    <BUTTON TITLE="yellow" ID="yellow-colorselect" onclick="setColor('yellow', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid yellow; background: #dec433"></DIV></BUTTON>
+                    <BUTTON TITLE="green" ID="green-colorselect" onclick="setColor('green', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid green; background: #41b037"></DIV></BUTTON>
+                    <BUTTON TITLE="blue" ID="blue-colorselect" onclick="setColor('blue', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid blue; background: #4367ab"></DIV></BUTTON>
+                    <BUTTON TITLE="purple" ID="purple-colorselect" onclick="setColor('purple', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid purple; background: #b240b8"></DIV></BUTTON>
                 </DIV>
             </DIV>
-            <BUTTON CLASS="save-button" onclick="callSave()">Save Changes</BUTTON>
+            <BUTTON CLASS="save-button jb_green" ID="save-button" onclick="submitUserSettings()">Save Changes</BUTTON>
+
+            <DIV ID="notifications">
+                <!-- notifications display here -->
+            </DIV>
         </DIV>
     </BODY>
 </HTML>

@@ -595,7 +595,8 @@ app.post("/api", (req, res) => {
             res.json({"starttime": dev_server_starttime, "startms": dev_server_abs_starttime, "emailssent": dev_emails});
         } else if (req.body.action === "editplayercolor") {
             let getuuid = req.cookies.uuid;
-            if(res.body.color && getuuid && playercoloroptions.includes(res.body.color)) {
+            let color = req.body.color;
+            if(color && getuuid && playercoloroptions.includes(color)) {
                 auth.changePlayerColor(getuuid, color).then(function() {
                     res.json({"success": "colorchanged"});
                 }).catch(function() {
