@@ -111,3 +111,23 @@ body {
     border-radius: 10px;
     margin-top: 25px;
 }
+
+.u-back {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 696969;
+    padding: 5px;
+    font-size: 20px;
+    background: var(--light-darker);
+    border: 1px solid var(--medium);
+    padding-left: 10px;
+    padding-right: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.u-back:hover {
+    background: var(--light);
+    border-radius: 10px;
+}
