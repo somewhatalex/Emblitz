@@ -52,6 +52,7 @@ body {
     font-weight: bold;
     text-shadow: 0px 0px 12px #0f0f0f;
     margin-top: -90px;
+    float: left;
 }
 
 .s-divider {
