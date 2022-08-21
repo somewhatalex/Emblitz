@@ -15,7 +15,7 @@ window.addEventListener("load", function() {
 
 function epochToDate(epochtime) {
     let datecreated = new Date(Number(epochtime));
-    return datecreated.getMonth() + "/" + datecreated.getDate() + "/" + datecreated.getFullYear().toString().slice(2, 4);
+    return (datecreated.getMonth() + 1) + "/" + datecreated.getDate() + "/" + datecreated.getFullYear().toString().slice(2, 4);
 }
 
 function loadProfile(info) {
