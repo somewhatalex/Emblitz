@@ -49,9 +49,19 @@ function submitRegister() {
         /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 
+    let usernameformatted = document.getElementById("i-username").value.match(
+        /^[a-zA-Z0-9_]+$/
+    )
+
     if(!emailformatted && document.getElementById("i-email").value) {
         document.getElementById("error-email").style.display = "inline";
         document.getElementById("error-email").innerText = "please enter a valid email";
+        errors = true;
+    }
+
+    if(!usernameformatted) {
+        document.getElementById("error-username").style.display = "inline";
+        document.getElementById("error-username").innerText = "only letters, numbers, and underscores allowed";
         errors = true;
     }
 
@@ -125,6 +135,18 @@ function submitRegister() {
                     }
 
                     //declared errors by server
+                    if(text.errors.includes("u5")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "don't use profanity in your username";
+                        errors = true;
+                    }
+
+                    if(text.errors.includes("u4")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "only letters, numbers, and underscores allowed";
+                        errors = true;
+                    }
+
                     if(text.errors.includes("u1")) {
                         document.getElementById("error-username").style.display = "inline";
                         document.getElementById("error-username").innerText = "must be at least 2 characters long";

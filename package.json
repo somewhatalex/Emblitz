@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/bob4koolest/emblitz#readme",
   "dependencies": {
+    "bad-words": "^3.0.4",
     "body-parser": "^1.20.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",

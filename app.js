@@ -21,7 +21,8 @@ const { initDB } = require("./scripts/auth.js");
 const badges = require("./scripts/badges.js");
 const { response } = require("express");
 const colorData = require("./scripts/colorData.js");
-const nocache = require("nocache")
+const nocache = require("nocache");
+const badwords = require("bad-words");
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
 
@@ -70,6 +71,8 @@ if(process.env.PRODUCTION === "yes") {
         port = process.env.PORT;
     }
 }
+
+const badWordsFilter = new badwords();
 
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
@@ -459,11 +462,21 @@ app.post("/auth2", (req, res) => {
         let emailformatted = req.body.email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         );
+        let usernameformatted = req.body.username.match(
+            /^[a-zA-Z0-9_]+$/
+        );
+
+        let wordtofilter = req.body.username.replace(/_/g, "");
+        let containsbadwords = badWordsFilter.isProfane(wordtofilter);
         
         if(req.body.username.length < 2) {
             errors.push("u1");
         } else if(req.body.username.length > 12) {
             errors.push("u2")
+        } else if(!usernameformatted) {
+            errors.push("u4");
+        } else if(containsbadwords) {
+            errors.push("u5");
         }
         if(!req.body.email) {
             errors.push("e1");

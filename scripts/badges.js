@@ -25,28 +25,28 @@ const badges = {
         "name": "5 Wins",
         "level": "Silver",
         "description": "Win 5 Emblitz battles in public multiplayer rooms!",
-        "image": "firstwin.png"
+        "image": "5wins.png"
     },
 
     "10wins": {
         "name": "10 Wins",
         "level": "Gold",
         "description": "Win 10 Emblitz battles in public multiplayer rooms!",
-        "image": "firstwin.png"
+        "image": "10wins.png"
     },
 
     "20wins": {
         "name": "20 Wins",
         "level": "Diamond",
         "description": "Win 20 Emblitz battles in public multiplayer rooms!",
-        "image": "firstwin.png"
+        "image": "20wins.png"
     },
 
     "50wins": {
         "name": "50 Wins",
         "level": "Ruby",
         "description": "Win 50 Emblitz battles in public multiplayer rooms!",
-        "image": "firstwin.png"
+        "image": "50wins.png"
     }
 }
 

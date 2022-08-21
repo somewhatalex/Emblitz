@@ -1,5 +1,5 @@
 # Emblitz
-Real-time strategy game that's playable online in a browser. We now have a name! 😎
+Real-time strategy game that's playable online in a browser. Very simple to set up.
 
 You need to set up a postgresql server and create the `.env` file for the project yourself:
 Host should be `127.0.0.1` if testing locally.
@@ -38,4 +38,5 @@ npm i express-rate-limit
 npm i nodemailer
 npm i password-hash
 npm i nocache
+npm i bad-words
 ```
