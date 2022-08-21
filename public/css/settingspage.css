@@ -44,7 +44,7 @@ body {
     font-size: 60px;
     display: inline-block;
     position: absolute;
-    top: 23%;
+    top: 50%;
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
     margin-left: 25px;

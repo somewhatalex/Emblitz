@@ -20,6 +20,8 @@ const crypto = require("crypto");
 const { initDB } = require("./scripts/auth.js");
 const badges = require("./scripts/badges.js");
 const { response } = require("express");
+const colorData = require("./scripts/colorData.js");
+const nocache = require("nocache")
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
 
@@ -197,6 +199,13 @@ app.use(compression());
 app.use("/api/", apiLimiter);
 app.use("/authapi/", adminApiLimiter);
 
+/*
+App can't have pages caching because too much of it is dynamic
+and changes very frequently. Plus, webpages are small enough
+to not suffer a noticably slower load time as a result.
+*/
+app.use(nocache());
+
 //enable req.body to be used
 app.use(bodyParser.urlencoded({
     extended: true
@@ -263,8 +272,8 @@ app.all("/", (req, res) => {
             }
 
             profileoutput += `
-            <DIV CLASS="profile-outline">
-                <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid red"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+            <DIV CLASS="profile-outline" STYLE="background: ${colorData[userinfo.playercolor].normal}">
+                <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${userinfo.playercolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
                 <DIV CLASS="glb_p_info">
                     <DIV ID="p_name" CLASS="lb_p_name">${userinfo.username}</DIV>
                     <A CLASS="my_profile" HREF="./user/${userinfo.username}"><SPAN STYLE="text-decoration: underline">My profile</SPAN> <I CLASS="fa fa-external-link-square"></I></A>
@@ -381,7 +390,9 @@ app.get("/user/*", (req, res) => {
 
     auth.getPublicUserInfo(username).then(function(result) {
         res.render("user", {
-            username: result.username
+            username: result.username,
+            playercolor: result.playercolor,
+            playercolorbg: colorData[result.playercolor].normal
         });
     }).catch(function() {
         res.render("./errorpages/404")

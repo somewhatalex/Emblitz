@@ -32,6 +32,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
+    "nocache": "^3.0.4",
     "nodemailer": "^6.7.7",
     "password-hash": "^1.2.2",
     "path": "^0.12.7",
