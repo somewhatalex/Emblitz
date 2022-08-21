@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+        <TITLE>Emblitz | Settings</TITLE>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="language" content="en">
+
+        <meta name="viewport" content="initial-scale=1.0, width=device-width">
+        <LINK REL="stylesheet" HREF="../css/style.css">
+        <LINK REL="stylesheet" HREF="../css/settingspage.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <link rel="icon" href="./images/icon.png">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QNCVLQXQCJ"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-QNCVLQXQCJ');
+        </script>
+
+        <!-- server-returned player settings and configs -->
+        <SCRIPT>
+            //or = original
+            var or_playercolor = "<%= playercolor %>";
+
+            var playercolor = or_playercolor;
+        </SCRIPT>
+
+        <SCRIPT TYPE="text/javascript" SRC="./js/settingspage.js"></SCRIPT>
+        <SCRIPT TYPE="text/javascript" SRC="./js/colorData.js"></SCRIPT>
+    </HEAD>
+    <BODY>
+        
+        <BUTTON CLASS="u-back" ONCLICK="window.location.href='../'"><I CLASS="fa fa-chevron-left"></I></BUTTON>
+        <DIV CLASS="s-main">
+            <DIV CLASS="s-header"><I CLASS="fa fa-gear"></I> Settings</DIV>
+            <DIV CLASS="s-user-profile">
+                <DIV CLASS="s-avatar-frame" ID="avatar-frame"><IMG ID="avatar-img" CLASS="s-avatar-img" SRC="../images/defaultpfp.png">
+                    <DIV CLASS="s-player-name" ID="player-name"><%= playername %></DIV>
+                </DIV>
+            </DIV>
+            <DIV CLASS="s-divider"></DIV>
+            <DIV CLASS="s-colorselect">
+                <DIV CLASS="s-area-header">Player color:</DIV>
+                <DIV CLASS="s-color-selectbar">
+                    <BUTTON TITLE="red" ID="red-colorselect" onclick="setColor('red', this)" CLASS="s-cs-button cs-selected"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid red; background: #de4343"></DIV></BUTTON>
+                    <BUTTON TITLE="orange" ID="orange-colorselect" onclick="setColor('orange', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid orange; background: #e38d24"></DIV></BUTTON>
+                    <BUTTON TITLE="yellow" ID="yellow-colorselect" onclick="setColor('yellow', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid yellow; background: #dec433"></DIV></BUTTON>
+                    <BUTTON TITLE="green" ID="green-colorselect" onclick="setColor('green', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid green; background: #41b037"></DIV></BUTTON>
+                    <BUTTON TITLE="blue" ID="blue-colorselect" onclick="setColor('blue', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid blue; background: #4367ab"></DIV></BUTTON>
+                    <BUTTON TITLE="purple" ID="purple-colorselect" onclick="setColor('purple', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid purple; background: #b240b8"></DIV></BUTTON>
+                </DIV>
+            </DIV>
+            <BUTTON CLASS="save-button jb_green" ID="save-button" onclick="submitUserSettings()">Save Changes</BUTTON>
+
+            <DIV ID="notifications">
+                <!-- notifications display here -->
+            </DIV>
+        </DIV>
+    </BODY>
+</HTML>

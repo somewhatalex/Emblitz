@@ -1,0 +1,324 @@
+body {
+    background: var(--dark);
+}
+
+.u-banner-container {
+    height: 250px;
+}
+
+.u-banner {
+    background: url(../images/background1.JPG);
+    filter: blur(2px);
+    height: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+.u-banner-content {
+    position: absolute;
+    top: 40px;
+    left: 100px;
+    text-align: left;
+    color: var(--light);
+    display: inline-block;
+}
+
+.u-body{
+    color: white;
+    padding: 20px;
+}
+
+.u-username-big {
+    font-size: 60px;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: 20px;
+    margin-right: 10px;
+    font-weight: bold;
+    text-shadow: 0px 0px 12px #0f0f0f;
+}
+
+.u-playerstats {
+    width: calc(100% - 180px);
+    margin-left: 90px;
+    margin-right: 90px;
+    font-size: 22px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid var(--medium);
+    min-width: 250px;
+}
+
+.u-playerstats-stat {
+    display: inline;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.u-playerstats-stat:not(:last-child) {
+    border-right: 2px solid var(--medium);
+    padding-right: 40px;
+}
+
+.u-playerstats-stat:not(:first-child) {
+    padding-left: 40px;
+}
+
+.u-playerstats-stat:first-child {
+    padding-left: 15px;
+}
+
+.u-playerstats-stat:last-child {
+    padding-right: 15px;
+}
+
+.u-avatar-frame {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid red;
+    display: inline-block;
+    -webkit-box-shadow: 0px 0px 12px 4px #292929;
+    box-shadow: 0px 0px 12px 4px #292929;
+    overflow: hidden;
+    background: #de4343;
+}
+
+/*Stuff for badges array*/
+.u-badge {
+    background: #474747;
+    width: 250px;
+    height: 350px;
+    -webkit-box-shadow: 0px 0px 12px 2px #0A0A0A; 
+    box-shadow: 0px 0px 12px 2px #0A0A0A;
+    border-radius: 10px;
+}
+
+.u-badge-title {
+    margin-top: 30px;
+    font-weight: bold;
+    margin-left: 100px;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.u-container {
+    position: relative;
+    width: calc(100% - 200px);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, min(250px));
+    gap: 30px 30px;
+    padding: 10px;
+    padding-left: 100px;
+    transition: 0.3s;
+    overflow: hidden;
+}
+
+.u-badge-img {
+    width: 100px;
+    height: 100px;
+}
+
+.u-badge-icon {
+    margin-top: 20px;
+    display: block;
+    text-align: center;
+    width: 100%;
+    height: 100px;
+}
+
+.u-badge-level {
+    margin-top: 10px;
+    padding: 2px;
+    border-radius: 8px;
+    color: var(--light);
+    width: auto;
+    font-size: 15px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.u-badge-card-title {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 20px;
+    text-align: center;
+    font-weight: bold;
+    margin-top: -5px;
+}
+
+.u-badge-card-awarded {
+    font-size: 15px;
+    color: var(--medium);
+    padding-left: 2px;
+    margin-left: 8px;
+    border-left: 1px solid var(--medium)
+}
+
+.u-badge-card-description {
+    margin-top: 5px;
+    overflow: auto;
+    height: 140px;
+}
+
+.medal-img {
+    width: 30px;
+    height: auto;
+    margin-bottom: -10px;
+    margin-right: 5px;
+}
+
+.u-pstats-card {
+    padding: 20px;
+    background: #474747;
+    -webkit-box-shadow: 0px 0px 12px 2px #0A0A0A; 
+    box-shadow: 0px 0px 12px 2px #0A0A0A;
+    border-radius: 10px;
+    float: center;
+    margin-left: 100px;
+    font-size: 18px;
+    margin-top: 30px;
+    width: calc(100% - 250px);
+    max-width: 400px;
+    min-width: 210px;
+}
+
+.u-badge-area {
+    margin-top: 30px;
+}
+
+.u-pc-line {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.u-avatar-img {
+    width: 150px;
+    height: 150px;
+}
+
+@media (max-width: 930px) {
+    .up2 {
+        border: none !important;
+    }
+
+    .up3 {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: -10px;
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 750px) {
+    .u-username-big {
+        font-size: 40px;
+    }
+
+    .u-avatar-frame {
+        width: 100px;
+        height: 100px;
+    }
+
+    .u-avatar-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .u-banner-container {
+        height: 200px;
+    }
+}
+
+@media (max-width: 700px) {
+    .up1, .up2 {
+        display: block;
+        border: none !important;
+        margin-bottom: 10px !important;
+    }
+
+    .up3 {
+        margin-top: 5px !important;
+        margin-bottom: -15px !important;
+    }
+}
+
+@media (max-width: 550px) {
+    .u-username-big {
+        font-size: 30px;
+    }
+
+    .u-banner-content {
+        top: 60px;
+    }
+
+    .u-avatar-frame {
+        width: 70px;
+        height: 70px;
+    }
+
+    .u-avatar-img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .u-body {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .u-banner-container {
+        height: 170px;
+    }
+
+    .u-banner-content {
+        left: 20px;
+    }
+
+    .u-container {
+        overflow: visible;
+    }
+}
+
+@media (max-width: 470px) {
+    .u-badge-title, .u-pstats-card {
+        margin-left: 40px;
+    }
+
+    .u-container {
+        padding-left: 40px;
+    }
+    
+    .u-playerstats {
+        margin-left: 40px;
+    }
+}
+
+@media (max-width: 420px) {
+    .u-username-big {
+        font-size: 25px;
+    }
+}
+
+.u-back {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 696969;
+    padding: 5px;
+    font-size: 20px;
+    background: var(--light-darker);
+    border: 1px solid var(--medium);
+    padding-left: 10px;
+    padding-right: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.u-back:hover {
+    background: var(--light);
+    border-radius: 10px;
+}

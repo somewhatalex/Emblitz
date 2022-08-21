@@ -99,25 +99,24 @@
                             document.getElementById("admin_mainpage").style.display = "block";
                             authpassword = password;
                             resolve("ok");
+                            refreshstatus();
+                            setInterval(function() {
+                                refreshstatus();
+                            }, 60000);
                         });
                     });
                 });
             }
 
             function showtab(tab) {
-                if(tab === "newpost") {
-                    document.getElementById("newpost").style.display = "block";
-                    document.getElementById("deletepost").style.display = "none";
-                    document.getElementById("viewposts").style.display = "none";
-                } else if(tab === "delete") {
-                    document.getElementById("newpost").style.display = "none";
-                    document.getElementById("deletepost").style.display = "block";
-                    document.getElementById("viewposts").style.display = "none";
-                } else if(tab === "viewposts") {
-                    document.getElementById("newpost").style.display = "none";
-                    document.getElementById("deletepost").style.display = "none";
-                    document.getElementById("viewposts").style.display = "block";
+                for(let i=0; i<document.getElementsByClassName("posttab").length; i++) {
+                    document.getElementsByClassName("posttab")[i].style.display = "none";
+                }
+                document.getElementById(tab).style.display = "block";
+                if(tab === "viewposts") {
                     getposts("refresh");
+                } else if(tab === "status") {
+                    refreshstatus();
                 }
             }
 
@@ -146,6 +145,53 @@
                         }
                         posttable.innerHTML += trtoappend;
                         startindex = startindex + 20;
+                    });
+                });
+            }
+
+            function refreshstatus() {
+                fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getdevstats", auth: authpassword})}).then(response => {
+                    response.json().then(function(text) {
+                        document.getElementById("server_upsince").innerText = text.starttime;
+                        document.getElementById("server_upfor").innerText = ((Date.now() - text.startms)/(3600000)).toFixed(2) + " hrs";
+                        document.getElementById("server_emails").innerText = text.emailssent;
+                    });
+                });
+            }
+
+            function submitSQLquery() {
+                if(!document.getElementById("sql_query").value) {
+                    alert("Please enter an SQL query!");
+                    return;
+                }
+                fetch("/authapi", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "runsqlquery", query: document.getElementById("sql_query").value, auth: authpassword})}).then(response => {
+                    response.json().then(function(text) {
+                        if(text.error) {
+                            document.getElementById("sql_result").innerText = "You're making SQL queries too quickly, please wait 1 min and slow down!";
+                            return;
+                        }
+
+                        let data = text.result;
+                        if(!data || data.length == 0) {
+                            document.getElementById("sql_result").innerText = "0 results returned, try checking your syntax or running another query.";
+                            return;
+                        }
+
+                        let tablecontent = "<TABLE>"
+                        for (key in data[0]) {
+                            tablecontent += '<td>' + key + '</td>';
+                        }
+                        tablecontent += "</tr>";
+                        for (var i = 0; i < data.length; i++) {
+                            tablecontent +='<tr>';
+                            for (key in data[i]) {
+                                tablecontent += '<td>' + data[i][key] + '</td>';
+                            }
+                            tablecontent +='</tr>';
+                        }
+                        tablecontent += "</TABLE>";
+
+                        document.getElementById("sql_result").innerHTML = tablecontent;
                     });
                 });
             }
@@ -188,25 +234,36 @@
                 margin-bottom: 10px;
             }
 
-            #posttable {
+            table {
                 max-width: 750px;
             }
 
-            #posttable, #posttable th, #posttable td {
+            table, table th, table td {
                 border: 1px solid black;
                 border-collapse: collapse;
             }
 
-            #posttable th, #posttable td {
+            table th, table td {
                 padding: 5px;
             }
 
-            #posttable tr {
+            table tr {
                 background: white;
             }
 
-            #posttable tr:nth-child(even) {
+            table tr:nth-child(even) {
                 background: #d8d8d8;
+            }
+
+            #sql_result {
+                padding: 10px;
+                width: calc(100% - 20px);
+                font-size: 17px;
+                background: #f7f7f7;
+                border: 1px solid #7e7e7e;
+                color: black;
+                margin-top: 2px;
+                overflow: auto;
             }
         </STYLE>
         <DIV CLASS="auth_main">
@@ -216,24 +273,37 @@
                 <BUTTON ONCLICK="verifyPassword()">Admin Login</BUTTON>
             </DIV>
             <DIV ID="admin_mainpage" STYLE="display: none;">
+                <BUTTON ONCLICK="showtab('status')" STYLE="margin-right: 5px;">Server Status</BUTTON>
                 <BUTTON ONCLICK="showtab('newpost')" STYLE="margin-right: 5px;">Create Post</BUTTON>
-                <BUTTON ONCLICK="showtab('delete')" STYLE="margin-right: 5px;">Delete Post</BUTTON>
-                <BUTTON ONCLICK="showtab('viewposts')">View Posts</BUTTON>
+                <BUTTON ONCLICK="showtab('deletepost')" STYLE="margin-right: 5px;">Delete Post</BUTTON>
+                <BUTTON ONCLICK="showtab('viewposts')" STYLE="margin-right: 5px;">View Posts</BUTTON>
+                <BUTTON ONCLICK="showtab('databasemanagement')">Database Management</BUTTON>
                 <DIV CLASS="divider"></DIV>
-                <DIV ID="newpost" STYLE="display: block">
+                <DIV CLASS="posttab" ID="status" STYLE="display: block">
+                    <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Server Status</DIV>
+                    <BUTTON ONCLICK="refreshstatus()" STYLE="margin-bottom: 20px">Refresh table</BUTTON>
+                    <TABLE>
+                        <TBODY>
+                            <TR><TD>Server up since</TD><TD ID="server_upsince">--</TD></TR>
+                            <TR><TD>Server up for</TD><TD ID="server_upfor">--</TD></TR>
+                            <TR><TD>Emails sent since server is up</TD><TD ID="server_emails">--</TD></TR>
+                        </TBODY>
+                    </TABLE>
+                </DIV>
+                <DIV CLASS="posttab" ID="newpost" STYLE="display: none">
                     <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Make a new post:</DIV>
                     <INPUT MAXLENGTH="300" ID="title" STYLE="width: 400px" TYPE="text" PLACEHOLDER="Name of post..."><BR>
                     <INPUT MAXLENGTH="1000" ID="image" STYLE="width: 400px" TYPE="text" PLACEHOLDER="[DOES NOT WORK YET] Optional thumbnail image url here..."><BR>
                     <INPUT MAXLENGTH="1000" ID="date" STYLE="width: 400px" TYPE="date" PLACEHOLDER="Date here..."><BR>
-                    <TEXTAREA MAXLENGTH="30000" ID="content" STYLE="width: 500px; height: 50vh" TYPE="text" PLACEHOLDER="Content here here..."></TEXTAREA>
+                    <TEXTAREA MAXLENGTH="30000" ID="content" STYLE="width: 500px; height: 50vh" TYPE="text" PLACEHOLDER="Content here..."></TEXTAREA>
                     <BR><BUTTON ONCLICK="submitpost()">Submit Post</BUTTON>
                 </DIV>
-                <DIV ID="deletepost" STYLE="display: none">
+                <DIV CLASS="posttab" ID="deletepost" STYLE="display: none">
                     <DIV STYLE="font-size: 17px; margin-bottom: 10px;">Delete a post:</DIV>
                     <INPUT MAXLENGTH="10000" ID="postid" STYLE="width: 400px" TYPE="text" PLACEHOLDER="ID of post..."><BR>
                     <BR><BUTTON ONCLICK="deletepost()">Delete Post</BUTTON>
                 </DIV>
-                <DIV ID="viewposts" STYLE="display: none">
+                <DIV CLASS="posttab" ID="viewposts" STYLE="display: none">
                     <DIV STYLE="font-size: 17px;">Most recent post titles and ids:</DIV>
                     <BR><BUTTON ONCLICK="getposts('refresh')" STYLE="margin-bottom: 20px">Refresh list</BUTTON>
                     <TABLE ID="posttable">
@@ -249,6 +319,17 @@
                         </TBODY>
                     </TABLE>
                     <BR><BUTTON ID="loadmoreposts" ONCLICK="getposts()">Load More Posts</BUTTON>
+                </DIV>
+                <DIV CLASS="posttab" ID="databasemanagement" STYLE="display: none">
+                    <DIV STYLE="font-size: 17px;">Database Management</DIV>
+                    <DIV STYLE="font-size: 17px; margin-top: 10px; margin-bottom: 5px;">Frequently used commands:</DIV>
+                    <BUTTON ONCLICK="document.getElementById('sql_query').value = 'SELECT * FROM users WHERE username=\'[username]\''">User lookup by name</BUTTON>
+                    <BUTTON ONCLICK="document.getElementById('sql_query').value = 'ALTER TABLE users ADD [column_name] [datatype]'">Insert column into users table</BUTTON>
+                    <BUTTON ONCLICK="document.getElementById('sql_query').value = 'DELETE FROM users WHERE username=\'[username]\''">Delete user account</BUTTON>
+                    <TEXTAREA MAXLENGTH="100000" ID="sql_query" STYLE="width: calc(100% - 10px); height: 10vh; min-height: 150px;" SPELLCHECK="false" TYPE="text" PLACEHOLDER="SQL query here..."></TEXTAREA>
+                    <BUTTON ONCLICK="submitSQLquery()">Run SQL Query</BUTTON>
+                    <DIV STYLE="font-size: 17px; margin-top: 15px;">Result:</DIV>
+                    <DIV ID="sql_result">Run a query to see the result.</DIV>
                 </DIV>
             </DIV>
         </DIV>

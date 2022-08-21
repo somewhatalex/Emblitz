@@ -75,18 +75,7 @@
                     <DIV CLASS="homemenu-bg"></DIV>
                     <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
                     <DIV CLASS="join_input" ID="join_input">
-                        <DIV CLASS="ji-area">
-                            <DIV CLASS="ji-header">Enter your username and preferred player color.</DIV>
-                            <INPUT ID="p_name" ONKEYUP='localStorage.setItem("username", this.value);' CLASS="name_input" MAXLENGTH="18" TYPE="text" PLACEHOLDER="Username here...">
-                            <SELECT ONCHANGE='localStorage.setItem("color", this.value);' CLASS="framecolorselect" ID="framecolor">
-                                <OPTION VALUE="red">red</OPTION>
-                                <OPTION VALUE="orange">orange</OPTION>
-                                <OPTION VALUE="yellow">yellow</OPTION>
-                                <OPTION VALUE="green">green</OPTION>
-                                <OPTION VALUE="blue">blue</OPTION>
-                                <OPTION VALUE="purple">purple</OPTION>
-                            </SELECT>
-                        </DIV>
+                        <%- profile_output %>
                         <DIV CLASS="mapselect">
                             <DIV CLASS="mapselecttitle">Current map selection:</DIV>
                             <TABLE CLASS="mapnav">
@@ -124,14 +113,14 @@
                             </TABLE>
                         </DIV>
                         <DIV CLASS="h_button_options">
-                            <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, false)">Play</BUTTON>
+                            <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, false)">Play</BUTTON>
                             <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
                             <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
                                 <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game. If not, use the "Play" button to play a random match.</DIV>
-                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect(document.getElementById('p_name').value, 'r-' + document.getElementById('room_id').value, document.getElementById('framecolor').value, null, false)">Connect</BUTTON>
+                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect('r-' + document.getElementById('room_id').value, null, false)">Connect</BUTTON>
                             </DIV>
                             <BR><BR>
-                            <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(document.getElementById('p_name').value, null, document.getElementById('framecolor').value, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
+                            <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                             <BR>
                         </DIV>
                         <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Game Tutorial</A> | <A HREF="./privacy" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Privacy Policy</A><BR><BR>
@@ -269,6 +258,9 @@
                     <DIV CLASS="endscreen-bg"></DIV>
                     <DIV CLASS="endscreen-inner">
                         <DIV CLASS="e-header" ID="e-header">You were defeated</DIV>
+                        <DIV CLASS="e-medal-change" ID="e-medal-change">
+                            <IMG CLASS="e-medal-icon" SRC="./images/medal.png"> <SPAN ID="e-medals">+0 Medals</SPAN>
+                        </DIV>
                         <DIV CLASS="e-stats"><SPAN ID="e-intro">You lost all your territories and were defeated!</SPAN> You had a max of <SPAN ID="e-troops">0</SPAN> troops and controlled a max of <SPAN ID="e-territories">0</SPAN> territories at your peak. You placed <SPAN ID="e-place">6th</SPAN> playing the <SPAN ID="e-map"></SPAN> map. <SPAN ID="e-ending">Better luck next time!</SPAN></DIV>
                         <BUTTON ONCLICK="share()" CLASS="endbutton end-blue"><I CLASS="fa fa-share-square-o"></I> Share</BUTTON><BUTTON CLASS="endbutton end-green" ONCLICK="spectategame()"><I CLASS="fa fa-eye"></I> Spectate</BUTTON><BUTTON CLASS="endbutton end-red" ONCLICK="leavegame()"><I CLASS="fa fa-chevron-circle-left"></I> Leave Game</BUTTON>
                     </DIV>

@@ -61,23 +61,13 @@ window.onload = function() {
         }
     }
 
-
+    getUserInfo();
     inithomepage();
 }
 
 function inithomepage() {
-    if(!localStorage.getItem("color")) {
-        localStorage.setItem("color", "red");
-    } else {
-        document.getElementById("framecolor").value = localStorage.getItem("color");
-    }
-
     if(!localStorage.getItem("map")) {
         localStorage.setItem("map", "random");
-    }
-
-    if(localStorage.getItem("username")) {
-        document.getElementById("p_name").value = localStorage.getItem("username");
     }
 
     if(!localStorage.getItem("hasvisited")) {
@@ -86,6 +76,7 @@ function inithomepage() {
     }
 
     loadPosts("refresh");
+    getUserInfo();
 
     for(let i=0; i<mapDescriptions.length; i++) {
         if(mapDescriptions[i][3] === localStorage.getItem("map")) {
@@ -778,7 +769,16 @@ function tickLobbyTimer() {
     }, 1000);
 }
 
-function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
+function getUserInfo() {
+    fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmyinfo"})}).then(response => {
+        response.json().then(function(result) {
+            document.getElementById("ms_medals").innerText = result.medals;
+            document.getElementById("ms_badges").innerText = Object.keys(JSON.parse(result.badges)).length;
+        });
+    });
+}
+
+function gameConnect(inputroomid, pmap, createnewroom) {
     document.getElementById("lobbyscreen").style.display = "none";
     document.getElementById("gamescreen").style.display = "none";
     document.getElementById("gamelobby").style.display = "block";
@@ -787,7 +787,7 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
             document.getElementById("invitecode").innerText = roomid.replace("r-", "");
             tickLobbyTimer();
             websocket = ws;
-            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "pname": name, "pcolor": pcolor, "gid": gid}));
+            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "uuid": getCookie("uuid"), "gid": gid, "pubkey": getCookie("publickey")}));
             confirmJoinGame().then(function() {
                 ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
             });
@@ -834,17 +834,33 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                         }
                         for(let i=0; i<response.users.length; i++) {
                             if(response.users[i].id === uid) {
-                                document.getElementById("lobbyptable").innerHTML += `
-                                <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                    <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
-                                </DIV>`;
+                                if(response.users[i].name.startsWith("Player ")) {
+                                    document.getElementById("lobbyptable").innerHTML += `
+                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                    </DIV>`;
+                                } else {
+                                    document.getElementById("lobbyptable").innerHTML += `
+                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" ONCLICK="window.open('./user/${response.users[i].name}', '_blank');" TITLE="View ${response.users[i].name}'s profile in a new window" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; cursor: pointer">
+                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                    </DIV>`;
+                                }
                             } else {
-                                document.getElementById("lobbyptable").innerHTML += `
-                                <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                    <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
-                                </DIV>`;
+                                if(response.users[i].name.startsWith("Player ")) {
+                                    document.getElementById("lobbyptable").innerHTML += `
+                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                    </DIV>`;
+                                } else {
+                                    document.getElementById("lobbyptable").innerHTML += `
+                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" ONCLICK="window.open('./user/${response.users[i].name}', '_blank');" TITLE="View ${response.users[i].name}'s profile in a new window" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; cursor: pointer">
+                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
+                                    </DIV>`;
+                                }
                             }
                         }
 
@@ -1094,6 +1110,21 @@ function gameConnect(name, inputroomid, pcolor, pmap, createnewroom) {
                 } else if(response.lobbytimer) {
                     lobbycountdown = response.lobbytimer;
                     document.getElementById("timeramount").innerText = lobbycountdown;
+                } else if(response.playermedalchange && response.playermedalchange === uid) {
+                    if(response.amount === "none") {
+                        document.getElementById("e-medal-change").style.display = "none";
+                    } else {
+                        document.getElementById("e-medal-change").style.display = "block";
+                        let medalPlurality = 's';
+                        let medalSign = '+';
+                        if(response.amount == 1){
+                            medalPlurality = '';
+                        }
+                        if(response.amount < 0){
+                            medalSign = '';
+                        }
+                        document.getElementById("e-medals").innerText = `${medalSign}${response.amount} medal${medalPlurality}`;
+                    }
                 }
             }
         });

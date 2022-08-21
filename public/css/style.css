@@ -30,6 +30,32 @@
     }
 }
 
+@media (max-width: 440px) {
+    .mp_settings {
+        margin-left: 0px !important;
+        border: none !important;
+        display: block;
+        padding-left: 0px !important;
+    }
+}
+
+@media (max-width: 404px) {
+    .ms_stat_two {
+        margin-left: 0px !important;
+        display: block;
+        padding-left: 0px !important;
+        margin-top: 4px;
+    }
+
+    .ms_stat_one {
+        border: none !important;
+    }
+
+    .ms_stat {
+        text-align: center;
+    }
+}
+
 /*small screens*/
 @media (max-width: 700px) {
     .troopscontrol {
@@ -674,6 +700,11 @@ input { /*override default styles*/
     height: 70px;
     position: relative;
     width: 100%;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
 }
 
 .glb_avatar-frame {
@@ -964,7 +995,7 @@ input { /*override default styles*/
 }
 
 .endscreen-bg {
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     opacity: 0.9;
@@ -1042,6 +1073,7 @@ input { /*override default styles*/
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    overflow-y: auto;
 }
 
 .e-header {
@@ -1049,6 +1081,21 @@ input { /*override default styles*/
     font-weight: bold;
     font-size: 28px;
     margin-bottom: 10px;
+}
+
+.e-medal-change {
+    text-align: left;
+    color: var(--light);
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.e-medal-icon {
+    width: 30px;
+    height: auto;
+    margin-bottom: -10px;
+    margin-right: 2px;
 }
 
 .e-stats {
@@ -1858,4 +1905,93 @@ input { /*override default styles*/
         transform: translate(-80px, -15px);
         opacity: 0
     }
+}
+
+.pf-badge {
+    width: 60px;
+    height: auto;
+    cursor: pointer;
+}
+
+.profile-outline {
+    background-color: #de4343;
+    height: 70px;
+    position: relative;
+    margin: auto;
+    max-width: 370px;
+    width: calc(100% - 100px);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    padding: 10px;
+    text-align: left;
+}
+
+.my_profile {
+    font-size: 17px;
+    color: var(--light);
+    text-decoration: none;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.my_profile:visited {
+    color: var(--light);
+    text-decoration: none;
+}
+
+.my_profile:hover {
+    font-size: 17px;
+    color: var(--light-darker);
+    text-decoration: none;
+}
+
+.my_stats {
+    background: #3f3f3f;
+    margin: auto;
+    max-width: 370px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 10px;
+    width: calc(100% - 100px);
+    font-size: 17px;
+}
+
+.ms_medals {
+    width: 25px;
+    height: auto;
+    margin-bottom: -7px;
+    margin-right: 4px;
+}
+
+.ms_badges {
+    width: 25px;
+    height: auto;
+    margin-bottom: -7px;
+    margin-right: 4px;
+}
+
+.ms_stat_one {
+    border-right: 2px solid var(--light);
+    padding-right: 10px;
+    margin-right: 7px;
+}
+
+.mp_settings {
+    padding-left: 8px;
+    margin-left: 5px;
+    border-left: 2px solid var(--light);
+}
+
+.po-container {
+    background: #3f3f3f;
+    margin: auto;
+    max-width: 370px;
+    border-radius: 10px;
+    padding: 10px;
+    width: calc(100% - 100px);
+    font-size: 17px;
+}
+
+.po-description {
+    font-size: 17px;
 }

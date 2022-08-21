@@ -1,10 +1,133 @@
 <!DOCTYPE html>
 <HTML>
     <HEAD>
+        <TITLE>Emblitz | Login</TITLE>
+        <meta name="description" content="Login or create an Emblitz account to make the most out of your experience!">
+        <meta name="keywords" content="emblitz, pvp, real time, game, video game, videogame, conquest, domination, multiplayer, strategy, battle">
+        <meta name="robots" content="index, follow">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="language" content="en">
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <LINK REL="stylesheet" HREF="./css/style.css">
+        <LINK REL="stylesheet" HREF="./css/login.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QNCVLQXQCJ"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-QNCVLQXQCJ');
+        </script>
+
+        <link rel="icon" href="./images/icon.png">
+        <SCRIPT TYPE="text/javascript" SRC="./js/loginvalidation.js"></SCRIPT>
     </HEAD>
     <BODY>
-        work in progress
+        <SCRIPT>
+            window.addEventListener("load", function() {
+                document.getElementById("mainarea").style.opacity = "1";
+
+                // --> /login?action=[register/verify]
+                var url = new URL(window.location.href);
+                var action = url.searchParams.get("action");
+
+                if(action === "register") {
+                    registerwindow();
+                } else if(action === "verify") {
+                    document.getElementById("mainarea").style.opacity = "0";
+                    setTimeout(function() {
+                        document.getElementById("mainarea").innerHTML = `
+                            <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                            <DIV CLASS="lg_resulttext">Please check your email for a verification email. Note that it will expire in 10 minutes, and any unverified accounts will be deleted in an hour. Try checking your spam and promotions tabs if you don't see the email. Still don't see it? Press the button below to resend the email.</DIV>
+                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register jb_gray" ID="i-resendemail" ONCLICK="resendemail()">Resend Verification Email</BUTTON>
+                            <DIV CLASS="lg_resulttext" ID="lg_resendstatus" STYLE="display: none; margin-top: 10px"></DIV>
+                            <DIV CLASS="lg_resulttext">Once you verified your email, click here to go to Emblitz.</DIV>
+                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register jb_green" ONCLICK="window.location='http://emblitz.com'">To Emblitz!</BUTTON>
+                            `
+                        document.getElementById("mainarea").style.opacity = "1";
+                    }, 500);
+                }
+            });
+
+            function registerwindow() {
+                document.getElementById("mainarea").style.opacity = "0";
+                setTimeout(function() {
+                    document.getElementById("mainarea").innerHTML = `
+                        <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                        <FORM CLASS="lg_container" ID="form-register" ONSUBMIT="return false" METHOD="POST">
+                            <DIV CLASS="lg_headertext"><B>Register</B> for free to unlock more game features and battle players from all over the world! It only takes about 30 seconds and all your info is kept private and encrypted.</DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-envelope"></I> Email <SPAN CLASS="lb_form_error" ID="error-email"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-email" NAME="email" MAXLENGTH="1500" TYPE="email" PLACEHOLDER="Email...">
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username <SPAN CLASS="lb_form_error" ID="error-username"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-username" NAME="username" TYPE="name" MAXLENGTH="12" PLACEHOLDER="Username...">
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password <SPAN CLASS="lb_form_error" ID="error-password"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-password" NAME="password" TYPE="password" PLACEHOLDER="Password..." MAXLENGTH="30" ONKEYUP="checkPass(this.value)">
+                            <DIV CLASS="lb_password_check">
+                                Password must contain:
+                                <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_char"><I CLASS="fa fa-times"></I></SPAN> 8-30 characters</DIV>
+                                <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_upper"><I CLASS="fa fa-times"></I></SPAN> at least 1 uppercase letter</DIV>
+                                <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_lower"><I CLASS="fa fa-times"></I></SPAN> at least 1 lowercase letter</DIV>
+                                <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_number"><I CLASS="fa fa-times"></I></SPAN> at least 1 number</DIV>
+                            </DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-check"></I> Confirm Password <SPAN CLASS="lb_form_error" ID="error-passwordconfirm"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-password-confirm" NAME="password" TYPE="password" PLACEHOLDER="Retype password here..." MAXLENGTH="30">
+                            <DIV CLASS="lg_divider"></DIV>
+                            <INPUT CLASS="lg_submit jb_green" ID="i-submit" TYPE="Submit" ONCLICK="submitRegister()" VALUE="Register">
+                        </FORM>
+                        <DIV CLASS="lg_register_text">Already have an account?</DIV>
+                        <BUTTON CLASS="lg_register jb_gray" ID="backtologin" ONCLICK="loginwindow()">Login</BUTTON>
+                        `
+                    document.getElementById("mainarea").style.opacity = "1";
+                }, 500);
+            }
+
+            function loginwindow() {
+                document.getElementById("mainarea").style.opacity = "0";
+                setTimeout(function() {
+                    document.getElementById("mainarea").innerHTML = `
+                        <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                        <FORM CLASS="lg_container" ONSUBMIT="return false" METHOD="POST">
+                            <DIV CLASS="lg_headertext"><B>Login</B> to your account here to make the most out of the game!
+                                <%- currentuser %>
+                            </DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username</DIV>
+                            <INPUT CLASS="lg_input" NAME="username" TYPE="name" ID="login-username" PLACEHOLDER="Username...">
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password</DIV>
+                            <INPUT CLASS="lg_input" NAME="password" TYPE="password" ID="login-password" PLACEHOLDER="Password...">
+                            <DIV CLASS="lg_divider"></DIV>
+                            <INPUT CLASS="lg_submit jb_green" TYPE="Submit" VALUE="Login" ID="i-loginbtn" ONCLICK="login()">
+                        </FORM>
+                        <DIV CLASS="lg_register_text">Don't have an account?</DIV>
+                        <BUTTON CLASS="lg_register jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
+                        `
+                    document.getElementById("mainarea").style.opacity = "1";
+                }, 500);
+            }
+        </SCRIPT>
+
+        <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
+        <DIV CLASS="lg_content">
+            <DIV CLASS="lg_bg"></DIV>
+            <DIV ID="mainarea">
+                <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                <FORM CLASS="lg_container" ONSUBMIT="return false" METHOD="POST">
+                    <DIV CLASS="lg_headertext"><B>Login</B> to your account here to make the most out of the game!
+                        <%- currentuser %>
+                    </DIV>
+                    <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username <SPAN CLASS="lb_form_error" ID="error-login-username"></SPAN></DIV>
+                    <INPUT CLASS="lg_input" NAME="username" TYPE="name" ID="login-username" PLACEHOLDER="Username...">
+                    <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password <SPAN CLASS="lb_form_error" ID="error-login-password"></SPAN></DIV>
+                    <INPUT CLASS="lg_input" NAME="password" TYPE="password" ID="login-password" PLACEHOLDER="Password...">
+                    <DIV CLASS="lg_divider"></DIV>
+                    <INPUT CLASS="lg_submit jb_green" TYPE="Submit" VALUE="Login" ID="i-loginbtn" ONCLICK="login()">
+                </FORM>
+                <DIV CLASS="lg_register_text">Don't have an account?</DIV>
+                <BUTTON CLASS="lg_register jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
+            </DIV>
+        </DIV>
     </BODY>
 </HTML>

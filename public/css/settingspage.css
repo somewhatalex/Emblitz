@@ -1,0 +1,133 @@
+body {
+    background: #212121;
+}
+
+.s-main {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    margin-top: 50px;
+    color: var(--light);
+    background: var(--dark);
+    -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.8); 
+    box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.8);
+}
+
+.s-avatar-frame {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid red;
+    display: inline-block;
+    -webkit-box-shadow: 0px 0px 12px 4px #292929;
+    box-shadow: 0px 0px 12px 4px #292929;
+    overflow: hidden;
+    background: #de4343;
+}
+
+.s-avatar-img {
+    width: 150px;
+    height: 150px;
+}
+
+.s-user-profile {
+    display: inline-block;
+}
+
+.s-header {
+    font-weight: bold;
+    font-size: 35px;
+    padding-bottom: 20px;
+}
+
+.s-player-name {
+    font-size: 60px;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: 25px;
+    margin-right: 10px;
+    font-weight: bold;
+    text-shadow: 0px 0px 12px #0f0f0f;
+    margin-top: -90px;
+    float: left;
+}
+
+.s-divider {
+    border: 1px solid var(--light);
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.s-area-header {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.s-color-selectbar {
+    width: 100%;
+    overflow-x: auto;
+    margin-right: 50px;
+    border: 2px solid var(--light);
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+.s-cs-inner {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+}
+
+.s-cs-button {
+    display: inline-block;
+    border-radius: 50%;
+    padding: 3px;
+    margin: 7px;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+.s-cs-button:focus {
+    outline: none;
+}
+
+.cs-selected {
+    border: 3px solid var(--light)
+}
+
+.save-button {
+    min-width: 180px;
+    font-size: 20px;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 10px;
+    margin-top: 25px;
+}
+
+.u-back {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 696969;
+    padding: 5px;
+    font-size: 20px;
+    background: var(--light-darker);
+    border: 1px solid var(--medium);
+    padding-left: 10px;
+    padding-right: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.u-back:hover {
+    background: var(--light);
+    border-radius: 10px;
+}
