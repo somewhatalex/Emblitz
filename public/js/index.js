@@ -206,7 +206,7 @@ function loadPosts(refresh) {
 
             trtoappend += `<BUTTON CLASS="gn-loadmore jb_gray" ONCLICK="loadPosts()">Load more news</BUTTON>`;
             postarea.innerHTML += trtoappend;
-            p_startindex = p_startindex + 20;
+            p_startindex = p_startindex + 6;
         });
     });
 }
