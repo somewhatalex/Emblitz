@@ -2008,3 +2008,7 @@ input { /*override default styles*/
 .gn-reader-area a:visited, .news-content a:visited {
     color: var(--light);
 }
+
+.gn-reader-area a:visited:hover, .news-content a:visited:hover {
+    color: var(--medium);
+}
