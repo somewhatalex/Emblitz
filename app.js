@@ -43,7 +43,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.5 | 8/21/2022";
+const gameversion = "1.2.6 | 8/25/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};

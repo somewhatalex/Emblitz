@@ -14,6 +14,7 @@ const badges = {
         "image": "verifiedaccount.png"
     },
 
+    //win count badges
     "firstwin": {
         "name": "First Win",
         "level": "Bronze",
@@ -46,6 +47,78 @@ const badges = {
         "name": "50 Wins",
         "level": "Ruby",
         "description": "Win 50 Emblitz battles in public multiplayer rooms!",
+        "image": "50wins.png"
+    },
+
+    //troop count badges
+    "50troops_territory": {
+        "name": "Battle Call",
+        "level": "Bronze",
+        "description": "Amass 50 troops in a single territory.",
+        "image": "50wins.png"
+    },
+
+    "100troops_territory": {
+        "name": "Recruiter",
+        "level": "Silver",
+        "description": "Amass 100 troops in a single territory.",
+        "image": "50wins.png"
+    },
+
+    "500troops_territory": {
+        "name": "Bold Leader",
+        "level": "Gold",
+        "description": "Amass 500 troops in a single territory.",
+        "image": "50wins.png"
+    },
+
+    "1500troops_territory": {
+        "name": "Unstoppable Force",
+        "level": "Diamond",
+        "description": "Amass 1500 troops in a single territory.",
+        "image": "50wins.png"
+    },
+
+    "3000troops_territory": {
+        "name": "Legendary Army",
+        "level": "Ruby",
+        "description": "Amass 3000 troops in a single territory.",
+        "image": "50wins.png"
+    },
+
+    //total troop count badges
+    "200totaltroops": {
+        "name": "Village Chief",
+        "level": "Bronze",
+        "description": "Have a maximum of 200 troops in one game.",
+        "image": "50wins.png"
+    },
+
+    "500totaltroops": {
+        "name": "Town Mayor",
+        "level": "Silver",
+        "description": "Have an maximum of 500 troops in one game.",
+        "image": "50wins.png"
+    },
+
+    "1000totaltroops": {
+        "name": "Governor",
+        "level": "Gold",
+        "description": "Have an maximum of 1000 troops in one game.",
+        "image": "50wins.png"
+    },
+
+    "3000totaltroops": {
+        "name": "President",
+        "level": "Diamond",
+        "description": "Have an maximum of 3000 troops in one game.",
+        "image": "50wins.png"
+    },
+
+    "10000totaltroops": {
+        "name": "Empire Builder",
+        "level": "Ruby",
+        "description": "Have an maximum of 10000 troops in one game.",
         "image": "50wins.png"
     }
 }
