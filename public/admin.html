@@ -195,6 +195,21 @@
                     });
                 });
             }
+
+            function insertAtCaret(text) {
+                var txtarea = document.getElementById("content");
+                var scrollPos = txtarea.scrollTop;
+                var caretPos = txtarea.selectionStart;
+
+                var front = (txtarea.value).substring(0, caretPos);
+                var back = (txtarea.value).substring(txtarea.selectionEnd, txtarea.value.length);
+                txtarea.value = front + text + back;
+                caretPos = caretPos + text.length;
+                txtarea.selectionStart = caretPos;
+                txtarea.selectionEnd = caretPos;
+                txtarea.focus();
+                txtarea.scrollTop = scrollPos;
+            }
         </SCRIPT>
         <STYLE>
             .auth_main {
@@ -295,6 +310,7 @@
                     <INPUT MAXLENGTH="300" ID="title" STYLE="width: 400px" TYPE="text" PLACEHOLDER="Name of post..."><BR>
                     <INPUT MAXLENGTH="1000" ID="image" STYLE="width: 400px" TYPE="text" PLACEHOLDER="[DOES NOT WORK YET] Optional thumbnail image url here..."><BR>
                     <INPUT MAXLENGTH="1000" ID="date" STYLE="width: 400px" TYPE="date" PLACEHOLDER="Date here..."><BR>
+                    <BR><BUTTON ONCLICK="insertAtCaret(`<a href='[LINK ADDRESS]' target='_blank'>[LINK NAME]</a>`)">Add Link</BUTTON><BR>
                     <TEXTAREA MAXLENGTH="30000" ID="content" STYLE="width: 500px; height: 50vh" TYPE="text" PLACEHOLDER="Content here..."></TEXTAREA>
                     <BR><BUTTON ONCLICK="submitpost()">Submit Post</BUTTON>
                 </DIV>

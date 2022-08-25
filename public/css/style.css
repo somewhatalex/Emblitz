@@ -1995,3 +1995,16 @@ input { /*override default styles*/
 .po-description {
     font-size: 17px;
 }
+
+.gn-reader-area a, .news-content a {
+    color: var(--light);
+    text-decoration: underline;
+}
+
+.gn-reader-area a:hover, .news-content a:hover {
+    color: var(--medium);
+}
+
+.gn-reader-area a:visited, .news-content a:visited {
+    color: var(--light);
+}
