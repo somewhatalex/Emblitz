@@ -103,3 +103,25 @@ window.addEventListener("beforeunload", function (e) {
         return confirmationMessage;
     }
 });
+
+function promptLogout() {
+    document.getElementById("logout-confirm").style.display = "block";
+    setTimeout(function() {
+        document.getElementById("logout-confirm").style.opacity = 1;
+    }, 50);
+}
+
+window.onclick = function(event) {
+    if (event.target === document.getElementById("logout-confirm") || event.target === document.getElementById("lc-exit") || event.target === document.getElementById("cancellogout")) {
+        document.getElementById("logout-confirm").style.display = "none";
+    }
+}
+
+function logoutUser() {
+    document.getElementById("logout-confirm").style.display = "none";
+    notification("notify", "Logging out...", "Logging you out, please wait.", 100);
+
+    fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "logoutuser"})}).then(function() {
+        window.location.href = "../";
+    });
+}

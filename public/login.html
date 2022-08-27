@@ -94,9 +94,9 @@
                             <DIV CLASS="lg_headertext"><B>Login</B> to your account here to make the most out of the game!
                                 <%- currentuser %>
                             </DIV>
-                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username</DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username <SPAN CLASS="lb_form_error" ID="error-login-username"></SPAN></DIV>
                             <INPUT CLASS="lg_input" NAME="username" TYPE="name" ID="login-username" PLACEHOLDER="Username...">
-                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password</DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password <SPAN CLASS="lb_form_error" ID="error-login-password"></SPAN></DIV>
                             <INPUT CLASS="lg_input" NAME="password" TYPE="password" ID="login-password" PLACEHOLDER="Password...">
                             <DIV CLASS="lg_divider"></DIV>
                             <INPUT CLASS="lg_submit jb_green" TYPE="Submit" VALUE="Login" ID="i-loginbtn" ONCLICK="login()">

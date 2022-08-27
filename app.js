@@ -43,7 +43,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.6 | 8/25/2022";
+const gameversion = "1.2.7 | 8/27/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -741,6 +741,10 @@ app.post("/api", (req, res) => {
             });
         } else if(req.body.action === "badgedata") {
             res.json(badges);
+        } else if(req.body.action === "logoutuser") {
+            res.clearCookie("uuid");
+            res.clearCookie("publickey");
+            res.send("logged out");
         } else {
             res.json({"error": "invalid form body"});
             res.end();
