@@ -741,6 +741,10 @@ app.post("/api", (req, res) => {
             });
         } else if(req.body.action === "badgedata") {
             res.json(badges);
+        } else if(req.body.action === "logoutuser") {
+            res.clearCookie("uuid");
+            res.clearCookie("publickey");
+            res.send("logged out");
         } else {
             res.json({"error": "invalid form body"});
             res.end();

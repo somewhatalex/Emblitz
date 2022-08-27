@@ -43,7 +43,10 @@
                 </DIV>
                 <DIV CLASS="s-player-name" ID="player-name"><%= playername %></DIV>
             </DIV>
-            <DIV CLASS="s-divider"></DIV>
+            <DIV CLASS="s-divider" STYLE="margin-bottom: 15px;"></DIV>
+                <BUTTON CLASS="s-option-top jb_gray" ONCLICK="window.location.href='./user/<%= playername %>'"><I CLASS="fa fa-user"></I> My Profile</BUTTON>
+                <BUTTON CLASS="s-option-top s-warning" ONCLICK="promptLogout()"><I CLASS="fa fa-sign-out"></I> Log Out</BUTTON>
+            <DIV CLASS="s-divider" STYLE="margin-top: 15px;"></DIV>
             <DIV CLASS="s-colorselect">
                 <DIV CLASS="s-area-header">Player color:</DIV>
                 <DIV CLASS="s-color-selectbar">
@@ -55,10 +58,24 @@
                     <BUTTON TITLE="purple" ID="purple-colorselect" onclick="setColor('purple', this)" CLASS="s-cs-button"><DIV CLASS="s-cs-inner" STYLE="border: 5px solid purple; background: #b240b8"></DIV></BUTTON>
                 </DIV>
             </DIV>
+
+            <DIV CLASS="s-more-tt">More settings and profile customization options coming soon!</DIV>
             <BUTTON CLASS="save-button jb_green" ID="save-button" onclick="submitUserSettings()">Save Changes</BUTTON>
 
             <DIV ID="notifications">
                 <!-- notifications display here -->
+            </DIV>
+
+            <DIV ID="logout-confirm">
+                <DIV ID="lc-content">
+                    <DIV CLASS="lc-top"><I ID="lc-exit" CLASS="fa fa-times"></I></DIV>
+                    <DIV CLASS="lc-middle">Are you sure you want to log out?</DIV>
+                    <DIV CLASS="s-divider" STYLE="border: 1px solid var(--night); margin-top: 15px; margin-bottom: 15px;"></DIV>
+                    <DIV CLASS="lc-bottom">
+                        <BUTTON CLASS="s-option-top jb_green" ID="cancellogout">No, cancel</BUTTON>
+                        <BUTTON CLASS="s-option-top s-warning" ONCLICK="logoutUser()">Yes, logout</BUTTON>
+                    </DIV>
+                </DIV>
             </DIV>
         </DIV>
     </BODY>
