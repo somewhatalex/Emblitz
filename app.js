@@ -932,8 +932,9 @@ gameevents.on("playerWon", function(result) {
     sendRoomMsg(result[0], {"playerWon": result[1]});
 });
 
-gameevents.on("medalchange", function(result) {
-    sendRoomMsg(result[0], {"playermedalchange": result[1], "amount": result[2]});
+gameevents.on("pstatschange", function(result) {
+    sendRoomMsg(result[0], {"playermedalchange": result[1], "amount": result[2][0]});
+    sendRoomMsg(result[0], {"playerxpchange": result[1], "amount": result[2][1]});
 });
 
 //passively send messages to all users in room w/o request
