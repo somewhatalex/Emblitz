@@ -254,7 +254,7 @@ function game() {
                     if(!games.get(roomid).isprivate) {
                         auth.editPlayerGameStats(totalplayersinroom.length+1, games.get(roomid).totalplayers, idToPubkey(roomid, targetedplayer)).then(function(result) {
                             games.get(roomid).playerstate.find(item => item.id === targetedplayer).isaccounted = true;
-                            self.emit("medalchange", [roomid, targetedplayer, result]);
+                            self.emit("pstatschange", [roomid, targetedplayer, result]);
                         });
                     }
                     self.emit("playerdead", [roomid, targetedplayer, totalplayersinroom.length+1]);
@@ -281,7 +281,7 @@ function game() {
             if(!games.get(roomid).isprivate) {
                 auth.editPlayerGameStats(1, games.get(roomid).totalplayers, idToPubkey(roomid, totalplayersinroom[0])).then(function(result) {
                     games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
-                    self.emit("medalchange", [roomid, totalplayersinroom[0], result]);
+                    self.emit("pstatschange", [roomid, totalplayersinroom[0], result]);
                 });
             }
             self.emit("playerWon", [roomid, totalplayersinroom[0]]);

@@ -1125,6 +1125,13 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         }
                         document.getElementById("e-medals").innerText = `${medalSign}${response.amount} medal${medalPlurality}`;
                     }
+                } else if(response.playerxpchange && response.playerxpchange === uid) {
+                    if(response.amount === "none") {
+                        //document.getElementById("e-medal-change").style.display = "none";
+                    } else {
+                        //document.getElementById("e-medal-change").style.display = "block";
+                        console.log(response.amount);
+                    }
                 }
             }
         });

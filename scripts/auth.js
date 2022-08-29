@@ -279,29 +279,31 @@ function editPlayerGameStats(place, totalplayers, pubkey) {
         }
 
         //the medal change calculation algorithm
-        let medalchange = ((totalplayers-1)/2 - (place-1)) * (totalplayers+1) * 2
+        let medalchange = ((totalplayers-1)/2 - (place-1)) * (totalplayers+1) * 2;
         if(medalchange < 0) {
             medalchange = Math.round(medalchange*0.7);
         }
 
+        let xpGain = (totalplayers-place+1) * (totalplayers+1) * 2;
+
 
         if(place == 1) {
-            app.db.query(`UPDATE users SET wins=wins+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
+            app.db.query(`UPDATE users SET wins=wins+1, medals=medals+$1, xp=xp+$3 WHERE publickey=$2`, [medalchange, pubkey, xpGain]).then(function() {
                 app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
                     if(result.rows.length == 0) {
-                        resolve("none");
+                        resolve(["none", "none"]);
                     }
                     checkForWinBadge(result.rows[0].wins, pubkey);
-                    resolve(medalchange);
+                    resolve([medalchange, xpGain]);
                 });
             });
         } else {
-            app.db.query(`UPDATE users SET losses=losses+1, medals=medals+$1 WHERE publickey=$2`, [medalchange, pubkey]).then(function() {
+            app.db.query(`UPDATE users SET losses=losses+1, medals=medals+$1, xp=xp+$3 WHERE publickey=$2`, [medalchange, pubkey, xpGain]).then(function() {
                 app.db.query(`SELECT medals, wins, losses, publickey FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
                     if(result.rows.length == 0) {
-                        resolve("none");
+                        resolve(["none", "none"]);
                     }
-                    resolve(medalchange)
+                    resolve([medalchange, xpGain])
                 });
             });
         }

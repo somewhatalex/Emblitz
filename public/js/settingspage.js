@@ -114,10 +114,12 @@ function promptLogout() {
 window.onclick = function(event) {
     if (event.target === document.getElementById("logout-confirm") || event.target === document.getElementById("lc-exit") || event.target === document.getElementById("cancellogout")) {
         document.getElementById("logout-confirm").style.display = "none";
+        document.getElementById("logout-confirm").style.opacity = 0;
     }
 }
 
 function logoutUser() {
+    document.getElementById("logout-confirm").style.opacity = 0;
     document.getElementById("logout-confirm").style.display = "none";
     notification("notify", "Logging out...", "Logging you out, please wait.", 100);
 
