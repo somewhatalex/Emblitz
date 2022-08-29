@@ -1,13 +1,13 @@
-function getXpLevel(xp) {
-    return Math.floor(2*Math.sqrt(xp));
+function getLevelFromXp(xp) {
+    return Math.floor(-1 + Math.sqrt(xp+4));
 }
 
-function getXpFromLevel(level){ //Inverse
-    return Math.round((level*level)/4);
+function getXpFromLevel(level){
+    return Math.round(Math.pow(level, 2) + (2*level) - 3);
 }
 
-function xpUntilNextLevel(xp, level) {
-    return getXpFromLevel(level+1)-xp+1;
+function xpToNextLevel(level) {
+    return Math.round(getXpFromLevel(level+1)-getXpFromLevel(level))
 }
 
 function getRemainderXP(xp, level){
