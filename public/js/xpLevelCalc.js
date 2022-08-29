@@ -1,17 +1,15 @@
 function getXpLevel(xp) {
-    return Math.floor(/*xpToLevelEquation(xp)*/);
+    return Math.floor(2*Math.sqrt(xp));
 }
 
 function getXpFromLevel(level){ //Inverse
-    return Math.round(Math.pow(2, (level*.1))*level);
+    return Math.round((level*level)/4);
 }
 
 function xpUntilNextLevel(xp, level) {
-    return Math.ceil(/*xpToLevelEquation(xp)*/)
+    return getXpFromLevel(level+1)-xp+1;
 }
 
 function getRemainderXP(xp, level){
-
+    return xp-getXpFromLevel(level);
 }
-
-//I AM DIENG OF SLEEP DEPRIVATION PLZ HELP ME
