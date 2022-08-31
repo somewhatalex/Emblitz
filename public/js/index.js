@@ -63,6 +63,7 @@ window.onload = function() {
 
     getUserInfo();
     inithomepage();
+    detectAdBlock();
 }
 
 function inithomepage() {
@@ -747,6 +748,18 @@ function notification(type, title, content, persisttime) {
             currenttoast.remove();
         }, 300)
     }, persisttime*1000);
+}
+
+// Adblocker notification
+function detectAdBlock(){
+    let x = document.querySelector(".adsbygoogle");
+    let x_height = x.offsetHeight;
+     
+   if(x_height){
+   } else{
+    notification("notify","Adblocker","It seems that you're using an addblocker! If you don't mind, all of our profits go to a non-profit charity and disabling your adblocker would really help us. Thank you"
+    , 15);
+}
 }
 
 function getCookie(name) {
