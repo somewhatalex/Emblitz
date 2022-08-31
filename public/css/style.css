@@ -2012,3 +2012,102 @@ input { /*override default styles*/
 .gn-reader-area a:visited:hover, .news-content a:visited:hover {
     color: var(--medium);
 }
+
+/*adblock popup styling*/
+.adblock-divider {
+    border: 1px solid var(--light);
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+#adblock-content a {
+    color: var(--night);
+    text-decoration: underline;
+    transition: 0.3s;
+}
+
+#adblock-content a:hover {
+    color: #0f4ec4;
+}
+
+#adblock-content a:visited {
+    color: var(--night);
+}
+
+#adblock-content a:visited:hover {
+    color: #0f4ec4;
+}
+
+#adblock-confirm {
+    display: none;
+    position: fixed;
+    z-index: 2999998;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: 1s;
+}
+
+#adblock-content {
+    background-color: var(--medium);
+    margin: auto;
+    margin-top: calc(15% + 40px);
+    padding: 20px;
+    max-width: 800px;
+    width: 90%;
+    color: var(--dark);
+    font-size: 18px;
+}
+
+.adblock-warning {
+    background: none;
+    color: var(--light);
+    margin-left: 30px;
+}
+
+.adblock-warning:hover {
+    color: var(--dark);
+}
+
+@media (max-width: 424px) {
+    .adblock-warning {
+        margin-left: 0px !important;
+        margin-top: 10px;
+        display: block;
+    }
+}
+
+.adblock-top {
+    font-size: 24px;
+    float: right;
+}
+
+.adblock-middle {
+    margin-top: 26px;
+}
+
+.adblock-option-top {
+    min-width: 180px;
+    font-size: 20px;
+    padding: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 10px;
+}
+
+.adblock-option-nothanks {
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    border-radius: 10px;
+}
+
+/*--end adblock popup stying--*/
