@@ -63,9 +63,6 @@ window.onload = function() {
 
     getUserInfo();
     inithomepage();
-    if(!localStorage.getItem("adblockoptout")) {
-        detectAdBlock();
-    }
 }
 
 function inithomepage() {
@@ -754,17 +751,22 @@ function notification(type, title, content, persisttime) {
 
 // Adblocker notification
 function detectAdBlock() {
-    let x = document.querySelector(".adsbygoogle");
-    let x_height = x.offsetHeight;
-     
-    if(!x_height) {
-        console.log("Adblocker detected.");
+    console.log("[ERROR] Google ads script failed to load");
+    if(!localStorage.getItem("adblockoptout")) {
+        let x = document.querySelector(".adsbygoogle");
+        let x_height = x.offsetHeight;
+        
+        if(!x_height) {
+            console.log("Adblocker detected.");
 
-        //add the popup script here
-        document.getElementById("adblock-confirm").style.display = "block";
-        setTimeout(function() {
-            document.getElementById("adblock-confirm").style.opacity = "1";
-        }, 50);
+            //add the popup script here
+            document.getElementById("adblock-confirm").style.display = "block";
+            setTimeout(function() {
+                document.getElementById("adblock-confirm").style.opacity = "1";
+            }, 50);
+        }
+    } else {
+        console.log("> The adblock popup is hidden because the user opted out");
     }
 }
 
