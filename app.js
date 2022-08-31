@@ -43,7 +43,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.7 | 8/27/2022";
+const gameversion = "1.2.8 | 8/30/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -607,7 +607,8 @@ app.post("/authapi", (req, res) => {
                     "timecreated": userdata.timecreated,
                     "playercolor": userdata.playercolor,
                     "playersettings": userdata.playersettings,
-                    "metadata": userdata.metadata
+                    "metadata": userdata.metadata,
+                    "xp": userdata.xp
                 });
             }).catch(function(error) {
                 res.json({"error": error});

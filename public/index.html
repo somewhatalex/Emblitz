@@ -48,6 +48,19 @@
         <DIV ID="notifications">
             <!-- notifications display here -->
         </DIV>
+
+        <DIV ID="adblock-confirm">
+            <DIV ID="adblock-content">
+                <DIV CLASS="ablock-top"></DIV>
+                <DIV CLASS="adblock-middle"><B>Looks like you're using an adblocker!</B> We're donating <B>ALL</B> our revenue to <A HREF="http://bicyclesforall.net" TARGET="_blank">Bicycles For All</A>, so disabling your adblocker will help us support a local nonprofit. For more info, please visit their social media page by clicking on the link. Thanks for your help!</DIV>
+                <DIV CLASS="adblock-divider" STYLE="border: 1px solid var(--night); margin-top: 15px; margin-bottom: 15px;"></DIV>
+                <DIV CLASS="adblock-buttons">
+                    <BUTTON CLASS="adblock-option-top jb_green" ID="adblockok" ONCLICK="hideAdblockPopup(true)">I'll disable it</BUTTON>
+                    <BUTTON CLASS="adblock-option-nothanks adblock-warning" ONCLICK="hideAdblockPopup(false)">No thanks</BUTTON>
+                </DIV>
+            </DIV>
+        </DIV>
+
         <DIV CLASS="lobbyscreen" ID="lobbyscreen">
             <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
             <DIV CLASS="tutorial-tooltip" ID="t-tooltip">Hello! Would you like a quick tutorial of the game? You can also access it through the "game tutorial" button on this page.<A HREF="./tutorial" ONCLICK="hidetutorialtt()" STYLE="font-size: 20px" TARGET="_blank" CLASS="tooltip-link">Sure!</A><BUTTON ONCLICK="hidetutorialtt();" CLASS="tooltip-link-second">No thanks</BUTTON></DIV>

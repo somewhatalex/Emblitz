@@ -63,6 +63,9 @@ window.onload = function() {
 
     getUserInfo();
     inithomepage();
+    if(!localStorage.getItem("adblockoptout")) {
+        detectAdBlock();
+    }
 }
 
 function inithomepage() {
@@ -747,6 +750,34 @@ function notification(type, title, content, persisttime) {
             currenttoast.remove();
         }, 300)
     }, persisttime*1000);
+}
+
+// Adblocker notification
+function detectAdBlock() {
+    let x = document.querySelector(".adsbygoogle");
+    let x_height = x.offsetHeight;
+     
+    if(!x_height) {
+        console.log("Adblocker detected.");
+
+        //add the popup script here
+        document.getElementById("adblock-confirm").style.display = "block";
+        setTimeout(function() {
+            document.getElementById("adblock-confirm").style.opacity = "1";
+        }, 50);
+    }
+}
+
+function hideAdblockPopup(disabled) {
+    //disabled (false) = "clicked on 'I'll disable it'"
+    if(disabled == false) {
+        localStorage.setItem("adblockoptout", true);
+    }
+
+    document.getElementById("adblock-confirm").style.opacity = "0";
+    setTimeout(function() {
+        document.getElementById("adblock-confirm").style.display = "none";
+    }, 500);
 }
 
 function getCookie(name) {

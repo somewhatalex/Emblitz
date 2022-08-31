@@ -21,7 +21,6 @@ function epochToDate(epochtime) {
 function loadProfile(info) {
     document.getElementById("wins-amount").innerText = info.medals;
     document.getElementById("gamesplayed-amount").innerText = Number(info.wins) + Number(info.losses);
-
     document.getElementById("join-date").innerText = epochToDate(info.timecreated);
 
     document.getElementById("up-wins").innerText = info.wins;
