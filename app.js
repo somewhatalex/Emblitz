@@ -607,7 +607,8 @@ app.post("/authapi", (req, res) => {
                     "timecreated": userdata.timecreated,
                     "playercolor": userdata.playercolor,
                     "playersettings": userdata.playersettings,
-                    "metadata": userdata.metadata
+                    "metadata": userdata.metadata,
+                    "xp": userdata.xp
                 });
             }).catch(function(error) {
                 res.json({"error": error});
