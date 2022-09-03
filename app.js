@@ -25,7 +25,6 @@ const nocache = require("nocache");
 const badwords = require("bad-words");
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
-
 Update 7/27/22: passport.js creates a lot of hosting compatibility issues
 and requires a separate db so I'll have to ignore this advice just for this
 one time.

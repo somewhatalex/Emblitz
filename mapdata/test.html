@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test</title>
+        <script>
+            function getMapMoves(map) {
+  return new Promise((resolve, reject) => {
+    fs.readFile("./mapdata/" + roommap + "/moves.json", "utf8", function(err, moves) {
+      if(err) reject(err);
+      JSON.parse(moves).then(function(data) {
+        resolve(data);
+      }
+    });
+  });
+}
+        </script>
+    </head>
+    <body>
+
+    </body>
+</html>
