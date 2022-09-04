@@ -105,6 +105,8 @@ function resetAll() {
     uid = "";
     pnames = [];
 
+    var lobbycountdown = 20;
+
     mapdict = "";
     mapmoves = "";
     possibleMoves = [];
@@ -114,7 +116,7 @@ function resetAll() {
     myColor = "";
     playerColors = {};
 
-    websocket = null;
+    websocket, lobbytimeinterval = null;
 
     attackPhase = "";
     selectedRegion = "";
@@ -792,7 +794,6 @@ const gid = getCookie("GID");
 var lobbytimeinterval = null;
 var lobbycountdown = 20;
 function tickLobbyTimer() {
-    lobbycountdown = 20;
     document.getElementById("timeramount").innerText = lobbycountdown;
     lobbytimeinterval = setInterval(function() {
         if(document.getElementsByClassName("glb_player").length > 1 && lobbycountdown > 0) {

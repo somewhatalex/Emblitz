@@ -30,6 +30,7 @@ function game() {
     }
 
     this.getMapState = function(roomid) {
+        if(!games.get(roomid)) return "no room";
         return games.get(roomid).mapstate;
     }
 

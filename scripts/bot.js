@@ -5,6 +5,8 @@ const emitter = require("events").EventEmitter;
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
+gameevents.setMaxListeners(0);
+
 var botids = [];
 var botgids = [];
 
@@ -105,6 +107,7 @@ class emblitzBot {
     let parent = this;
     this.attacktimer = setInterval(function() {
       let mapdata = game.getMapState(parent.roomid);
+      if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
       //wyatt write your attack ai here
 
@@ -115,6 +118,7 @@ class emblitzBot {
     let parent = this;
     this.deploytimer = setInterval(function() {
       let mapdata = game.getMapState(parent.roomid);
+      if(mapdata === "no room") clearTimeout(parent.deploytimer);
       
       //wyatt write your deploy ai here
 

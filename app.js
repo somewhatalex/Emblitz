@@ -855,7 +855,7 @@ function initializeBot(roomid) {
                             });
                         }
                     });
-                }, randomnumber(1500 + (x*3000), 3000 + (x*4000)));
+                }, randomnumber(1500 + (x*3000), 3000 + (x*5500)));
             }
             break;
         }
@@ -937,6 +937,7 @@ function joinroom(map, createroom) {
         rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": [], "bots": 0});
         game.newGame(id, roommap, deploytime, isprivate).then(function(result) {
             //console.log(result);
+            initializeBot(id);
         });
         return id;
     }
@@ -1199,7 +1200,7 @@ wss.on("connection", (ws) => {
         for (var i=0; i < rooms.length; i++) {
             if (rooms[i].id === removeclient.room) {
                 rooms[i]["players"]--;
-                if(rooms[i]["players"] - rooms[i]["bots"] < 2) {
+                if(rooms[i]["players"] < 2) {
                     if(game.queryGameStatus(rooms[i]["id"]) === "lobby") {
                         game.pauseLobbyTimer(rooms[i]["id"]);
                     }
