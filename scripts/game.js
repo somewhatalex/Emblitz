@@ -29,6 +29,10 @@ function game() {
         return games.get(roomid).phase;
     }
 
+    this.getMapState = function(roomid) {
+        return games.get(roomid).mapstate;
+    }
+
     //lobby timer controls
     this.pauseLobbyTimer = function(roomid) {
         gameLobbyTimerHandlers[roomid].pause(gameLobbyTimers[roomid]);

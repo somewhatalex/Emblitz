@@ -1,75 +1,129 @@
 const fs = require("fs");
-let movesArray //Pls make this a 2 dimensional array which each element contains a string for the starting territory and which one it can move to
-//for example ["ae bc", "bc de", "de ab"] would become
-/*
-["ae", "bc" //Element 1 //Each element is an array of 2 strings
-"bc", "de" //Element 2
-"de", "ab" //Element 3
-]
-*/
+const gamehandler = require("./game.js");
+const emitter = require("events").EventEmitter;
 
-let ownedTerritories; //Territories owned by the bot
+const game = new gamehandler();
+const gameevents = gamehandler.gameevents;
 
-function rallyTroops(){
-  
+var botids = [];
+var botgids = [];
+
+//user ids start with u-, bots start with u-b-
+//keep these separate
+
+function botid() {
+  let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
+  let id = "u-b-";
+  for(let i=0; i<20; i++) {
+      id += chars.charAt(randomnumber(0, chars.length-1));
+  }
+  while(botids.includes(id)) {
+      let id = "u-b-"
+      for(let i=0; i<20; i++) {
+          id += chars.charAt(randomnumber(0, chars.length-1));
+      }
+  }
+  botids.push(id);
+  return id;
 }
 
-let counter = 0;
-
-//Finds the best path from one territory to another
-function pathFindToTerritory(moves, startTerritory, targetTerritory){
-  let path;
-  path[0]=start;
-  let possibleSolutions;
-  let workingVariable;
-  let shortestPath;
-  let shortestPathLength = Infinity;
-  while(counter < moves.length){
-    for(i=0;i<path.length;i++){
-      for(x=0;x<moves.length;x++){
-        if(moves[x][0] == path[i][(path[i].length - 1)]){
-          workingVariable = path[i];
-          pathList.push(moves[x][1]);
-        }if(moves[x][1] == target){
-          possibleSolutions.push(workingVariable);
-        }
+function botgid() {
+  let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
+  let id = "b-";
+  for(let i=0; i<40; i++) {
+      id += chars.charAt(randomnumber(0, chars.length-1));
+  }
+  while(botgids.includes(id)) {
+      let id = "b-"
+      for(let i=0; i<40; i++) {
+          id += chars.charAt(randomnumber(0, chars.length-1));
       }
-    }
-    counter++;
   }
-  for(y=0;y<possibleSolutions.length;y++){
-    workingVariable = 0;
-    for(z=0;z<possibleSolutions[y].length;y++){
-      workingVariable += possibleSolutions[y][z].troopCount;
-    }
-    if(workingVariable<shortestPathLength){
-      shortestPathLength = workingVariable;
-      shortestPath = possibleSolutions[y];
-    }
-  }
-  return shortestPath
+  botgids.push(id);
+  return id;
 }
 
-//Finds a path to the territory which it is attacking
-/*function pathFindToTerritory(moves, startTerritory, targetTerritory){
-  while(smallestPath < shortestPath.length){
-    let pathList;//Array for path lists being created
-    pathList[0] = start;
-    let completedPathList;//Array of paths which make it to the target
-    let workingVariable;//variable currently being operated on
-    for(i=0;i<pathList.length;i++){//Goes through all items in the path list
-      for(x=0;x<moves.length;x++){//adds a new path if it is possible to go there
-        if(moves[x][0] == path[i][(path[i].length - 1)]){
-          workingVariable = path[i];
-          pathList.push(moves[x][1]);
-        }{
-          if(moves[x][1] == target){
-            completedPathList.push(workingVariable);
-            for()
-          }
-        }
-      }
-    }
-    counter++;
+function randomnumber(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+class emblitzBot {
+  constructor(roomid, botname, color, moves) {
+    this.roomid = roomid;
+    this.botname = botname;
+    this.color = color;
+    this.moves = moves;
+    this.id = botid();
+    this.gid = botgid();
+    this.deploytimer = null;
+    this.attacktimer = null;
   }
-}*/
+
+  /*
+  -- valid bot actions in-game --
+  game.deployTroops(roomid, playerid, location);
+  game.attackTerritory(roomid, playerid, start, target, trooppercent);
+  game.getMapState(roomid);
+
+  > game.getMapState gets the current map state (can be called anytime)
+  > game.attackTerritory takes care of moving troops as well between territories
+  */
+
+  moveToTerritory(territory) {
+    console.log(territory); //placeholder for now
+    console.log(this.roomid + this.botname + this.color);
+  }
+
+  joinGame() {
+    let parent = this; //the promise seems to override "this"
+    return new Promise(function(resolve) {
+      game.addPlayer(parent.roomid, parent.id, parent.gid).then(function() {
+        resolve([parent.id, parent.botname, parent.color]);
+      });
+    });
+  }
+
+  initiateController() {
+    let parent = this;
+    gameevents.on("startDeployPhase", function(result) {
+      if(result[0] === parent.roomid) {
+        parent.initiateDeployAI();
+      }
+    });
+    
+    gameevents.on("startAttackPhase", function(result) {
+      if(result[0] === parent.roomid) {
+        parent.endDeployAI();
+        parent.initiateAttackAI();
+      }
+    });
+  }
+
+  initiateAttackAI() {
+    let parent = this;
+    this.attacktimer = setInterval(function() {
+      let mapdata = game.getMapState(parent.roomid);
+      
+      //wyatt write your attack ai here
+
+    }, randomnumber(900, 1100));
+  }
+
+  initiateDeployAI() {
+    let parent = this;
+    this.deploytimer = setInterval(function() {
+      let mapdata = game.getMapState(parent.roomid);
+      
+      //wyatt write your deploy ai here
+
+    }, randomnumber(900, 1100));
+  }
+
+  endDeployAI() {
+    clearInterval(this.deploytimer);
+  }
+}
+
+module.exports = emblitzBot;

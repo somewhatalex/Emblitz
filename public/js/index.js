@@ -885,7 +885,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                                     document.getElementById("lobbyptable").innerHTML += `
                                     <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
                                         <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"> ${response.users[i].name}</DIV></DIV>
                                     </DIV>`;
                                 } else {
                                     document.getElementById("lobbyptable").innerHTML += `
