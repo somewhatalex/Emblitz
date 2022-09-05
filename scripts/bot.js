@@ -105,16 +105,20 @@ class emblitzBot {
 
   initiateAttackAI() {
     let parent = this;
-    let workingVariable;
-    let moveslength = parent.moves.length;
-    let newmovesarr = []
+
+    //parse moves array into 2d arr format
+    console.log(this.moves)
+    let moveslength = this.moves.length;
+    let newmovesarr = [];
     for(let i=0; i < moveslength; i++) {
-      workingVariable = parent.moves[i].split(" ");
-      console.log(workingVariable);
+      newmovesarr.push(this.moves[i].split(" "));
     }
+
+    console.log(newmovesarr);
+
     this.attacktimer = setInterval(function() {
     let mapdata = game.getMapState(parent.roomid);
-    if(mapdata === "no room") clearTimeout(parent.attacktimer);
+      if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
       //wyatt write your attack ai here
       /*Object.keys(mapdata).forEach((key) => {

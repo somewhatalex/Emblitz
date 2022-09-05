@@ -834,7 +834,7 @@ function initializeBot(roomid) {
                             }
 
                             //now create a bot instance
-                            let newbot = new emblitzBot(roomid, "Player " + randomnumber(1, 999), pcolor, moves);
+                            let newbot = new emblitzBot(roomid, "Player " + randomnumber(1, 999), pcolor, JSON.parse(moves));
                             newbot.joinGame().then(function(result) {
                                 rooms[i]["playerslist"].push({"id": result[0], "name": result[1], "pcolor": result[2]});
                                 sendRoomMsg(rooms[i].id, {"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"], "isprivateroom": rooms[i]["isprivate"]});
