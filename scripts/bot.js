@@ -105,12 +105,21 @@ class emblitzBot {
 
   initiateAttackAI() {
     let parent = this;
+    let workingVariable;
+    let moveslength = parent.moves.length;
+    let newmovesarr = []
+    for(let i=0; i < moveslength; i++) {
+      workingVariable = parent.moves[i].split(" ");
+      console.log(workingVariable);
+    }
     this.attacktimer = setInterval(function() {
-      let mapdata = game.getMapState(parent.roomid);
-      if(mapdata === "no room") clearTimeout(parent.attacktimer);
+    let mapdata = game.getMapState(parent.roomid);
+    if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
       //wyatt write your attack ai here
-
+      /*Object.keys(mapdata).forEach((key) => {
+        console.log(mapdata[key].troopcount);
+      });*/
     }, randomnumber(900, 1100));
   }
 
@@ -121,7 +130,6 @@ class emblitzBot {
       if(mapdata === "no room") clearTimeout(parent.deploytimer);
       
       //wyatt write your deploy ai here
-
     }, randomnumber(900, 1100));
   }
 
