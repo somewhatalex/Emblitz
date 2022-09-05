@@ -107,7 +107,6 @@ class emblitzBot {
     let parent = this;
 
     //parse moves array into 2d arr format
-    console.log(this.moves)
     let moveslength = this.moves.length;
     let newmovesarr = [];
     for(let i=0; i < moveslength; i++) {
