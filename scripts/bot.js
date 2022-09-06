@@ -114,8 +114,6 @@ class emblitzBot {
       newmovesarr.push(this.moves[i].split(" "));
     }
 
-    console.log(newmovesarr);
-
     this.attacktimer = setInterval(function() {
       let ownedTerritories = [];
       let borderTerritory = [];
