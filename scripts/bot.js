@@ -105,10 +105,13 @@ class emblitzBot {
 
   initiateAttackAI() {
     let parent = this;
+    let territoriesOwned = [];
 
     //parse moves array into 2d arr format
     let moveslength = this.moves.length;
     let newmovesarr = [];
+    let ownedTerritories = [];
+    let borderTerritory = [];
     for(let i=0; i < moveslength; i++) {
       newmovesarr.push(this.moves[i].split(" "));
     }
@@ -117,12 +120,26 @@ class emblitzBot {
 
     this.attacktimer = setInterval(function() {
     let mapdata = game.getMapState(parent.roomid);
+    let workingVariable;
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
       //wyatt write your attack ai here
-      /*Object.keys(mapdata).forEach((key) => {
-        console.log(mapdata[key].troopcount);
-      });*/
+      Object.keys(mapdata).forEach((key) => {
+        if(mapdata[key].player == parent.id){
+          workingVariable = mapdata[key].territory;
+          for(let i=0;i<moveslength;i++){//Put territories in to catagories, ownedTerritories if this bot owns them, and border territories if they border a forign territory
+            if(mapdata[moves[i][1]].player == parent.id){
+              ownedTerritory.push(mapdata[moves[i][0]]);
+            }
+            if(moves[i][0] = workingVariable && mapdata[moves[i][1]].player == parent.id){
+              borderTerritory.push(mapdata[moves[i][0]]);
+            }else if(moves[i][0] = workingVariable && mapdata[moves[i][0]].player == parent.id){
+              borderTerritory.push(mapdata[moves[i][1]]);
+            }
+          }
+          //
+        }
+      });
     }, randomnumber(900, 1100));
   }
 
