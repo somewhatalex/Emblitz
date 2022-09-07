@@ -1,46 +1,30 @@
 let roomid = "";
 let uid = "";
 let pnames = [];
-
 var mapdict = "";
 var mapmoves = "";
 var possibleMoves = [];
-
 var inGame = false;
-
 var myColor = "";
 var playerColors = {};
-
 var websocket = null;
-
 var attackPhase = "";
 var selectedRegion = "";
-
 var coordadjusts = null;
 var mapboundsX = null;
 var mapboundsY = null;
-
 var totalterritories = 1;
-
 var lifetimepeaktroops = 0;
 var lifetimepeakterritories = 0;
-
 var mapname = "";
-
 var sharedetails = "";
-
 var setEventListeners = false; //do not reset this
-
 var alltimeouts = [];
-
 var mapselectindex = 0;
 var mapselectedvalue = "random";
-
 var showlb = false; //mobile only
-
 var previoustouch;
 var previousmobilezoom;
-
 var p_startindex = 0;
 
 //mobile detection
@@ -105,7 +89,7 @@ function resetAll() {
     uid = "";
     pnames = [];
 
-    var lobbycountdown = 20;
+    lobbycountdown = 20;
 
     mapdict = "";
     mapmoves = "";
@@ -116,6 +100,7 @@ function resetAll() {
     myColor = "";
     playerColors = {};
 
+    clearInterval(lobbytimeinterval);
     websocket, lobbytimeinterval = null;
 
     attackPhase = "";

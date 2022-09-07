@@ -828,7 +828,7 @@ input { /*override default styles*/
     width: 100%;
     text-align: center;
     z-index: 1000000;
-    padding-bottom: 40px;
+    padding-bottom: 70px;
 }
 
 .homemenu {
@@ -847,7 +847,7 @@ input { /*override default styles*/
 .homemenu-bg {
     position: absolute;
     top: 0;
-    height: calc(100% - 60px);
+    height: calc(100% - 90px);
     opacity: 0.9;
     width: 490px;
     background: var(--night);

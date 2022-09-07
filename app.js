@@ -43,7 +43,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.8 | 8/30/2022";
+const gameversion = "1.3.0 | 9/7/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -813,6 +813,13 @@ function initializeBot(roomid) {
                             rooms[i]["players"]++;
                             rooms[i]["bots"]++;
                             rooms[i]["playersready"]++; //bots are always ready
+
+                            //same thing to start the lobby timer back up
+                            if(rooms[i]["players"] > 1) {
+                                if(game.queryGameStatus(rooms[i]["id"]) === "lobby") {
+                                    game.resumeLobbyTimer(rooms[i]["id"]);
+                                }
+                            }
 
                             //color assignment -- same algorithm as player color assignment
                             //default color = red

@@ -64,6 +64,7 @@ function game() {
     
         this.resume = function(id, roomid) {
             start = Math.floor(new Date().getTime());
+            console.log(delay);
             self.emit("updateLobbyTimer", [roomid, delay]);
             gameLobbyTimers[id] = setTimeout(function() {
                 callback.apply(selftimer, Array.prototype.slice.call(args, 3, args.length));

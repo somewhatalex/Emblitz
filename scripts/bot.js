@@ -127,7 +127,7 @@ class emblitzBot {
           workingVariable = mapdata[key].territory;
           for(let i=0;i<moveslength;i++){//Put territories in to catagories, ownedTerritories if this bot owns them, and border territories if they border a forign territory
             if(mapdata[moves[i][1]].player == parent.id){
-              ownedTerritory.push(mapdata[moves[i][0]]);
+              ownedTerritories.push(mapdata[moves[i][0]]);
             }
             if(moves[i][0] = workingVariable && mapdata[moves[i][1]].player == parent.id){
               borderTerritory.push(mapdata[moves[i][0]]);
@@ -143,12 +143,60 @@ class emblitzBot {
 
   initiateDeployAI() {
     let parent = this;
+    let deployiterations = 0;
+    let iterationsneeded = randomnumber(1, 5); //iterations until bot can deploy troops
+    let hasdeployedtroops = false; //has deployed troops initially
+    let targetterritory;
+
     this.deploytimer = setInterval(function() {
-      let mapdata = game.getMapState(parent.roomid);
-      if(mapdata === "no room") clearTimeout(parent.deploytimer);
-      
-      //wyatt write your deploy ai here
-    }, randomnumber(900, 1100));
+      if(deployiterations >= iterationsneeded) {
+        let mapdata = game.getMapState(parent.roomid);
+        if(mapdata === "no room") clearTimeout(parent.deploytimer);
+        
+        //deploy ai code
+        let availableterritories = [];
+        Object.keys(mapdata).forEach((key) => {
+          if(mapdata[key].player == null) {
+              availableterritories.push(mapdata[key]);
+          }
+        });
+
+        //determine where to deploy
+        if(!hasdeployedtroops) {
+          targetterritory = availableterritories[Math.floor(Math.random()*availableterritories.length)];
+          hasdeployedtroops = true;
+        } else {
+          if(randomnumber(1, 5) <= 3) { // 3/5 chance of doing the change territory algorithm
+            //get neighboring territories
+
+            let pm_length = parent.moves.length;
+            for(let i=0; i<pm_length; i++) {
+              if(parent.moves[i].includes(targetterritory.territory)) {
+                let dest = parent.moves[i].split(" ").filter(function(item) {
+                    return item !== targetterritory.territory;
+                });
+                //if the bot is next to another player, move somewhere else
+                if(mapdata[dest].player != null && mapdata[dest].player != parent.id) {
+                  let at_length = availableterritories.length;
+                  let new_territories = [];
+                  for(let i=0; i<at_length; i++) {
+                    if(availableterritories[i].territory !== targetterritory.territory) {
+                      new_territories.push(availableterritories[i]);
+                    }
+                  }
+                  //choose a territory from the available ones (besides the current one)
+                  targetterritory = new_territories[Math.floor(Math.random()*new_territories.length)];
+                }
+              }
+            }
+          }
+        }
+
+        game.deployTroops(parent.roomid, parent.id, targetterritory.territory);
+      }
+
+      deployiterations++;
+    }, randomnumber(900, 1500));
   }
 
   endDeployAI() {

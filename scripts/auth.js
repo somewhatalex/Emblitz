@@ -293,7 +293,9 @@ function editPlayerGameStats(place, totalplayers, pubkey) {
                     if(result.rows.length == 0) {
                         resolve(["none", "none"]);
                     }
-                    checkForWinBadge(result.rows[0].wins, pubkey);
+                    if(result.rows[0]) {
+                        checkForWinBadge(result.rows[0].wins, pubkey);
+                    }
                     resolve([medalchange, xpGain]);
                 });
             });
