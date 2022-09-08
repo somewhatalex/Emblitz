@@ -109,35 +109,61 @@ class emblitzBot {
 
     //parse moves array into 2d arr format
     let moveslength = this.moves.length;
-    let newmovesarr = [];
-    for(let i=0; i < moveslength; i++) {
-      newmovesarr.push(this.moves[i].split(" "));
-    }
 
     this.attacktimer = setInterval(function() {
       let ownedTerritories = [];
-      let borderTerritory = [];
       let mapdata = game.getMapState(parent.roomid);
-      let workingVariable;
+      let path = [];
+      let possibleMoves = [];
+      let isBorder = false;
+      let bestOption = '';
+      let bestOptionCount = 0;
+      let workingVariable = '';
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
       //wyatt write your attack ai here
       Object.keys(mapdata).forEach((key) => {
         if(mapdata[key].player == parent.id){
-          workingVariable = mapdata[key].territory;
-          for(let i=0;i<moveslength;i++){//Put territories in to catagories, ownedTerritories if this bot owns them, and border territories if they border a forign territory
-            if(mapdata[moves[i][1]].player == parent.id){
-              ownedTerritories.push(mapdata[moves[i][0]]);
-            }
-            if(moves[i][0] = workingVariable && mapdata[moves[i][1]].player == parent.id){
-              borderTerritory.push(mapdata[moves[i][0]]);
-            }else if(moves[i][0] = workingVariable && mapdata[moves[i][0]].player == parent.id){
-              borderTerritory.push(mapdata[moves[i][1]]);
-            }
-          }
-          //
+          ownedTerritories.push(mapdata[key]);
         }
       });
+      
+      path.push(ownedTerritories[randomnumber(0, (ownedTerritories.length - 1))].id); // Select a random territory owned to start at
+      for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
+          workingVariable = parent.moves[i].split(" ");
+          if(workingVariable[0] == path[0]){
+            possibleMoves.push(workingVariable[1]);
+            if(mapdata[workingVariable[1]].id != id){ //Check for forign move potential to see if it is a border territory
+              isBorder = true;
+            }
+          }
+      }
+      if(isBorder){
+        bestOptionLength = Infinity;
+        for(let i = 0; i < possibleMoves.length; i++){ // Find which enemy is the weakest
+          if(mapdata[possibleMoves[i]].troopcount < bestOptionCount){
+            bestOption = possibleMoves[i];
+            bestOptionCount = mapdata[possibleMoves[i]].length;
+          }
+        }
+        let troopaddamount = (bestOptionCount * 0.1) + 1;
+          if(troopaddamount > 5) {
+            troopaddamount = 5;
+          } 
+          bestOptionCount = (bestOptionCount + troopaddamount) * 1.2;
+
+          if(mapdata[workingVariable[0]].troopcount > bestOptionCount){
+            game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 100); // 100 is temporary, am tired
+          }
+      }else{
+        for(let i = 0; i < possibleMoves.length; i++){
+          if(mapdata[possibleMoves[i]].troopcount > bestOptionCount){
+            bestOption = possibleMoves[i];
+            bestOptionCount = mapdata[possibleMoves[i]].length;
+          }
+        }
+        game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 95); // 95 is temporary, am tired
+      }
     }, randomnumber(900, 1100));
   }
 
