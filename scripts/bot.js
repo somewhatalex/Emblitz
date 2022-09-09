@@ -110,14 +110,14 @@ class emblitzBot {
     let moveslength = this.moves.length;
 
     let ownedTerritories = [];
-      let mapdata = game.getMapState(parent.roomid);
-      let path = [];
-      let possibleMoves = [];
-      let isBorder = false;
-      let bestOption = '';
-      let bestOptionCount = 0;
-      let workingVariable = '';
-      if(mapdata === "no room") clearTimeout(parent.attacktimer);
+    let mapdata = game.getMapState(parent.roomid);
+    let path = [];
+    let possibleMoves = [];
+    let isBorder = false;
+    let bestOption = '';
+    let bestOptionCount = 0;
+    let workingVariable = '';
+    if(mapdata === "no room") clearTimeout(parent.attacktimer);
 
     this.attacktimer = setInterval(function() {
       ownedTerritories = [];
@@ -164,14 +164,16 @@ class emblitzBot {
           if(mapdata[path[0]].troopcount > bestOptionCount){
             game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, 100); // 100 is temporary, am tired
           }
-      }else{
+      } else {
         for(let i = 0; i < possibleMoves.length; i++){
           if(mapdata[possibleMoves[i]].troopcount > bestOptionCount){
             bestOption = possibleMoves[i];
             bestOptionCount = mapdata[possibleMoves[i]].length;
           }
         }
-        game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 95); // 95 is temporary, am tired
+        if(bestOption !== '') {
+          game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 95); // 95 is temporary, am tired
+        }
       }
     }, randomnumber(900, 1100));
   }
