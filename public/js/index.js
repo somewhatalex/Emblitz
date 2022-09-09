@@ -614,6 +614,8 @@ function joinGame(inputroomid, pmap, createnewroom) {
                     reject("The room you tried joining is full. Try joining another game.");
                 } else if(text.error === "room " + inputroomid + " does not exist") {
                     reject("The room you tried joining does not exist. Did you type the join code correctly?");
+                } else if(text.error === "room " + inputroomid + " has started") {
+                    reject("The game you tried joining has already started. Try joining another game.");
                 }
             });
         });

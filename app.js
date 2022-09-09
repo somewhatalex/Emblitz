@@ -454,6 +454,7 @@ function getroommap(id) {
             return rooms[i].map.toString();
         }
     }
+    return false;
 }
 
 app.post("/auth2", (req, res) => {
@@ -689,7 +690,11 @@ app.post("/api", (req, res) => {
                         if(rooms[i]["players"] >= rooms[i]["maxplayers"]) {
                             res.json({"error": "room " + preset + " is full"});
                         } else {
-                            res.json({"uid": userid(), "room": preset});
+                            if(game.queryGameStatus(preset) !== "lobby") {
+                                res.json({"error": "room " + preset + " has started"});
+                            } else {
+                                res.json({"uid": userid(), "room": preset});
+                            }
                         }
                         roomfound = true;
                         break;
@@ -806,10 +811,12 @@ function initializeBot(roomid) {
             for(let x=0; x < attempttimes; x++) {
                 setTimeout(function() {
                     if(!getroommap(roomid)) return;
+                    if(!rooms[i]) return;
+                    if(rooms[i]["isprivate"]) return;
                     fs.readFile("./mapdata/" + getroommap(roomid) + "/moves.json", "utf8", function(err, moves) {
                         if (err) console.log(err);
 
-                        if(rooms[i]["maxplayers"] - rooms[i]["players"] > 1 && rooms[i]["ingame"] == false && rooms[i]["isprivate"] == false) {
+                        if(rooms[i]["maxplayers"] - rooms[i]["players"] > 1 && rooms[i]["ingame"] == false) {
                             rooms[i]["players"]++;
                             rooms[i]["bots"]++;
                             rooms[i]["playersready"]++; //bots are always ready
@@ -998,7 +1005,7 @@ gameevents.on("syncTroopTimer", function(result) {
 
 gameevents.on("updateLobbyTimer", function(result) {
     setTimeout(function() {
-        sendRoomMsg(result[0], {"lobbytimer": Math.round(result[1]/1000)-1});
+        sendRoomMsg(result[0], {"lobbytimer": Math.round(result[1]/1000) - 1});
     }, 1000);
 });
 

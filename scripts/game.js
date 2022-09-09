@@ -64,14 +64,12 @@ function game() {
     
         this.resume = function(id, roomid) {
             start = Math.floor(new Date().getTime());
-            console.log(delay);
-            self.emit("updateLobbyTimer", [roomid, delay]);
             gameLobbyTimers[id] = setTimeout(function() {
                 callback.apply(selftimer, Array.prototype.slice.call(args, 3, args.length));
             }, delay);
+
+            self.emit("updateLobbyTimer", [roomid, delay]);
         };
-    
-        this.pause(gameLobbyTimers[id]);
     }
 
     function gameTimingEvents(roomid, deploytime) {
@@ -80,20 +78,23 @@ function game() {
         
         //set lobby timer (when lobby wait is done, start deploy phase)
         gameLobbyTimerHandlers[roomid] = new Timer(roomid, startDeployPhase, 20000, roomid, deploytime);
+        gameLobbyTimerHandlers[roomid].pause(gameLobbyTimers[roomid]);
     }
 
     function startDeployPhase(roomid, deploytime) {
-        if(games.get(roomid).phase === "lobby") {
-            if(gameLobbyTimers[roomid]) {
-                clearTimeout(gameLobbyTimers[roomid]);
-                delete gameLobbyTimers[roomid];
-            }
+        if(games.get(roomid)) {
+            if(games.get(roomid).phase === "lobby") {
+                if(gameLobbyTimers[roomid]) {
+                    clearTimeout(gameLobbyTimers[roomid]);
+                    delete gameLobbyTimers[roomid];
+                }
 
-            games.get(roomid).phase = "deploy";
-            games.get(roomid).totalplayers = games.get(roomid).playerstate.length;
-            self.emit("startDeployPhase", [roomid, deploytime, "ok"]);
-            gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
-        };
+                games.get(roomid).phase = "deploy";
+                games.get(roomid).totalplayers = games.get(roomid).playerstate.length;
+                self.emit("startDeployPhase", [roomid, deploytime, "ok"]);
+                gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
+            };
+        }
     }
 
     function endDeployPhase(roomid) {
@@ -155,33 +156,35 @@ function game() {
     }
 
     this.deployTroops = function(roomid, playerid, location) {
-        if(games.get(roomid).phase === "deploy") {
-            let mapstatejson = games.get(roomid).mapstate;
-            let targetterritory = Object.keys(games.get(roomid).mapstate);
-            let targetlength = targetterritory.length;
-            for(let i=0; i<targetlength; i++) {
-                let queryterritory = mapstatejson[targetterritory[i]]
-                //reset all territories the player has (player can only have 1 bc it's deploy phase)
-                if(playerid === mapstatejson[targetterritory[i]].player) {
-                    //only reset if player deployed in valid place
-                    if(mapstatejson[location].player === playerid || mapstatejson[location].player === null) {
-                        games.get(roomid).mapstate[targetterritory[i]].player = null;
-                        games.get(roomid).mapstate[targetterritory[i]].troopcount = 1;
+        if(games.get(roomid)) {
+            if(games.get(roomid).phase === "deploy") {
+                let mapstatejson = games.get(roomid).mapstate;
+                let targetterritory = Object.keys(games.get(roomid).mapstate);
+                let targetlength = targetterritory.length;
+                for(let i=0; i<targetlength; i++) {
+                    let queryterritory = mapstatejson[targetterritory[i]]
+                    //reset all territories the player has (player can only have 1 bc it's deploy phase)
+                    if(playerid === mapstatejson[targetterritory[i]].player) {
+                        //only reset if player deployed in valid place
+                        if(mapstatejson[location].player === playerid || mapstatejson[location].player === null) {
+                            games.get(roomid).mapstate[targetterritory[i]].player = null;
+                            games.get(roomid).mapstate[targetterritory[i]].troopcount = 1;
+                        }
+                    }
+                    //override the previous condition if player selects this
+                    if(location === queryterritory.territory) {
+                        //only assign if not taken
+                        if(queryterritory.player == null) {
+                            games.get(roomid).mapstate[targetterritory[i]].player = playerid;
+                            games.get(roomid).mapstate[targetterritory[i]].troopcount = 10;
+                        } else {
+                            self.emit("gameError" + roomid, "cannot update");
+                            return;
+                        }
                     }
                 }
-                //override the previous condition if player selects this
-                if(location === queryterritory.territory) {
-                    //only assign if not taken
-                    if(queryterritory.player == null) {
-                        games.get(roomid).mapstate[targetterritory[i]].player = playerid;
-                        games.get(roomid).mapstate[targetterritory[i]].troopcount = 10;
-                    } else {
-                        self.emit("gameError" + roomid, "cannot update");
-                        return;
-                    }
-                }
+                self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
             }
-            self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
         }
     }
 

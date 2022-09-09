@@ -213,16 +213,18 @@ class emblitzBot {
                     return item !== targetterritory.territory;
                 });
                 //if the bot is next to another player, move somewhere else
-                if(mapdata[dest].player != null && mapdata[dest].player != parent.id) {
-                  let at_length = availableterritories.length;
-                  let new_territories = [];
-                  for(let i=0; i<at_length; i++) {
-                    if(availableterritories[i].territory !== targetterritory.territory) {
-                      new_territories.push(availableterritories[i]);
+                if(mapdata[dest]) {
+                  if(mapdata[dest].player != null && mapdata[dest].player != parent.id) {
+                    let at_length = availableterritories.length;
+                    let new_territories = [];
+                    for(let i=0; i<at_length; i++) {
+                      if(availableterritories[i].territory !== targetterritory.territory) {
+                        new_territories.push(availableterritories[i]);
+                      }
                     }
+                    //choose a territory from the available ones (besides the current one)
+                    targetterritory = new_territories[Math.floor(Math.random()*new_territories.length)];
                   }
-                  //choose a territory from the available ones (besides the current one)
-                  targetterritory = new_territories[Math.floor(Math.random()*new_territories.length)];
                 }
               }
             }
