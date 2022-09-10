@@ -105,47 +105,141 @@ class emblitzBot {
 
   initiateAttackAI() {
     let parent = this;
-    let territoriesOwned = [];
-
     let moveslength = this.moves.length;
 
-    let ownedTerritories = [];
-    let mapdata = game.getMapState(parent.roomid);
-    let path = [];
-    let possibleMoves = [];
-    let isBorder = false;
-    let bestOption = '';
-    let bestOptionCount = 0;
-    let workingVariable = '';
-    if(mapdata === "no room") clearTimeout(parent.attacktimer);
+    let aggression = 0;
 
     this.attacktimer = setInterval(function() {
-      ownedTerritories = [];
-      mapdata = game.getMapState(parent.roomid);
-      path = [];
-      possibleMoves = [];
-      isBorder = false;
-      bestOption = '';
-      bestOptionCount = 0;
-      workingVariable = '';
+      let ownedTerritories = [];
+      let mapdata = game.getMapState(parent.roomid);
+      let path = [];
+      let possibleMoves = [];
+      let isBorder = false;
+      let bestOption = '';
+      let bestOptionCount = 0;
+      let workingVariable = '';
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
+      let prev_OT = 0; //previous owned territories
+
       //wyatt write your attack ai here
       Object.keys(mapdata).forEach((key) => {
         if(mapdata[key].player == parent.id){
           ownedTerritories.push(mapdata[key].territory);
         }
       });
+
+      if(ownedTerritories.length < prev_OT.length) {
+        aggression += 0.05; //bot was attacked, increase aggression
+      }
       
-      path.push(ownedTerritories[randomnumber(0, (ownedTerritories.length - 1))]); // Select a random territory owned to start at
-      for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
-          workingVariable = parent.moves[i].split(" ");
-          if(workingVariable[0] == path[0]){
-            possibleMoves.push(workingVariable[1]);
-            if(mapdata[workingVariable[1]].player != parent.id){ //Check for forign move potential to see if it is a border territory
+      
+      aggression += 0.05; //slightly increase aggression each iteration
+
+      /*aggression score: the higher it is, the more willing the bot is
+      to attack other players' territories
+      */
+
+      //----PRIORITY ALGORITHM----//
+
+      let priorityscores = []; //all the priority scores aggregated
+      let priorityscore = 0; //priority of territory being considered
+      let territoryindex = 0; //index of territory being considered
+      let territoryconsidered = ""; //abbr. of territory
+      
+      for(let i=0; i<ownedTerritories.length; i++) {
+        let temp_priority = 0; //temp priority being considered
+
+        //find possible moves from territory
+        for(let x = 0; x < moveslength; x++) {
+          if(parent.moves[x].includes(ownedTerritories[i])) {
+            let otherterritory = parent.moves[x].split(" ").filter(function(item) {
+              return item !== ownedTerritories[i];
+            });
+            var g_targetterritory = otherterritory;
+            if(mapdata[otherterritory].player !== parent.id){ //Check for foreign move potential to see if it is a border territory
               isBorder = true;
+              temp_priority += 0.5;
+              
+              //prefer non-player occupied regions if aggression is low
+              if(!mapdata[otherterritory].player && randomnumber(0.5, 25) > aggression) {
+                temp_priority += randomnumber(0.9, 2);
+              }
+
+              //real player
+              if(mapdata[otherterritory].player) {
+                let abs_aggression = aggression;
+                if(abs_aggression < 0.2) {
+                  abs_aggression = 0.2;
+                } else if(abs_aggression > 1) {
+                  abs_aggression = 1;
+                }
+                let to_add = ((mapdata[ownedTerritories[i]].troopcount/mapdata[otherterritory].troopcount)/1.2) * abs_aggression + randomnumber(-0.2, 0.2);
+                if(to_add > 2) {
+                  to_add = 2;
+                }
+
+                for(let z = 0; z < moveslength; z++) {
+                  if(parent.moves[z].includes(ownedTerritories[i])) {
+                    let otherterritory = parent.moves[z].split(" ").filter(function(item) {
+                      return item !== ownedTerritories[i];
+                    });
+                    if(mapdata[otherterritory].player === parent.id){
+                      //request for help
+                      let pscoreslength = priorityscores.length;
+                      for(let p=0; p<pscoreslength; p++) {
+                        if(priorityscores[p][0].toString() === otherterritory[0]) {
+                          let to_add = ((mapdata[otherterritory].troopcount/mapdata[ownedTerritories[i]].troopcount)/1.6) + ((mapdata[g_targetterritory].troopcount/mapdata[ownedTerritories[i]].troopcount)/1.3) + randomnumber(-0.2, 0.2);
+                          if(to_add > 5) {
+                            to_add = 5;
+                          }
+
+                          priorityscores[p][2] += to_add;
+                        }
+                      }
+                    }
+                  }
+                }
+
+                temp_priority += to_add;
+              }
+            } else {
+              let to_add = ((mapdata[ownedTerritories[i]].troopcount/mapdata[otherterritory].troopcount)/2) + randomnumber(-0.2, 0.2);
+              if(to_add > 1.2) {
+                to_add = 1.2;
+              }
+
+              temp_priority += to_add;
             }
           }
+        }
+
+        //console.log(ownedTerritories[i] + ": " + temp_priority)
+        
+        priorityscores.push([ownedTerritories[i], i, temp_priority]);
+      }
+
+      let pscoreslength = priorityscores.length;
+      for(let i=0; i<pscoreslength; i++) {
+        if(priorityscores[i][2] > priorityscore) {
+          territoryconsidered = ownedTerritories[i];
+          territoryindex = i;
+          priorityscore = priorityscores[i][2];
+        }
+      }
+
+      //console.log("highest: " + territoryconsidered + " -- " + priorityscore)
+
+      //----END PRIORITY ALGORITHM----//
+      
+      path.push(ownedTerritories[territoryindex]); // Select a random territory owned to start at
+      for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
+        if(parent.moves[i].includes(territoryconsidered)) {
+          let dest = parent.moves[i].split(" ").filter(function(item) {
+              return item !== territoryconsidered;
+          });
+          possibleMoves.push(dest);
+        }
       }
       if(isBorder){
         bestOptionCount = Infinity;
@@ -156,19 +250,31 @@ class emblitzBot {
           }
         }
         let troopaddamount = (bestOptionCount * 0.1) + 1;
-          if(troopaddamount > 5) {
-            troopaddamount = 5;
-          } 
-          bestOptionCount = (bestOptionCount + troopaddamount) * 1.2;
+        if(troopaddamount > 5) {
+          troopaddamount = 5;
+        }
+        bestOptionCount = (bestOptionCount + troopaddamount) * 1.2;
 
-          if(mapdata[path[0]].troopcount > bestOptionCount){
-            game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, 100); // 100 is temporary, am tired
+        let neededtroops_percent = (bestOptionCount/mapdata[path[0]].troopcount) * 100;
+
+        if(mapdata[path[0]].troopcount > bestOptionCount){
+          game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, neededtroops_percent + randomnumber(15, 25));
+        } else {
+          if(randomnumber(1, 4) < aggression) {
+            let sendpercent = neededtroops_percent/randomnumber(1.5, 2.5);
+            if(sendpercent > 60) {
+              sendpercent = 60 - randomnumber(0, 40);
+            }
+            game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, sendpercent);
           }
+        }
       } else {
         for(let i = 0; i < possibleMoves.length; i++){
-          if(mapdata[possibleMoves[i]].troopcount > bestOptionCount){
-            bestOption = possibleMoves[i];
-            bestOptionCount = mapdata[possibleMoves[i]].length;
+          if(mapdata[possibleMoves[i]]) {
+            if(mapdata[possibleMoves[i]].troopcount > bestOptionCount){
+              bestOption = possibleMoves[i];
+              bestOptionCount = mapdata[possibleMoves[i]].length;
+            }
           }
         }
         if(bestOption !== '') {
