@@ -118,6 +118,12 @@ class emblitzBot {
       let bestOption = '';
       let bestOptionCount = 0;
       let workingVariable = '';
+
+      let priorityscores = []; //all the priority scores aggregated
+      let priorityscore = 0; //priority of territory being considered
+      let territoryindex = 0; //index of territory being considered
+      let territoryconsidered = ""; //abbr. of territory
+
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
       let prev_OT = 0; //previous owned territories
@@ -142,10 +148,10 @@ class emblitzBot {
 
       //----PRIORITY ALGORITHM----//
 
-      let priorityscores = []; //all the priority scores aggregated
-      let priorityscore = 0; //priority of territory being considered
-      let territoryindex = 0; //index of territory being considered
-      let territoryconsidered = ""; //abbr. of territory
+      priorityscores = []; //all the priority scores aggregated
+      priorityscore = 0; //priority of territory being considered
+      territoryindex = 0; //index of territory being considered
+      territoryconsidered = ""; //abbr. of territory
       
       for(let i=0; i<ownedTerritories.length; i++) {
         let temp_priority = 0; //temp priority being considered
@@ -159,7 +165,7 @@ class emblitzBot {
             var g_targetterritory = otherterritory;
             if(mapdata[otherterritory].player !== parent.id){ //Check for foreign move potential to see if it is a border territory
               isBorder = true;
-              temp_priority += 0.5;
+              temp_priority += 1;
               
               //prefer non-player occupied regions if aggression is low
               if(!mapdata[otherterritory].player && randomnumber(0.5, 25) > aggression) {
@@ -249,11 +255,11 @@ class emblitzBot {
             bestOptionCount = mapdata[possibleMoves[i]].troopcount;
           }
         }
-        let troopaddamount = (bestOptionCount * 0.1) + 1;
+        /*let troopaddamount = (bestOptionCount * 0.1) + 1;
         if(troopaddamount > 5) {
           troopaddamount = 5;
-        }
-        bestOptionCount = (bestOptionCount + troopaddamount) * 1.2;
+        }*/
+        bestOptionCount = (bestOptionCount + 1) * 1.2;
 
         let neededtroops_percent = (bestOptionCount/mapdata[path[0]].troopcount) * 100;
 
@@ -262,8 +268,8 @@ class emblitzBot {
         } else {
           if(randomnumber(1, 4) < aggression) {
             let sendpercent = neededtroops_percent/randomnumber(1.5, 2.5);
-            if(sendpercent > 60) {
-              sendpercent = 60 - randomnumber(0, 40);
+            if(sendpercent > 50) {
+              sendpercent = 50 - randomnumber(0, 40);
             }
             game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, sendpercent);
           }
@@ -278,10 +284,10 @@ class emblitzBot {
           }
         }
         if(bestOption !== '') {
-          game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 95); // 95 is temporary, am tired
+          game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 50); // 95 is temporary, am tired
         }
       }
-    }, randomnumber(900, 1100));
+    }, randomnumber(900, 1200));
   }
 
   initiateDeployAI() {
