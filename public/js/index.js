@@ -1,46 +1,30 @@
 let roomid = "";
 let uid = "";
 let pnames = [];
-
 var mapdict = "";
 var mapmoves = "";
 var possibleMoves = [];
-
 var inGame = false;
-
 var myColor = "";
 var playerColors = {};
-
 var websocket = null;
-
 var attackPhase = "";
 var selectedRegion = "";
-
 var coordadjusts = null;
 var mapboundsX = null;
 var mapboundsY = null;
-
 var totalterritories = 1;
-
 var lifetimepeaktroops = 0;
 var lifetimepeakterritories = 0;
-
 var mapname = "";
-
 var sharedetails = "";
-
 var setEventListeners = false; //do not reset this
-
 var alltimeouts = [];
-
 var mapselectindex = 0;
 var mapselectedvalue = "random";
-
 var showlb = false; //mobile only
-
 var previoustouch;
 var previousmobilezoom;
-
 var p_startindex = 0;
 
 //mobile detection
@@ -105,6 +89,8 @@ function resetAll() {
     uid = "";
     pnames = [];
 
+    lobbycountdown = 20;
+
     mapdict = "";
     mapmoves = "";
     possibleMoves = [];
@@ -114,7 +100,8 @@ function resetAll() {
     myColor = "";
     playerColors = {};
 
-    websocket = null;
+    clearInterval(lobbytimeinterval);
+    websocket, lobbytimeinterval = null;
 
     attackPhase = "";
     selectedRegion = "";
@@ -627,6 +614,8 @@ function joinGame(inputroomid, pmap, createnewroom) {
                     reject("The room you tried joining is full. Try joining another game.");
                 } else if(text.error === "room " + inputroomid + " does not exist") {
                     reject("The room you tried joining does not exist. Did you type the join code correctly?");
+                } else if(text.error === "room " + inputroomid + " has started") {
+                    reject("The game you tried joining has already started. Try joining another game.");
                 }
             });
         });
@@ -792,7 +781,6 @@ const gid = getCookie("GID");
 var lobbytimeinterval = null;
 var lobbycountdown = 20;
 function tickLobbyTimer() {
-    lobbycountdown = 20;
     document.getElementById("timeramount").innerText = lobbycountdown;
     lobbytimeinterval = setInterval(function() {
         if(document.getElementsByClassName("glb_player").length > 1 && lobbycountdown > 0) {
@@ -885,7 +873,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                                     document.getElementById("lobbyptable").innerHTML += `
                                     <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
                                         <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"> ${response.users[i].name}</DIV></DIV>
                                     </DIV>`;
                                 } else {
                                     document.getElementById("lobbyptable").innerHTML += `

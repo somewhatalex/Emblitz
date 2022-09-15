@@ -23,9 +23,9 @@ const { response } = require("express");
 const colorData = require("./scripts/colorData.js");
 const nocache = require("nocache");
 const badwords = require("bad-words");
+const emblitzBot = require("./scripts/bot.js")
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
-
 Update 7/27/22: passport.js creates a lot of hosting compatibility issues
 and requires a separate db so I'll have to ignore this advice just for this
 one time.
@@ -43,7 +43,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.2.8 | 8/30/2022";
+const gameversion = "1.3.0 | 9/7/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -454,6 +454,7 @@ function getroommap(id) {
             return rooms[i].map.toString();
         }
     }
+    return false;
 }
 
 app.post("/auth2", (req, res) => {
@@ -689,7 +690,11 @@ app.post("/api", (req, res) => {
                         if(rooms[i]["players"] >= rooms[i]["maxplayers"]) {
                             res.json({"error": "room " + preset + " is full"});
                         } else {
-                            res.json({"uid": userid(), "room": preset});
+                            if(game.queryGameStatus(preset) !== "lobby") {
+                                res.json({"error": "room " + preset + " has started"});
+                            } else {
+                                res.json({"uid": userid(), "room": preset});
+                            }
                         }
                         roomfound = true;
                         break;
@@ -794,6 +799,83 @@ function checkDupeRoom(id) {
     }
 }
 
+//Actually, several bots are attempted to be initiated
+function initializeBot(roomid) {
+    let totalroomcount = rooms.length;
+    for(let i=0; i<totalroomcount; i++) {
+        if(rooms[i].id === roomid) {
+            let attempttimes = Math.round(rooms[i]["maxplayers"] - 2);
+            if (attempttimes < 1) {
+                attempttimes = randomnumber(1, 2);
+            }
+            for(let x=0; x < attempttimes; x++) {
+                setTimeout(function() {
+                    if(!getroommap(roomid)) return;
+                    if(!rooms[i]) return;
+                    if(rooms[i]["isprivate"]) return;
+                    fs.readFile("./mapdata/" + getroommap(roomid) + "/moves.json", "utf8", function(err, moves) {
+                        if (err) console.log(err);
+
+                        if(rooms[i]["maxplayers"] - rooms[i]["players"] > 1 && rooms[i]["ingame"] == false) {
+                            rooms[i]["players"]++;
+                            rooms[i]["bots"]++;
+                            rooms[i]["playersready"]++; //bots are always ready
+
+                            //same thing to start the lobby timer back up
+                            if(rooms[i]["players"] > 1) {
+                                if(game.queryGameStatus(rooms[i]["id"]) === "lobby") {
+                                    game.resumeLobbyTimer(rooms[i]["id"]);
+                                }
+                            }
+
+                            //color assignment -- same algorithm as player color assignment
+                            //default color = red
+                            let pcolor = "red";
+                            let takencolors = [];
+                            let availablecolors = playercoloroptions;
+                            let playerliststring = rooms[i]["playerslist"];
+                            for(let i=0; i<playerliststring.length; i++) {
+                                takencolors.push(playerliststring[i]["pcolor"]);
+                            }
+                            
+                            if(takencolors.includes(pcolor)) {
+                                for(let i=0; i<takencolors.length; i++) {
+                                    availablecolors = availablecolors.filter(function(item) {
+                                        return item !== takencolors[i];
+                                    });
+                                }
+                                pcolor = availablecolors[(Math.random() * availablecolors.length) | 0];
+                            }
+
+                            //now create a bot instance
+                            let newbot = new emblitzBot(roomid, "Player " + randomnumber(1, 999), pcolor, JSON.parse(moves));
+                            newbot.joinGame().then(function(result) {
+                                rooms[i]["playerslist"].push({"id": result[0], "name": result[1], "pcolor": result[2]});
+                                sendRoomMsg(rooms[i].id, {"users": rooms[i]["playerslist"], "playersconfirmed": rooms[i]["playersconfirmed"], "isprivateroom": rooms[i]["isprivate"]});
+
+                                //bot should "press" ready on its own, or at least mimic the behavior
+                                setTimeout(function() {
+                                    if(!rooms[i]) return;
+                                    if(!rooms[i]["playersconfirmed"].includes(result[0])) {
+                                        rooms[i]["playersconfirmed"].push(result[0]);
+                                        sendRoomMsg(rooms[i].id, {"confirmedusers": rooms[i]["playersconfirmed"]});
+                                    }
+                
+                                    if(rooms[i]["playersconfirmed"].length == rooms[i]["players"] && rooms[i]["players"] > 1) {
+                                        game.skipLobbyTimer(rooms[i].id);
+                                    }
+                                }, randomnumber(3000, 6000));
+                                newbot.initiateController();
+                            });
+                        }
+                    });
+                }, randomnumber(1500 + (x*3000), 3000 + (x*5500)));
+            }
+            break;
+        }
+    }
+}
+
 function joinroom(map, createroom) {
     let roommap = "";
     let allmapnames = Object.keys(allmaps);
@@ -827,15 +909,16 @@ function joinroom(map, createroom) {
             }
         }
         
-        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "deploytime": deploytime, "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": [], "bots": 0});
         game.newGame(id, roommap, deploytime, isprivate).then(function(result) {
             //console.log(result)
+            initializeBot(id); //initialize bots in a new room
         });
         return id;
     } else {
         for(let i=0; i<rooms.length; i++) {
             //remove rooms with 0 users that persist longer than 30 seconds -- futureproof, also see line 380ish
-            if(rooms[i]["players"] < 1) {
+            if(rooms[i]["players"] - rooms[i]["bots"] < 1) {
                 if((Math.floor(new Date().getTime()) - rooms[i]["created"]) > 30000) {
                     game.removeGame(rooms[i].id);
                     rooms.splice(i, 1);
@@ -865,9 +948,10 @@ function joinroom(map, createroom) {
             }
         }
 
-        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": []});
+        rooms.push({"id": id, "isprivate": isprivate, "ingame": false, "map": roommap, "created": Math.floor(new Date().getTime()), "maxplayers": maxplayers, "players": 0, "playersconfirmed": [], "playersready": 0, "playerslist": [], "bots": 0});
         game.newGame(id, roommap, deploytime, isprivate).then(function(result) {
-            //console.log(result)
+            //console.log(result);
+            initializeBot(id);
         });
         return id;
     }
@@ -921,7 +1005,7 @@ gameevents.on("syncTroopTimer", function(result) {
 
 gameevents.on("updateLobbyTimer", function(result) {
     setTimeout(function() {
-        sendRoomMsg(result[0], {"lobbytimer": Math.round(result[1]/1000)-1});
+        sendRoomMsg(result[0], {"lobbytimer": Math.round(result[1]/1000) - 1});
     }, 1000);
 });
 
@@ -1140,7 +1224,7 @@ wss.on("connection", (ws) => {
                 }
 
                 //splice client id as well
-                if(rooms[i]["players"] < 1) {
+                if(rooms[i]["players"] - rooms[i]["bots"] < 1) {
                     game.removeGame(rooms[i].id);
                     rooms.splice(i, 1);
                 }

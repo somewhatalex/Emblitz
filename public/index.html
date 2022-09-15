@@ -140,7 +140,10 @@
                 </DIV>
             </DIV>
             <BUTTON ID="shownewsbutton" ONCLICK='document.getElementById("gamenews-container").style.setProperty("display", "inline-block", "important"); this.style.setProperty("display", "none", "important"); document.getElementsByClassName("homeguicontainer")[0].style.setProperty("position", "fixed");' CLASS="shownewsbutton jb_gray"><I CLASS="fa fa-newspaper-o"></I> Latest News</BUTTON>
-            <DIV CLASS="gameversion"><%= gameversion %></DIV>
+            <DIV CLASS="gameversion">
+                <DIV>&copy Emblitz</DIV>
+                <%= gameversion %>
+            </DIV>
             <DIV CLASS="gn-reader">
                 <DIV CLASS="gn-reader-bg"></DIV>
                 <DIV CLASS="gn-reader-area">
