@@ -2139,6 +2139,7 @@ input { /*override default styles*/
 }
 
 .ls-bg {
+    background: #268cbb;
     background-image: url(../images/background2.JPG);
     background-position: center;
     background-repeat: no-repeat;
