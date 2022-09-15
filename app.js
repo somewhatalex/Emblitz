@@ -43,7 +43,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.3.1 | 9/14/2022";
+const gameversion = "1.3.2 | 9/15/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -1211,6 +1211,12 @@ wss.on("connection", (ws) => {
         let removeclient = clients.get(ws);
         let removeclientid = removeclient.uid;
         removeFromArray(userids, removeclientid);
+        
+        game.removePlayer(removeclient.room, removeclientid)
+        gameevents.once("removePlayer" + removeclient.room, function(result) {
+            //console.log(result);
+        });
+
         for (var i=0; i < rooms.length; i++) {
             if (rooms[i].id === removeclient.room) {
                 rooms[i]["players"]--;
@@ -1232,11 +1238,6 @@ wss.on("connection", (ws) => {
             }
         }
         clients.delete(ws);
-  
-        game.removePlayer(removeclient.room, removeclientid)
-        gameevents.once("removePlayer" + removeclient.room, function(result) {
-            //console.log(result);
-        });
 
         //EVERYTHING BELOW HERE WILL BE SENT TO ALL MEMBERS OF A ROOM
         [...clients.keys()].forEach((client) => {

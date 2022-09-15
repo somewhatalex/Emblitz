@@ -2111,3 +2111,108 @@ input { /*override default styles*/
 }
 
 /*--end adblock popup stying--*/
+
+
+/*loading page*/
+.loadingscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin-top: -15px;
+    margin-left: -15px;
+    width: calc(100% + 30px);
+    height: calc(100% + 30px);
+    z-index: 2999998; /*heheheha*/
+    color: var(--light);
+    opacity: 0;
+    display: none;
+    transition: 0.5s;
+}
+
+.ls-inner {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.ls-bg {
+    background-image: url(../images/background2.JPG);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(6px);
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
+.ls-title {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+@media screen and (max-width: 580px) {
+    .ls-title {
+        font-size: 7vw;
+    }
+}
+
+.ls-loader-container {
+    margin: auto;
+    width: 52px;
+    height: 52px;
+    margin-top: 15px;
+}
+
+.ls-loader {
+    width: 52px;
+    height: 52px;
+}
+
+.ls-loader:after {
+    content: " ";
+    display: block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    border-color: #fff transparent #fff transparent;
+    animation: ls-dual-ring 1.6s linear infinite;
+}
+
+@keyframes ls-dual-ring {
+    0% {
+        transform: rotate(0deg);
+        border-color: #fff transparent #fff transparent;
+    }
+
+    10% {
+        transform: rotate(20deg);
+    }
+
+    40% {
+        transform: rotate(160deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+        border-color: #fff;
+    }
+
+    60% {
+        transform: rotate(200deg);
+    }
+
+    90% {
+        transform: rotate(340deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+        border-color: #fff transparent #fff transparent;
+    }
+}
