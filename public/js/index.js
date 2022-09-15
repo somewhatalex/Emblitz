@@ -800,365 +800,367 @@ function getUserInfo() {
 }
 
 function gameConnect(inputroomid, pmap, createnewroom) {
-    document.getElementById("lobbyscreen").style.display = "none";
-    document.getElementById("gamescreen").style.display = "none";
-    document.getElementById("gamelobby").style.display = "block";
-    joinGame(inputroomid, pmap, createnewroom).then(function() {
-        connectToServer().then(function(ws) {
-            document.getElementById("invitecode").innerText = roomid.replace("r-", "");
-            tickLobbyTimer();
-            websocket = ws;
-            ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "uuid": getCookie("uuid"), "gid": gid, "pubkey": getCookie("publickey")}));
-            confirmJoinGame().then(function() {
-                ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
-            });
+    showLoadingScreen().then(function() {
+        document.getElementById("gamescreen").style.display = "none";
+        document.getElementById("gamelobby").style.display = "block";
+        joinGame(inputroomid, pmap, createnewroom).then(function() {
+            connectToServer().then(function(ws) {
+                hideLoadingScreen();
+                document.getElementById("invitecode").innerText = roomid.replace("r-", "");
+                tickLobbyTimer();
+                websocket = ws;
+                ws.send(JSON.stringify({"action": "userlogin", "uid": uid, "roomid": roomid, "uuid": getCookie("uuid"), "gid": gid, "pubkey": getCookie("publickey")}));
+                confirmJoinGame().then(function() {
+                    ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
+                });
 
-            ws.onmessage = (message) => {
-                let response = JSON.parse(message.data);
-                if(response.mapdata) {
-                    
-                } else if(response.mapname) {
-                    document.getElementById("mapname").innerText = mapnames[response.mapname];
-                    mapname = mapnames[response.mapname];
-                } else if(response.users) {
-                    if(inGame) {
-                        document.getElementById("players_container").innerHTML = "";
-                        for(let i=0; i<response.users.length; i++) {
-                            if(response.users[i].id === uid) {
-                                document.getElementById("players_container").innerHTML += `
-                                <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV>
-                                    <BR><DIV CLASS="l-stats"><I CLASS="fa fa-male"></I> <SPAN ID="troops-${response.users[i].id}">0</SPAN> | <I CLASS="fa fa-map-marker"></I> <SPAN ID="territories-${response.users[i].id}">0</SPAN></DIV></DIV>
-                                </DIV>`;
-                                document.getElementById("t-avatar-frame").style.border = "5px solid " + response.users[i].pcolor;
-                                document.getElementById("t-avatar-frame").innerHTML = `<IMG STYLE="width: 100%; height: 100%" SRC="./images/defaultpfp.png">`;
-                                document.getElementById("t-avatar-frame").style.background = colorData[response.users[i].pcolor].normal;
-                            } else {
-                                document.getElementById("players_container").innerHTML += `
-                                <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                    <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                    <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV>
-                                    <BR><DIV CLASS="l-stats"><I CLASS="fa fa-male"></I> <SPAN ID="troops-${response.users[i].id}">0</SPAN> | <I CLASS="fa fa-map-marker"></I> <SPAN ID="territories-${response.users[i].id}">0</SPAN></DIV></DIV>
-                                </DIV>`;
-                            }
-                            playerColors[response.users[i].id] = response.users[i].pcolor;
-                        }
+                ws.onmessage = (message) => {
+                    let response = JSON.parse(message.data);
+                    if(response.mapdata) {
                         
-                    } else {
-                        //in lobby
+                    } else if(response.mapname) {
+                        document.getElementById("mapname").innerText = mapnames[response.mapname];
+                        mapname = mapnames[response.mapname];
+                    } else if(response.users) {
+                        if(inGame) {
+                            document.getElementById("players_container").innerHTML = "";
+                            for(let i=0; i<response.users.length; i++) {
+                                if(response.users[i].id === uid) {
+                                    document.getElementById("players_container").innerHTML += `
+                                    <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                        <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                        <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV>
+                                        <BR><DIV CLASS="l-stats"><I CLASS="fa fa-male"></I> <SPAN ID="troops-${response.users[i].id}">0</SPAN> | <I CLASS="fa fa-map-marker"></I> <SPAN ID="territories-${response.users[i].id}">0</SPAN></DIV></DIV>
+                                    </DIV>`;
+                                    document.getElementById("t-avatar-frame").style.border = "5px solid " + response.users[i].pcolor;
+                                    document.getElementById("t-avatar-frame").innerHTML = `<IMG STYLE="width: 100%; height: 100%" SRC="./images/defaultpfp.png">`;
+                                    document.getElementById("t-avatar-frame").style.background = colorData[response.users[i].pcolor].normal;
+                                } else {
+                                    document.getElementById("players_container").innerHTML += `
+                                    <DIV CLASS="lb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                        <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                        <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV>
+                                        <BR><DIV CLASS="l-stats"><I CLASS="fa fa-male"></I> <SPAN ID="troops-${response.users[i].id}">0</SPAN> | <I CLASS="fa fa-map-marker"></I> <SPAN ID="territories-${response.users[i].id}">0</SPAN></DIV></DIV>
+                                    </DIV>`;
+                                }
+                                playerColors[response.users[i].id] = response.users[i].pcolor;
+                            }
+                            
+                        } else {
+                            //in lobby
+                            document.getElementById("lobbyptable").innerHTML = "";
+                            if(response.isprivateroom) {
+                                document.getElementById("proomdisplay").style.display = "block";
+                            } else {
+                                document.getElementById("proomdisplay").style.display = "none";
+                            }
+                            for(let i=0; i<response.users.length; i++) {
+                                if(response.users[i].id === uid) {
+                                    if(response.users[i].name.startsWith("Player ")) {
+                                        document.getElementById("lobbyptable").innerHTML += `
+                                        <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                            <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                            <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                        </DIV>`;
+                                    } else {
+                                        document.getElementById("lobbyptable").innerHTML += `
+                                        <DIV CLASS="glb_player" ID="l-${response.users[i].id}" ONCLICK="window.open('./user/${response.users[i].name}', '_blank');" TITLE="View ${response.users[i].name}'s profile in a new window" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; cursor: pointer">
+                                            <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                            <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
+                                        </DIV>`;
+                                    }
+                                } else {
+                                    if(response.users[i].name.startsWith("Player ")) {
+                                        document.getElementById("lobbyptable").innerHTML += `
+                                        <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
+                                            <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                            <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"> ${response.users[i].name}</DIV></DIV>
+                                        </DIV>`;
+                                    } else {
+                                        document.getElementById("lobbyptable").innerHTML += `
+                                        <DIV CLASS="glb_player" ID="l-${response.users[i].id}" ONCLICK="window.open('./user/${response.users[i].name}', '_blank');" TITLE="View ${response.users[i].name}'s profile in a new window" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; cursor: pointer">
+                                            <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
+                                            <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
+                                        </DIV>`;
+                                    }
+                                }
+                            }
+
+                            //add green outline for confirmed users
+                            if(response.playersconfirmed) {
+                                for(let i=0; i<response.playersconfirmed.length; i++) {
+                                    document.getElementById("l-" + response.playersconfirmed[i]).style.border = "2px solid green";
+                                }
+                            }
+                        }
+                        pnames = response.users;
+                    } else if(response.playerleft) {
+                        let p_displayed = document.getElementById("l-" + response.playerleft);
+                        if(p_displayed) {
+                            p_displayed.remove();
+                        }
+                        if(inGame) {
+                            let leftname = pnames.filter(obj => {
+                                return obj.id === response.playerleft;
+                            });
+                            leftname = leftname[0].name;
+                            notification("notify", leftname + " left", leftname + " has left the game.", 5);
+                        }
+                    //start game
+                    } else if(response.startgame) { //now load in map...
+                        document.getElementById("lobbyscreen").style.display = "none";
+                        document.getElementById("gamescreen").style.display = "block";
+                        document.getElementById("gamelobby").style.display = "none";
                         document.getElementById("lobbyptable").innerHTML = "";
-                        if(response.isprivateroom) {
-                            document.getElementById("proomdisplay").style.display = "block";
-                        } else {
-                            document.getElementById("proomdisplay").style.display = "none";
-                        }
-                        for(let i=0; i<response.users.length; i++) {
-                            if(response.users[i].id === uid) {
-                                if(response.users[i].name.startsWith("Player ")) {
-                                    document.getElementById("lobbyptable").innerHTML += `
-                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
-                                    </DIV>`;
+                        document.body.style.touchAction = "none";
+                        downloadMap().then(function() {
+                            inGame = true;
+                            initLB();
+                            ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid, "gid": gid}));
+
+                            infobar("show");
+                            let deploytime = response.deploytime;
+                            document.getElementById("eventstimer").style.width = "0%";
+                            document.getElementById("eventstimer").style.transitionDuration = deploytime-1 + "s";
+                            setTimeout(function() {
+                                document.getElementById("eventstimer").style.width = "100%";
+                            }, 10)
+                            alltimeouts.push(setTimeout(function() {
+                                infobar("hide");
+                            }, deploytime*1000));
+
+                            document.getElementById("troopslider").addEventListener("input", function() {
+                                let value = document.getElementById("troopslider").value;
+                                document.getElementById("trooppercentage").innerText = value + "%";
+                                this.style.background = "linear-gradient(to right, var(--green) 0%, var(--green) " + value + "%, var(--medium) " + value + "%, var(--medium) 100%)";
+
+                                if(selectedRegion) {
+                                    let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
+                                    if(troopmoveamount < 1) {
+                                        troopmoveamount = 1;
+                                    }
+                                    document.getElementById("sendamount").innerText = troopmoveamount + " troops";
                                 } else {
-                                    document.getElementById("lobbyptable").innerHTML += `
-                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" ONCLICK="window.open('./user/${response.users[i].name}', '_blank');" TITLE="View ${response.users[i].name}'s profile in a new window" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; cursor: pointer">
-                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"><I CLASS="fa fa-user-o"></I> ${response.users[i].name}</DIV></DIV>
-                                    </DIV>`;
+                                    document.getElementById("sendamount").innerText = "--";
                                 }
+                            });
+
+                            totalterritories = document.getElementsByClassName("map-region").length;
+
+                            document.getElementById("statsbar-bg").style.borderTop = "10px solid " + colorData[myColor].normal;
+                            document.getElementById("territoryprogress").style.background = colorData[myColor].normal;
+                            document.getElementById("territoryprogress").style.width = "0%";
+                            document.getElementById("s-totalterritories").innerText = totalterritories;
+
+                            document.getElementById("s-troops").innerText = "0";
+                            document.getElementById("s-territories").innerText = "0";
+                        });
+                    } else if(response.confirmedusers) {
+                        for(let i=0; i<response.confirmedusers.length; i++) {
+                            document.getElementById("l-" + response.confirmedusers[i]).style.border = "2px solid green";
+                        }
+                    } else if(response.message === "all users loaded") {
+                        attackPhase = "deploy";
+                    } else if(response.updatemap) {
+                        let updatemapdata = response.updatemap;
+                        let reslength = Object.keys(updatemapdata).length;
+                        let playeroccupied = 0;
+                        let playertotaltroops = 0;
+                        let playerstats = {};
+                        for(let i=0; i<reslength; i++) {
+                            let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
+                            let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
+                            if(!document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase())) {
+                                console.log(c_update_map_info.territory.toLowerCase());
+                            }
+                            let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
+                            let initialcolor = selectterritory.getAttribute("data-color");
+                            document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
+                            if(c_update_map_info.player != null) {
+                                selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
+                                selectterritory.setAttribute("fill", getColor(selectterritory, false));
                             } else {
-                                if(response.users[i].name.startsWith("Player ")) {
-                                    document.getElementById("lobbyptable").innerHTML += `
-                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken};">
-                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name"> ${response.users[i].name}</DIV></DIV>
-                                    </DIV>`;
+                                selectterritory.setAttribute("data-color", "default");
+                                selectterritory.setAttribute("fill", getColor(selectterritory, false));
+                            }
+
+                            if(selectterritory.getAttribute("data-color") === myColor) {
+                                playertotaltroops = playertotaltroops + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText);
+                                playeroccupied++;
+                            } else if(selectterritory.getAttribute("data-color") !== "default"){
+                                if(!playerstats.hasOwnProperty(selectterritory.getAttribute("data-color"))) {
+                                    playerstats[selectterritory.getAttribute("data-color")] = [Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), 1];
                                 } else {
-                                    document.getElementById("lobbyptable").innerHTML += `
-                                    <DIV CLASS="glb_player" ID="l-${response.users[i].id}" ONCLICK="window.open('./user/${response.users[i].name}', '_blank');" TITLE="View ${response.users[i].name}'s profile in a new window" STYLE="background-color: ${colorData[response.users[i].pcolor].normal}; box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; -webkit-box-shadow: inset 0px 0px 7px 1px ${colorData[response.users[i].pcolor].darken}; cursor: pointer">
-                                        <DIV CLASS="glb_avatar-frame" STYLE="border: 5px solid ${response.users[i].pcolor}"><IMG STYLE="width: 60px; height: 60px" SRC="./images/defaultpfp.png"></DIV>
-                                        <DIV CLASS="glb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${response.users[i].name}</DIV></DIV>
-                                    </DIV>`;
+                                    playerstats[selectterritory.getAttribute("data-color")] = [playerstats[selectterritory.getAttribute("data-color")][0] + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), playerstats[selectterritory.getAttribute("data-color")][1] + 1];
                                 }
                             }
-                        }
 
-                        //add green outline for confirmed users
-                        if(response.playersconfirmed) {
-                            for(let i=0; i<response.playersconfirmed.length; i++) {
-                                document.getElementById("l-" + response.playersconfirmed[i]).style.border = "2px solid green";
-                            }
-                        }
-                    }
-                    pnames = response.users;
-                } else if(response.playerleft) {
-                    let p_displayed = document.getElementById("l-" + response.playerleft);
-                    if(p_displayed) {
-                        p_displayed.remove();
-                    }
-                    if(inGame) {
-                        let leftname = pnames.filter(obj => {
-                            return obj.id === response.playerleft;
-                        });
-                        leftname = leftname[0].name;
-                        notification("notify", leftname + " left", leftname + " has left the game.", 5);
-                    }
-                //start game
-                } else if(response.startgame) { //now load in map...
-                    document.getElementById("lobbyscreen").style.display = "none";
-                    document.getElementById("gamescreen").style.display = "block";
-                    document.getElementById("gamelobby").style.display = "none";
-                    document.getElementById("lobbyptable").innerHTML = "";
-                    document.body.style.touchAction = "none";
-                    downloadMap().then(function() {
-                        inGame = true;
-                        initLB();
-                        ws.send(JSON.stringify({"action": "mapready", "roomid": roomid, "uid": uid, "gid": gid}));
-
-                        infobar("show");
-                        let deploytime = response.deploytime;
-                        document.getElementById("eventstimer").style.width = "0%";
-                        document.getElementById("eventstimer").style.transitionDuration = deploytime-1 + "s";
-                        setTimeout(function() {
-                            document.getElementById("eventstimer").style.width = "100%";
-                        }, 10)
-                        alltimeouts.push(setTimeout(function() {
-                            infobar("hide");
-                        }, deploytime*1000));
-
-                        document.getElementById("troopslider").addEventListener("input", function() {
-                            let value = document.getElementById("troopslider").value;
-                            document.getElementById("trooppercentage").innerText = value + "%";
-                            this.style.background = "linear-gradient(to right, var(--green) 0%, var(--green) " + value + "%, var(--medium) " + value + "%, var(--medium) 100%)";
-
-                            if(selectedRegion) {
-                                let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
-                                if(troopmoveamount < 1) {
-                                    troopmoveamount = 1;
+                            if(attackPhase === "attack") {
+                                if(initialcolor === selectterritory.getAttribute("data-color")) {
+                                    if(c_update_map_info.troopcount - initialtroops != 0) {
+                                        troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
+                                    }
+                                } else {
+                                    troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                                 }
-                                document.getElementById("sendamount").innerText = troopmoveamount + " troops";
-                            } else {
-                                document.getElementById("sendamount").innerText = "--";
-                            }
-                        });
 
-                        totalterritories = document.getElementsByClassName("map-region").length;
-
-                        document.getElementById("statsbar-bg").style.borderTop = "10px solid " + colorData[myColor].normal;
-                        document.getElementById("territoryprogress").style.background = colorData[myColor].normal;
-                        document.getElementById("territoryprogress").style.width = "0%";
-                        document.getElementById("s-totalterritories").innerText = totalterritories;
-
-                        document.getElementById("s-troops").innerText = "0";
-                        document.getElementById("s-territories").innerText = "0";
-                    });
-                } else if(response.confirmedusers) {
-                    for(let i=0; i<response.confirmedusers.length; i++) {
-                        document.getElementById("l-" + response.confirmedusers[i]).style.border = "2px solid green";
-                    }
-                } else if(response.message === "all users loaded") {
-                    attackPhase = "deploy";
-                } else if(response.updatemap) {
-                    let updatemapdata = response.updatemap;
-                    let reslength = Object.keys(updatemapdata).length;
-                    let playeroccupied = 0;
-                    let playertotaltroops = 0;
-                    let playerstats = {};
-                    for(let i=0; i<reslength; i++) {
-                        let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
-                        let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
-                        if(!document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase())) {
-                            console.log(c_update_map_info.territory.toLowerCase());
-                        }
-                        let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
-                        let initialcolor = selectterritory.getAttribute("data-color");
-                        document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
-                        if(c_update_map_info.player != null) {
-                            selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
-                            selectterritory.setAttribute("fill", getColor(selectterritory, false));
-                        } else {
-                            selectterritory.setAttribute("data-color", "default");
-                            selectterritory.setAttribute("fill", getColor(selectterritory, false));
-                        }
-
-                        if(selectterritory.getAttribute("data-color") === myColor) {
-                            playertotaltroops = playertotaltroops + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText);
-                            playeroccupied++;
-                        } else if(selectterritory.getAttribute("data-color") !== "default"){
-                            if(!playerstats.hasOwnProperty(selectterritory.getAttribute("data-color"))) {
-                                playerstats[selectterritory.getAttribute("data-color")] = [Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), 1];
-                            } else {
-                                playerstats[selectterritory.getAttribute("data-color")] = [playerstats[selectterritory.getAttribute("data-color")][0] + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), playerstats[selectterritory.getAttribute("data-color")][1] + 1];
-                            }
-                        }
-
-                        if(attackPhase === "attack") {
-                            if(initialcolor === selectterritory.getAttribute("data-color")) {
-                                if(c_update_map_info.troopcount - initialtroops != 0) {
-                                    troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
+                                if(selectedRegion) {
+                                    let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
+                                    if(troopmoveamount < 1) {
+                                        troopmoveamount = 1;
+                                    }
+                                    document.getElementById("sendamount").innerText = troopmoveamount + " troops";
                                 }
-                            } else {
+                            } else if(attackPhase === "deploy" && c_update_map_info.troopcount - initialtroops != 0 && selectterritory.getAttribute("data-color") !== "default") {
                                 troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                             }
+                        }
 
-                            if(selectedRegion) {
-                                let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
-                                if(troopmoveamount < 1) {
-                                    troopmoveamount = 1;
+                        if(playertotaltroops > lifetimepeaktroops) {
+                            lifetimepeaktroops = playertotaltroops;
+                        }
+
+                        if(playeroccupied > lifetimepeakterritories) {
+                            lifetimepeakterritories = playeroccupied;
+                        }
+
+                        document.getElementById("s-troops").innerText = playertotaltroops;
+                        document.getElementById("s-territories").innerText = playeroccupied;
+                        document.getElementById("territoryprogress").style.width = (playeroccupied/totalterritories)*100 + "%";
+
+                        document.getElementById("troops-" + uid).innerText = playertotaltroops;
+                        document.getElementById("territories-" + uid).innerText = playeroccupied;
+
+                        for(p_key in playerstats) {
+                            for(key in playerColors) {
+                                if(playerColors[key] === p_key) {
+                                    document.getElementById("troops-" + key).innerText = playerstats[p_key][0];
+                                    document.getElementById("territories-" + key).innerText = playerstats[p_key][1];
+                                    break;
                                 }
-                                document.getElementById("sendamount").innerText = troopmoveamount + " troops";
-                            }
-                        } else if(attackPhase === "deploy" && c_update_map_info.troopcount - initialtroops != 0 && selectterritory.getAttribute("data-color") !== "default") {
-                            troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
-                        }
-                    }
-
-                    if(playertotaltroops > lifetimepeaktroops) {
-                        lifetimepeaktroops = playertotaltroops;
-                    }
-
-                    if(playeroccupied > lifetimepeakterritories) {
-                        lifetimepeakterritories = playeroccupied;
-                    }
-
-                    document.getElementById("s-troops").innerText = playertotaltroops;
-                    document.getElementById("s-territories").innerText = playeroccupied;
-                    document.getElementById("territoryprogress").style.width = (playeroccupied/totalterritories)*100 + "%";
-
-                    document.getElementById("troops-" + uid).innerText = playertotaltroops;
-                    document.getElementById("territories-" + uid).innerText = playeroccupied;
-
-                    for(p_key in playerstats) {
-                        for(key in playerColors) {
-                            if(playerColors[key] === p_key) {
-                                document.getElementById("troops-" + key).innerText = playerstats[p_key][0];
-                                document.getElementById("territories-" + key).innerText = playerstats[p_key][1];
-                                break;
                             }
                         }
-                    }
-                } else if(response.setcolor) {
-                    myColor = response.setcolor;
-                } else if(response.startAttackPhase) {
-                    attackPhase = "attack";
+                    } else if(response.setcolor) {
+                        myColor = response.setcolor;
+                    } else if(response.startAttackPhase) {
+                        attackPhase = "attack";
 
-                    troopTimerBar();
-                    
-                    setTimeout(function() {
-                        document.getElementById("eventstimer").style.display = "none";
-                        document.getElementById("eventstimer").style.width = "0%";
-                        infobar("show");
-                        document.getElementById("statustext").innerHTML = "<B>Attack Phase Started:</B> Select one of your own territories to move troops or attack! Last person standing wins!";
-                        alltimeouts.push(setTimeout(function() {
-                            infobar("hide");
+                        troopTimerBar();
+                        
+                        setTimeout(function() {
+                            document.getElementById("eventstimer").style.display = "none";
+                            document.getElementById("eventstimer").style.width = "0%";
+                            infobar("show");
+                            document.getElementById("statustext").innerHTML = "<B>Attack Phase Started:</B> Select one of your own territories to move troops or attack! Last person standing wins!";
+                            alltimeouts.push(setTimeout(function() {
+                                infobar("hide");
+                                setTimeout(function() {
+                                    document.getElementById("infobar").style.display = "none";
+                                }, 400);
+                            }, 7000));
+                        }, 1000);
+                    } else if(response.syncTroopTimer) {
+                        troopTimerBar();
+                    } else if(response.error) {
+                        if(response.error === "invalid credentials") {
+                            ws.close();
+                            notification("error", "Error: Invalid credentials", "Please reload the page and join a new game. If this problem persists, contact us.", 10);
+                        }
+                    } else if(response.playerdead) {
+                        let p_displayed = document.getElementById("l-" + response.playerdead);
+                        p_displayed.remove();
+                        if(response.playerdead !== uid) {
+                            let defeatedname = pnames.filter(obj => {
+                                return obj.id === response.playerdead;
+                            });
+                            defeatedname = defeatedname[0].name;
+                            notification("warn", defeatedname + " was defeated", defeatedname + " lost all their territories and was defeated!", 6)
+                        } else {
+                            //you died
+                            document.getElementById("endscreen").style.display = "block";
+                            document.getElementById("endscreen").style.opacity = "0";
+                            document.getElementById("e-troops").innerText = lifetimepeaktroops;
+                            document.getElementById("e-territories").innerText = lifetimepeakterritories;
+
+                            let yourplace = response.place;
+                            switch(yourplace) {
+                                case 1:
+                                    yourplace += "st";
+                                    break;
+                                case 2:
+                                    yourplace += "nd";
+                                    break;
+                                case 3:
+                                    yourplace += "rd";
+                                    break;
+                                default:
+                                    yourplace += "th";
+                            }
+                            document.getElementById("e-place").innerText = yourplace;
+                            document.getElementById("e-map").innerText = mapname;
+                            document.getElementById("e-header").innerText = "You were defeated";
+                            document.getElementById("e-intro").innerText = "You lost all your territories and were defeated!";
+                            document.getElementById("e-ending").innerText = "Better luck next time!";
+                            sharedetails = "I played ⚔Emblitz, a real-time online strategy game, and placed " + yourplace + " in the " + mapname + " map. I had " + lifetimepeaktroops + " troops and captured " + lifetimepeakterritories + " territories at my peak. Play it at https://emblitz.com\n\n#Emblitz";
                             setTimeout(function() {
-                                document.getElementById("infobar").style.display = "none";
-                            }, 400);
-                        }, 7000));
-                    }, 1000);
-                } else if(response.syncTroopTimer) {
-                    troopTimerBar();
-                } else if(response.error) {
-                    if(response.error === "invalid credentials") {
-                        ws.close();
-                        notification("error", "Error: Invalid credentials", "Please reload the page and join a new game. If this problem persists, contact us.", 10);
-                    }
-                } else if(response.playerdead) {
-                    let p_displayed = document.getElementById("l-" + response.playerdead);
-                    p_displayed.remove();
-                    if(response.playerdead !== uid) {
-                        let defeatedname = pnames.filter(obj => {
-                            return obj.id === response.playerdead;
-                        });
-                        defeatedname = defeatedname[0].name;
-                        notification("warn", defeatedname + " was defeated", defeatedname + " lost all their territories and was defeated!", 6)
-                    } else {
-                        //you died
-                        document.getElementById("endscreen").style.display = "block";
-                        document.getElementById("endscreen").style.opacity = "0";
-                        document.getElementById("e-troops").innerText = lifetimepeaktroops;
-                        document.getElementById("e-territories").innerText = lifetimepeakterritories;
-
-                        let yourplace = response.place;
-                        switch(yourplace) {
-                            case 1:
-                                yourplace += "st";
-                                break;
-                            case 2:
-                                yourplace += "nd";
-                                break;
-                            case 3:
-                                yourplace += "rd";
-                                break;
-                            default:
-                                yourplace += "th";
+                                document.getElementById("endscreen").style.opacity = "1";
+                            }, 100);
                         }
-                        document.getElementById("e-place").innerText = yourplace;
-                        document.getElementById("e-map").innerText = mapname;
-                        document.getElementById("e-header").innerText = "You were defeated";
-                        document.getElementById("e-intro").innerText = "You lost all your territories and were defeated!";
-                        document.getElementById("e-ending").innerText = "Better luck next time!";
-                        sharedetails = "I played ⚔Emblitz, a real-time online strategy game, and placed " + yourplace + " in the " + mapname + " map. I had " + lifetimepeaktroops + " troops and captured " + lifetimepeakterritories + " territories at my peak. Play it at https://emblitz.com\n\n#Emblitz";
-                        setTimeout(function() {
-                            document.getElementById("endscreen").style.opacity = "1";
-                        }, 100);
-                    }
-                } else if(response.playerWon) {
-                    if(response.playerWon !== uid) {
-                        let winname = pnames.filter(obj => {
-                            return obj.id === response.playerdead;
-                        });
-                        winname = winname[0].name;
-                        notification("notify", winname + " won the game!", winname + " defeated all other players and is the last player standing!", 6)
-                    } else {
-                        //you died
-                        document.getElementById("endscreen").style.display = "block";
-                        document.getElementById("endscreen").style.opacity = "0";
-                        document.getElementById("e-troops").innerText = lifetimepeaktroops;
-                        document.getElementById("e-territories").innerText = lifetimepeakterritories;
-                        document.getElementById("e-place").innerText = "1st";
-                        document.getElementById("e-map").innerText = mapname;
-                        document.getElementById("e-header").innerText = "You won the battle";
-                        document.getElementById("e-intro").innerText = "You won the battle by being the last player standing!";
-                        document.getElementById("e-ending").innerText = "Congrats! Maybe join a new game and give it another go?";
-                        sharedetails = "I played ⚔Emblitz, a real-time online strategy game, and won a battle in the " + mapname + " map. I had " + lifetimepeaktroops + " troops and captured " + lifetimepeakterritories + " territories at my peak. Play it at https://emblitz.com\n\n#Emblitz";
-                        setTimeout(function() {
-                            document.getElementById("endscreen").style.opacity = "1";
-                        }, 100);
-                    }
-                } else if(response.lobbytimer) {
-                    lobbycountdown = response.lobbytimer;
-                    document.getElementById("timeramount").innerText = lobbycountdown;
-                } else if(response.playermedalchange && response.playermedalchange === uid) {
-                    if(response.amount === "none") {
-                        document.getElementById("e-medal-change").style.display = "none";
-                    } else {
-                        document.getElementById("e-medal-change").style.display = "block";
-                        let medalPlurality = 's';
-                        let medalSign = '+';
-                        if(response.amount == 1){
-                            medalPlurality = '';
+                    } else if(response.playerWon) {
+                        if(response.playerWon !== uid) {
+                            let winname = pnames.filter(obj => {
+                                return obj.id === response.playerdead;
+                            });
+                            winname = winname[0].name;
+                            notification("notify", winname + " won the game!", winname + " defeated all other players and is the last player standing!", 6)
+                        } else {
+                            //you died
+                            document.getElementById("endscreen").style.display = "block";
+                            document.getElementById("endscreen").style.opacity = "0";
+                            document.getElementById("e-troops").innerText = lifetimepeaktroops;
+                            document.getElementById("e-territories").innerText = lifetimepeakterritories;
+                            document.getElementById("e-place").innerText = "1st";
+                            document.getElementById("e-map").innerText = mapname;
+                            document.getElementById("e-header").innerText = "You won the battle";
+                            document.getElementById("e-intro").innerText = "You won the battle by being the last player standing!";
+                            document.getElementById("e-ending").innerText = "Congrats! Maybe join a new game and give it another go?";
+                            sharedetails = "I played ⚔Emblitz, a real-time online strategy game, and won a battle in the " + mapname + " map. I had " + lifetimepeaktroops + " troops and captured " + lifetimepeakterritories + " territories at my peak. Play it at https://emblitz.com\n\n#Emblitz";
+                            setTimeout(function() {
+                                document.getElementById("endscreen").style.opacity = "1";
+                            }, 100);
                         }
-                        if(response.amount < 0){
-                            medalSign = '';
+                    } else if(response.lobbytimer) {
+                        lobbycountdown = response.lobbytimer;
+                        document.getElementById("timeramount").innerText = lobbycountdown;
+                    } else if(response.playermedalchange && response.playermedalchange === uid) {
+                        if(response.amount === "none") {
+                            document.getElementById("e-medal-change").style.display = "none";
+                        } else {
+                            document.getElementById("e-medal-change").style.display = "block";
+                            let medalPlurality = 's';
+                            let medalSign = '+';
+                            if(response.amount == 1){
+                                medalPlurality = '';
+                            }
+                            if(response.amount < 0){
+                                medalSign = '';
+                            }
+                            document.getElementById("e-medals").innerText = `${medalSign}${response.amount} medal${medalPlurality}`;
                         }
-                        document.getElementById("e-medals").innerText = `${medalSign}${response.amount} medal${medalPlurality}`;
-                    }
-                } else if(response.playerxpchange && response.playerxpchange === uid) {
-                    if(response.amount === "none") {
-                        //document.getElementById("e-medal-change").style.display = "none";
-                    } else {
-                        //document.getElementById("e-medal-change").style.display = "block";
-                        console.log(response.amount);
+                    } else if(response.playerxpchange && response.playerxpchange === uid) {
+                        if(response.amount === "none") {
+                            //document.getElementById("e-medal-change").style.display = "none";
+                        } else {
+                            //document.getElementById("e-medal-change").style.display = "block";
+                            console.log(response.amount);
+                        }
                     }
                 }
-            }
+            });
+        }).catch(function(error) {
+            notification("error", "Error", error, 6);
+            exitLobby();
         });
-    }).catch(function(error) {
-        notification("error", "Error", error, 6);
-        exitLobby();
     });
 }
 

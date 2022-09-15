@@ -41,12 +41,16 @@
         <SCRIPT TYPE="text/javascript" SRC="./js/tutorialslide.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="./js/mapdescriptions.js"></SCRIPT>
         <SCRIPT TYPE="text/javascript" SRC="../js/xpLevelCalc.js"></SCRIPT>
+        <SCRIPT TYPE="text/javascript" SRC="../js/loadingScreen.js"></SCRIPT>
 
         <TITLE>Emblitz | Multiplayer Strategy Game</TITLE>
     </HEAD>
     <BODY>
         <DIV ID="notifications">
             <!-- notifications display here -->
+        </DIV>
+
+        <DIV CLASS="loadingscreen" ID="loadingscreen">
         </DIV>
 
         <DIV CLASS="lobbyscreen" ID="lobbyscreen">
@@ -119,7 +123,7 @@
                             <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
                             <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
                                 <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game. If not, use the "Play" button to play a random match.</DIV>
-                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect('r-' + document.getElementById('room_id').value, null, false)">Connect</BUTTON>
+                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect('r-' + document.getElementById('room_id').value.toLowerCase(), null, false)">Connect</BUTTON>
                             </DIV>
                             <BR><BR>
                             <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
@@ -237,7 +241,7 @@
                 </DIV>
             </DIV>
             <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">
-                <DIV ID="map" STYLE="transform: translate(0px, 0px);"><DIV ID="svg-map-bg" class="svg-map-bg"><DIV ID="mapl2"></DIV><DIV ID="maploading">Loading...</DIV></DIV></DIV>
+                <DIV ID="map" STYLE="transform: translate(0px, 0px);"><DIV ID="svg-map-bg" class="svg-map-bg"><DIV ID="mapl2"></DIV><DIV ID="maploading"><DIV STYLE="font-size: 22px; font-weight: bold; color: #ffffff">Loading...</DIV></DIV></DIV></DIV>
             </DIV>
         </DIV>
     </BODY>
