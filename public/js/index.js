@@ -805,7 +805,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
         document.getElementById("gamelobby").style.display = "block";
         joinGame(inputroomid, pmap, createnewroom).then(function() {
             connectToServer().then(function(ws) {
-                hideLoadingScreen();
+                hideLoadingScreen(false);
                 document.getElementById("invitecode").innerText = roomid.replace("r-", "");
                 tickLobbyTimer();
                 websocket = ws;
@@ -1159,6 +1159,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
             });
         }).catch(function(error) {
             notification("error", "Error", error, 6);
+            hideLoadingScreen(true);
             exitLobby();
         });
     });

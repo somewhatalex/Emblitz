@@ -1,3 +1,5 @@
+var loadingtimeout = null;
+
 function showLoadingScreen() {
     return new Promise((resolve) => {
         document.getElementById("loadingscreen").style.display = "block";
@@ -6,7 +8,7 @@ function showLoadingScreen() {
             document.getElementById("loadingscreen").style.opacity = "1";
         }, 50);
 
-        setTimeout(function() {
+        loadingtimeout = setTimeout(function() {
             document.getElementById("lobbyscreen").style.display = "none";
         }, 550);
 
@@ -22,7 +24,11 @@ function showLoadingScreen() {
     });
 }
 
-function hideLoadingScreen() {
+function hideLoadingScreen(haserror) {
+    if(haserror) {
+        clearTimeout(loadingtimeout);
+        document.getElementById("lobbyscreen").style.display = "block";
+    }
     document.getElementById("loadingscreen").style.opacity = "0";
     setTimeout(function() {
         document.getElementById("loadingscreen").style.display = "none";
