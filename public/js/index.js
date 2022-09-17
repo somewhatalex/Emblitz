@@ -1104,7 +1104,9 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                     } else if(response.playerdead) {
                         let p_displayed = document.getElementById("l-" + response.playerdead);
                         p_displayed.remove();
-                        document.getElementById("pbar-" + response.playerdead).remove();
+                        if(document.getElementById("pbar-" + response.playerdead)) {
+                            document.getElementById("pbar-" + response.playerdead).remove();
+                        }
                         if(response.playerdead !== uid) {
                             let defeatedname = pnames.filter(obj => {
                                 return obj.id === response.playerdead;
@@ -1145,7 +1147,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                     } else if(response.playerWon) {
                         if(response.playerWon !== uid) {
                             let winname = pnames.filter(obj => {
-                                return obj.id === response.playerdead;
+                                return obj.id === response.playerWon;
                             });
                             winname = winname[0].name;
                             notification("notify", winname + " won the game!", winname + " defeated all other players and is the last player standing!", 6)
