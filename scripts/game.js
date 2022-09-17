@@ -19,7 +19,7 @@ function game() {
                 for(let [key, value] of Object.entries(mapdict)) {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate});
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false});
                 resolve("ok");
             });
         });
@@ -189,6 +189,7 @@ function game() {
     }
 
     this.attackTerritory = function(roomid, playerid, start, target, trooppercent) {
+        if(games.get(roomid).hasended) return;
         if(games.get(roomid).phase === "attack") {
             let starttroops = games.get(roomid).mapstate[start].troopcount;
             let targettroops = games.get(roomid).mapstate[target].troopcount;
@@ -287,13 +288,14 @@ function game() {
         }
 
         if(totalplayersinroom.length == 1) {
-            if(!games.get(roomid).isprivate) {
+            if(!games.get(roomid).isprivate && games.get(roomid)) {
                 auth.editPlayerGameStats(1, games.get(roomid).totalplayers, idToPubkey(roomid, totalplayersinroom[0])).then(function(result) {
                     games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
                     self.emit("pstatschange", [roomid, totalplayersinroom[0], result]);
                 });
             }
             self.emit("playerWon", [roomid, totalplayersinroom[0]]);
+            games.get(roomid).hasended = true;
         }
     }
 
