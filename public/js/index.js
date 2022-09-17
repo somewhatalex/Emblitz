@@ -658,12 +658,22 @@ function troopChangeAnimation(value, location) {
 
 function initLB() {
     document.getElementById("players_container").innerHTML = "";
+
+    //reset the territory progress bar
+    document.getElementById("s-tb-container").innerHTML = `<DIV ID="territoryprogress" CLASS="s-territories-bar-inner"></DIV>`
     for(let i=0; i<pnames.length; i++) {
         document.getElementById("players_container").innerHTML += `
         <DIV CLASS="lb_player" ID="l-${pnames[i].id}">
             <DIV CLASS="lb_avatar-frame" STYLE="border: 5px solid ${pnames[i].pcolor}"></DIV>
             <DIV CLASS="lb_p_info"><DIV ID="p_name" CLASS="lb_p_name">${pnames[i].name}</DIV></DIV>
         </DIV>`;
+
+        //add in the bars for the territory progress bar
+        if(pnames[i].id !== uid) {
+            document.getElementById("s-tb-container").innerHTML += `<DIV ID="pbar-${pnames[i].id}" CLASS="s-territories-bar-inner"></DIV>`;
+            document.getElementById("pbar-" + pnames[i].id).style.background = colorData[pnames[i].pcolor].normal;
+            document.getElementById("pbar-" + pnames[i].id).style.width = "0%";
+        }
     }
 }
 
@@ -898,6 +908,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         let p_displayed = document.getElementById("l-" + response.playerleft);
                         if(p_displayed) {
                             p_displayed.remove();
+                            document.getElementById("pbar-" + response.playerleft).remove();
                         }
                         if(inGame) {
                             let leftname = pnames.filter(obj => {
@@ -950,6 +961,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             document.getElementById("statsbar-bg").style.borderTop = "10px solid " + colorData[myColor].normal;
                             document.getElementById("territoryprogress").style.background = colorData[myColor].normal;
                             document.getElementById("territoryprogress").style.width = "0%";
+                            document.getElementById("territoryprogress").style.display = "none"
                             document.getElementById("s-totalterritories").innerText = totalterritories;
 
                             document.getElementById("s-troops").innerText = "0";
@@ -1024,18 +1036,41 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             lifetimepeakterritories = playeroccupied;
                         }
 
+                        //update your info on the leaderboard
                         document.getElementById("s-troops").innerText = playertotaltroops;
                         document.getElementById("s-territories").innerText = playeroccupied;
+                        
+                        /*
+                        the client's territory progress bar is different
+                        it's always first and has the id "territoryprogress", while other
+                        players' bars have pbar- followed by their id
+                        */
+
                         document.getElementById("territoryprogress").style.width = (playeroccupied/totalterritories)*100 + "%";
 
-                        document.getElementById("troops-" + uid).innerText = playertotaltroops;
-                        document.getElementById("territories-" + uid).innerText = playeroccupied;
+                        if(document.getElementById("territoryprogress").style.width === "0%") {
+                            document.getElementById("territoryprogress").style.display = "none";
+                        } else {
+                            document.getElementById("territoryprogress").style.display = "inline-block";
+                        }
 
+                        if(document.getElementById("troops-" + uid)) {
+                            document.getElementById("troops-" + uid).innerText = playertotaltroops;
+                            document.getElementById("territories-" + uid).innerText = playeroccupied;
+                        }
+
+                        //for all the other players
                         for(p_key in playerstats) {
                             for(key in playerColors) {
                                 if(playerColors[key] === p_key) {
+                                    //update leaderboard
                                     document.getElementById("troops-" + key).innerText = playerstats[p_key][0];
                                     document.getElementById("territories-" + key).innerText = playerstats[p_key][1];
+
+                                    //edit the player's bar in the overall territories bar
+                                    if(key !== uid) {
+                                        document.getElementById("pbar-" + key).style.width = (playerstats[p_key][1]/totalterritories)*100 + "%";
+                                    }
                                     break;
                                 }
                             }
@@ -1069,6 +1104,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                     } else if(response.playerdead) {
                         let p_displayed = document.getElementById("l-" + response.playerdead);
                         p_displayed.remove();
+                        document.getElementById("pbar-" + response.playerdead).remove();
                         if(response.playerdead !== uid) {
                             let defeatedname = pnames.filter(obj => {
                                 return obj.id === response.playerdead;
