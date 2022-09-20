@@ -105,6 +105,7 @@ class emblitzBot {
 
   initiateAttackAI_A() {
     let parent = this;
+
     let moveslength = this.moves.length;
 
     let ownedTerritories = [];
@@ -116,7 +117,6 @@ class emblitzBot {
     let bestOptionCount = 0;
     let workingVariable = '';
     let switchVar = [];
-    let aggressionLevel = 0;
     if(mapdata === "no room") clearTimeout(parent.attacktimer);
 
     this.attacktimer = setInterval(function() {
@@ -183,12 +183,11 @@ class emblitzBot {
           game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 95); // 95 is temporary, am tired
         }
       }
-    }, randomnumber(400, 1200));
+    }, randomnumber(125, 1200));
   }
 
   initiateAttackAI_B() {
     let parent = this;
-    let territoriesOwned = [];
 
     let moveslength = this.moves.length;
 
