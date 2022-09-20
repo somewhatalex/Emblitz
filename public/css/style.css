@@ -184,7 +184,8 @@
     }
 
     .mobile-socials {
-        display: block !important;
+        display: inline-block !important;
+        max-width: 130px;
     }
 }
 
@@ -1561,6 +1562,10 @@ input { /*override default styles*/
 .socials-header {
     font-size: 17px;
     color: var(--light);
+}
+
+.socials-instagram {
+    margin-top: 10px;
 }
 
 .socials-bg {

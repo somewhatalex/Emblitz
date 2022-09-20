@@ -105,7 +105,6 @@ class emblitzBot {
 
   initiateAttackAI_A() {
     let parent = this;
-    let territoriesOwned = [];
 
     let moveslength = this.moves.length;
 
@@ -189,7 +188,6 @@ class emblitzBot {
 
   initiateAttackAI_B() {
     let parent = this;
-    let territoriesOwned = [];
 
     let moveslength = this.moves.length;
 
@@ -267,6 +265,7 @@ class emblitzBot {
     let moveslength = this.moves.length;
 
     let aggression = 0;
+    let prev_OT = 0; //previous owned territories
 
     this.attacktimer = setInterval(function() {
       let ownedTerritories = [];
@@ -284,8 +283,8 @@ class emblitzBot {
       let territoryconsidered = ""; //abbr. of territory
 
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
-      
-      let prev_OT = 0; //previous owned territories
+
+      prev_OT = ownedTerritories.length;
 
       //wyatt write your attack ai here
       Object.keys(mapdata).forEach((key) => {
@@ -294,7 +293,7 @@ class emblitzBot {
         }
       });
 
-      if(ownedTerritories.length < prev_OT.length) {
+      if(ownedTerritories.length < prev_OT) {
         aggression += 0.05; //bot was attacked, increase aggression
       }
       
