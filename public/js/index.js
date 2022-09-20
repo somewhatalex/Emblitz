@@ -803,8 +803,10 @@ function tickLobbyTimer() {
 function getUserInfo() {
     fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getmyinfo"})}).then(response => {
         response.json().then(function(result) {
-            document.getElementById("ms_medals").innerText = result.medals;
-            document.getElementById("ms_badges").innerText = Object.keys(JSON.parse(result.badges)).length;
+            if(document.getElementById("ms_medals")) {
+                document.getElementById("ms_medals").innerText = result.medals;
+                document.getElementById("ms_badges").innerText = Object.keys(JSON.parse(result.badges)).length;
+            }
         });
     });
 }
@@ -1171,7 +1173,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         lobbycountdown = response.lobbytimer;
                         document.getElementById("timeramount").innerText = lobbycountdown;
                     } else if(response.playermedalchange && response.playermedalchange === uid) {
-                        if(response.amount === "none") {
+                        if(isNaN(Number(response.amount))) {
                             document.getElementById("e-medal-change").style.display = "none";
                         } else {
                             document.getElementById("e-medal-change").style.display = "block";
@@ -1190,7 +1192,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             //document.getElementById("e-medal-change").style.display = "none";
                         } else {
                             //document.getElementById("e-medal-change").style.display = "block";
-                            console.log(response.amount);
+                            console.log("tagged xp: " + response.amount);
                         }
                     }
                 }
