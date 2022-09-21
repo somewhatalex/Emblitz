@@ -1618,6 +1618,62 @@ input { /*override default styles*/
     z-index: -1;
 }
 
+.powerupbar {
+    position: fixed;
+    z-index: 99998;
+    bottom: 120px;
+    font-size: 25px;
+    color: var(--light);
+    right: 20px;
+    text-align: center;
+}
+
+.powerup-btn {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 5px;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    display: block;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+.powerup-btn:hover {
+    border: 2px solid var(--light);
+    margin-left: -2px;
+    margin-right: -2px;
+}
+
+.powerup-btn img {
+    width: 40px;
+    height: 40px;
+}
+
+.powerup-btn-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    opacity: 0.7;
+    width: 100%;
+    background: var(--dark);
+    z-index: -1;
+    left: 0;
+}
+
+.powerup-recharge {
+    position: absolute;
+    height: 0%;
+    bottom: 0;
+    opacity: 0.7;
+    width: 100%;
+    background: var(--green);
+    z-index: -1;
+    left: 0;
+}
+
 .l-stats {
     font-size: 14px;
     color: var(--light);

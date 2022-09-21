@@ -292,6 +292,7 @@ function initializeMap() {
                 if(attackPhase === "deploy") {
                     deployTroops(d.currentTarget);
                 } else if(attackPhase === "attack") {
+                    //reset all lines
                     let currentAttackLines = document.getElementsByClassName("attack-line");
                     while(currentAttackLines[0]) {
                         currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
@@ -304,6 +305,44 @@ function initializeMap() {
                         allregions[i].style.strokeWidth = "2px";
                         allregions[i].style.strokeLinejoin = "round";
                     }
+
+                    //can move troops? if not, check if a powerup is blocking it
+                    if(!canMoveTroops) {
+                        //see if a powerup is active
+                        if(powerupType === "airlift") {
+                            let territory = d.currentTarget;
+                            //is a territory already selected?
+                            if(selectedRegion !== territory && selectedRegion !== "") {
+                                sendAirlift(selectedRegion, territory);
+                                selectedRegion = "";
+                                infobar("hide");
+                                setTimeout(function() {
+                                    document.getElementById("infobar").style.display = "none";
+                                }, 400);
+                                return;
+                            }
+                            if(territory.getAttribute("data-color") !== myColor || selectedRegion === territory) {
+                                if(selectedRegion === territory) {
+                                    territory.style.stroke = "#004ab3";
+                                    territory.style.strokeWidth = "5px";
+                                    territory.style.strokeLinejoin = "round";
+                                }
+                                return;
+                            }
+                            selectedRegion = territory;
+
+                            territory.style.stroke = "#004ab3";
+                            territory.style.strokeWidth = "5px";
+                            territory.style.strokeLinejoin = "round";
+
+                            //set notification to selected notification
+                            document.getElementById("eventstimer").style.display = "none";
+                            document.getElementById("eventstimer").style.width = "0%";
+                            infobar("show");
+                            document.getElementById("statustext").innerHTML = "<B>Airlift Powerup:</B> Select any destination territory to move troops to.";
+                        }
+                        return;
+                    };
 
                     let territory = d.currentTarget;
                     if(selectedRegion !== territory) {
@@ -347,7 +386,7 @@ function initializeMap() {
                         t_targeted.style.strokeLinejoin = "round";
                     }
 
-                    if(selectedRegion != territory) {
+                    if(selectedRegion !== territory) {
                         selectedRegion = territory;
                         territory.style.stroke = "#004ab3";
                         territory.style.strokeWidth = "5px";
