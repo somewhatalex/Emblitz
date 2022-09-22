@@ -1233,6 +1233,11 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             //document.getElementById("e-medal-change").style.display = "block";
                             console.log("tagged xp: " + response.amount);
                         }
+                    //a player initiated an air lift
+                    } else if(response.sendairlift) {
+                        let start = document.getElementById("t_origin_" + response.start.toLowerCase());
+                        let target = document.getElementById("t_origin_" + response.target.toLowerCase());
+                        airliftPlaneAnimation(start, target);
                     }
                 }
             });

@@ -1192,6 +1192,8 @@ wss.on("connection", (ws) => {
                     client.send(JSON.stringify(message));
                 }
 
+                let msg = JSON.parse(message);
+
                 //begin possible inbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": rooms[i]["playersready"]});
@@ -1202,6 +1204,8 @@ wss.on("connection", (ws) => {
                     }
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
+                } else if(action === "powerup-airlift") {
+                    sendmsg({"sendairlift": true, "start": msg.start, "target": msg.target});
                 }
             }
         });

@@ -1628,6 +1628,16 @@ input { /*override default styles*/
     text-align: center;
 }
 
+.powerups-airplane {
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    transition: 0.5s linear;
+    pointer-events: none;
+}
+
 .powerup-btn {
     position: relative;
     background: none;
