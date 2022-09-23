@@ -277,6 +277,25 @@ function game() {
         }
     }
 
+    this.airlift = function(start, target, distance, id, roomid) {
+        /*
+        the plane travels 120px a second, so to get the traveltime
+        you'll have to divide the total distance in pixels by 120
+        */
+
+        //145 is subtracted to accomodate the length of the plane
+        let traveltime = (distance-145/120)*1000;
+
+        //500ms is the deploy time, so the travel time can't be less than that
+        if(traveltime < 500) {
+            traveltime = 500;
+        }
+        setTimeout(function() {
+            //triggers both plane sync and paratrooper animation
+            self.emit("airliftarrived", [roomid, target, id]);
+        }, traveltime);
+    }
+
     function checkForWin(roomid) {
         let checkterritories = Object.keys(games.get(roomid).mapstate);
         checkterritories_length = checkterritories.length;
@@ -290,7 +309,9 @@ function game() {
         if(totalplayersinroom.length == 1) {
             if(!games.get(roomid).isprivate && games.get(roomid)) {
                 auth.editPlayerGameStats(1, games.get(roomid).totalplayers, idToPubkey(roomid, totalplayersinroom[0])).then(function(result) {
-                    games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
+                    if(games.get(roomid)) {
+                        games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
+                    }
                     self.emit("pstatschange", [roomid, totalplayersinroom[0], result]);
                 });
             }

@@ -14,6 +14,13 @@ planeAsset.src = "./images/assets/airliftplane.svg";
 planeAsset.className = "powerups-airplane";
 planeAsset.style.position = "absolute";
 
+//random number generator
+function randomnumber(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 //triggers airlift
 function airlift() {
     if(attackPhase === "attack") {
@@ -31,17 +38,19 @@ function airlift() {
 
 //requests airlift (animation, ws message)
 function sendAirlift(start, target) {
+    let plane_id = randomnumber(0, 99999);
     let distance = getDistance(start, target);
     start = start.getAttribute("data-code");
     target = target.getAttribute("data-code");
     console.log("[DEBUG] Sent airlift from " + start + " to " + target);
-    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "distance": distance, "uid": uid, "roomid": roomid, "gid": gid}));
+
+    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "distance": distance, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid}));
     canMoveTroops = true;
 }
 
 //airlift animation for the plane only
 //todo: add parachute and deploy animations
-function airliftPlaneAnimation(start, target) {
+function airliftPlaneAnimation(start, target, id) {
     let iterations = 0;
 
     //calculate starting location
@@ -59,20 +68,32 @@ function airliftPlaneAnimation(start, target) {
         angle = 360 + angle;
     }
 
-    let deltax = Math.cos(angle * (Math.PI / 180)) * 50;
-    let deltay = Math.sin(angle * (Math.PI / 180)) * 50;
+    let deltax = Math.cos(angle * (Math.PI / 180)) * 60;
+    let deltay = Math.sin(angle * (Math.PI / 180)) * 60;
+
+    //attach unique id for plane
+    plane.id = "powerup_plane_" + id;
 
     //and then style it and spawn it in
     plane.style.transform = "rotate(" + (angle + 180) + "deg)";
     plane.style.left = x + "px";
     plane.style.top = y + "px";
 
-    plane.style.width = "150px";
-    plane.style.marginTop = "-100px";
-    plane.style.marginLeft = "-100px";
+    plane.style.width = "20px";
+    plane.style.marginTop = "-10px";
+    plane.style.marginLeft = "-10px";
+
+    plane.style.opacity = 0;
+
+    setTimeout(function() {
+        plane.style.width = "210px";
+        plane.style.marginTop = "-105px";
+        plane.style.marginLeft = "-105px";
+        plane.style.opacity = 1;
+    }, 50);
 
     
-    document.getElementById("mapl2").append(plane);
+    document.getElementById("mapl1").append(plane);
 
     x -= deltax;
     y -= deltay;
@@ -81,6 +102,8 @@ function airliftPlaneAnimation(start, target) {
 
     let planeinterval = setInterval(function() {
         //vector calculation to determine change in x and y
+        x = parseInt(plane.style.left.replace("px", ""));
+        y = parseInt(plane.style.top.replace("px", ""));
         x -= deltax;
         y -= deltay;
 
@@ -88,7 +111,7 @@ function airliftPlaneAnimation(start, target) {
         plane.style.top = y + "px";
 
         iterations++;
-        if(iterations > 55) {
+        if(iterations > 65) {
             clearInterval(planeinterval);
             plane.remove();
         }

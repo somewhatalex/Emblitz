@@ -341,7 +341,7 @@ input { /*override default styles*/
     min-width: 100vw;
 }
 
-#mapl2 {
+#mapl2, #mapl1 {
     float: left;
     grid-area: 1/1;
     z-index: 100;
@@ -1634,7 +1634,7 @@ input { /*override default styles*/
     user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    transition: 0.5s linear;
+    transition: all 1.5s, left 0.5s linear, top 0.5s linear;
     pointer-events: none;
 }
 

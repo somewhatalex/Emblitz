@@ -1022,6 +1022,10 @@ gameevents.on("pstatschange", function(result) {
     sendRoomMsg(result[0], {"playerxpchange": result[1], "amount": result[2][1]});
 });
 
+gameevents.on("airliftarrived", function(result) {
+    sendRoomMsg(result[0], {"airliftarrived": result[1], "plane_id": result[2]});
+});
+
 //passively send messages to all users in room w/o request
 //format: sendRoomMsg("room69", {"bobux": "momento"});
 
@@ -1205,7 +1209,8 @@ wss.on("connection", (ws) => {
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 } else if(action === "powerup-airlift") {
-                    sendmsg({"sendairlift": true, "start": msg.start, "target": msg.target});
+                    sendmsg({"sendairlift": true, "start": msg.start, "target": msg.target, "plane_id": msg.plane_id, "roomid": msg.roomid});
+                    game.airlift(msg.start, msg.target, msg.distance, msg.plane_id, msg.roomid);
                 }
             }
         });

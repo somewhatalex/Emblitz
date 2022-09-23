@@ -59,6 +59,8 @@ function inithomepage() {
         localStorage.setItem("hasvisited", true);
     }
 
+    document.getElementById("mapl1").innerHTML = "";
+
     loadPosts("refresh");
     getUserInfo();
 
@@ -129,6 +131,8 @@ function resetAll() {
     previousmobilezoom = null;
 
     p_startindex = 0;
+
+    document.getElementById("mapl1").innerHTML = "";
 }
 
 function hidegamenews() {
@@ -1237,7 +1241,17 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                     } else if(response.sendairlift) {
                         let start = document.getElementById("t_origin_" + response.start.toLowerCase());
                         let target = document.getElementById("t_origin_" + response.target.toLowerCase());
-                        airliftPlaneAnimation(start, target);
+                        airliftPlaneAnimation(start, target, response.plane_id);
+                    } else if(response.airliftarrived) {
+                        let targetplane = document.getElementById("powerup_plane_" + response.plane_id);
+
+                        //get coordinates of the second territory
+                        var off2 = getOffset(document.getElementById("t_origin_" + response.airliftarrived.toLowerCase()));
+                        var x2 = off2.left + off2.width+20;
+                        var y2 = off2.top + off2.height+20;
+
+                        targetplane.style.left = x2 + "px";
+                        targetplane.style.top = y2 + "px";
                     }
                 }
             });
