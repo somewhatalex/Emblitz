@@ -1250,8 +1250,12 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         var x2 = off2.left + off2.width+20;
                         var y2 = off2.top + off2.height+20;
 
+                        //sync plane with server timing
                         targetplane.style.left = x2 + "px";
                         targetplane.style.top = y2 + "px";
+
+                        //play the parachute animation (since the plane just arrived)
+                        airliftParachuteAnimation(x2, y2);
                     }
                 }
             });

@@ -283,13 +283,14 @@ function game() {
         you'll have to divide the total distance in pixels by 120
         */
 
-        //145 is subtracted to accomodate the length of the plane
-        let traveltime = (distance-145/120)*1000;
+        //85 is subtracted to accomodate the length of the plane
+        let traveltime = ((distance-85)/120)*1000;
 
-        //500ms is the deploy time, so the travel time can't be less than that
+        //500ms is the deploy time, so the travel time can't be less than around 500ms
         if(traveltime < 500) {
             traveltime = 500;
         }
+
         setTimeout(function() {
             //triggers both plane sync and paratrooper animation
             self.emit("airliftarrived", [roomid, target, id]);

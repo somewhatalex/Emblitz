@@ -14,6 +14,12 @@ planeAsset.src = "./images/assets/airliftplane.svg";
 planeAsset.className = "powerups-airplane";
 planeAsset.style.position = "absolute";
 
+//preload parachute asset
+var parachuteAsset = new Image();
+parachuteAsset.src = "./images/assets/airliftparachute.svg";
+parachuteAsset.className = "powerups-parachute";
+parachuteAsset.style.position = "absolute";
+
 //random number generator
 function randomnumber(min, max) {
     min = Math.ceil(min);
@@ -116,6 +122,51 @@ function airliftPlaneAnimation(start, target, id) {
             plane.remove();
         }
     }, 500);
+}
+
+function airliftParachuteAnimation(x, y) {
+    for(let i=0; i<2; i++) {
+        //clone a new parachute asset
+        let parachute = parachuteAsset.cloneNode(true);
+        parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";
+        parachute.style.left = x + "px";
+        parachute.style.top = y + "px";
+
+        parachute.style.width = "20px";
+        parachute.style.marginTop = "-10px";
+        parachute.style.marginLeft = "-10px";
+
+        parachute.style.opacity = 0;
+
+        //once it's styled, prepend it to the div (prepend to make it appear behind planes)
+        document.getElementById("mapl1").prepend(parachute);
+
+        //slight delay to trigger parachute deploy animation
+        setTimeout(function() {
+            parachute.style.width = "80px";
+            parachute.style.marginTop = "-40px";
+            parachute.style.marginLeft = "-40px";
+
+            //randomize origin to stagger parachutes
+            x += randomnumber(-35, 35);
+            y += randomnumber(-35, 35);
+            parachute.style.left = x + "px";
+            parachute.style.top = y + "px";
+
+            parachute.style.opacity = 1;
+            setTimeout(function() {
+                parachute.style.transition = "4s linear";
+                parachute.style.width = "30px";
+                parachute.style.marginTop = "-15px";
+                parachute.style.marginLeft = "-15px";
+            }, 950);
+        }, 50);
+
+        //delete the parachute after 5 seconds
+        setTimeout(function() {
+             parachute.remove();       
+        }, 5000);
+    }
 }
 
 //get the angle between 2 territories

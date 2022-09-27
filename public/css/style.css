@@ -1638,6 +1638,16 @@ input { /*override default styles*/
     pointer-events: none;
 }
 
+.powerups-parachute {
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    transition: 1s;
+    pointer-events: none;
+}
+
 .powerup-btn {
     position: relative;
     background: none;
