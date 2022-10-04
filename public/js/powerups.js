@@ -27,6 +27,52 @@ function randomnumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+//do this at the start of every new round
+function resetPowerupBars() {
+    let powerupbutton = document.getElementById("airlift-powerup");
+    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
+    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "0%";
+    powerupbutton.style.cursor = "no-drop";
+    powerupbutton.setAttribute("disabled", "disabled");
+}
+
+function resetPowerupCooldowns() {
+    triggerPowerupCooldown("airlift", 20);
+}
+
+//function to control the powerup button timers
+//duration is in seconds
+//call this function whenever a powerup is used
+function triggerPowerupCooldown(item, duration) {
+    duration = duration*1000; //convert to ms
+
+    //get the button that triggers the powerup
+    let powerupbutton = document.getElementById(item + "-powerup");
+
+    //slight timeout to trigger css
+    setTimeout(function() {
+        powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
+        powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "0%";
+    }, 50);
+    
+    powerupbutton.style.cursor = "no-drop";
+    powerupbutton.setAttribute("disabled", "disabled");
+
+    setTimeout(function() {
+        powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = (duration-250)/1000 + "s linear"; //subtract 100ms to account for css trick delay
+        powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "100%";
+    }, 250); //accounts for previous timeout and 0.2s transition
+}
+
+//powerup timing is handled server-side
+function syncPowerupCooldown(item) {
+    let powerupbutton = document.getElementById(item + "-powerup");
+    powerupbutton.removeAttribute("disabled");
+    powerupbutton.style.cursor = "pointer";
+    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear"; //subtract 100ms to account for css trick delay
+    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "100%";
+}
+
 //triggers airlift
 function airlift() {
     if(attackPhase === "attack") {
@@ -44,13 +90,14 @@ function airlift() {
 
 //requests airlift (animation, ws message)
 function sendAirlift(start, target) {
+    triggerPowerupCooldown("airlift", 20);
     let plane_id = randomnumber(0, 99999);
     let distance = getDistance(start, target);
     start = start.getAttribute("data-code");
     target = target.getAttribute("data-code");
     console.log("[DEBUG] Sent airlift from " + start + " to " + target);
 
-    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "distance": distance, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid}));
+    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "distance": distance, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid, "amount": Math.round(document.getElementById("troopslider").value)}));
     canMoveTroops = true;
 }
 
