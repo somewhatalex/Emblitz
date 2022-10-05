@@ -238,6 +238,18 @@
                     <DIV CLASS="togglelb-bg"></DIV>
                     <DIV ID="togglelb-inner"><I CLASS="fa fa-angle-double-left"></I></DIV>
                 </DIV>
+                <!-- powerups bar -->
+                <DIV CLASS="powerupbar">
+                    <DIV CLASS="powerup-label">Powerups</DIV>
+                    <BUTTON CLASS="powerup-btn" ID="airlift-powerup" ONCLICK="airlift()">
+                        <DIV CLASS="powerup-nooverflow">
+                            <DIV CLASS="powerup-btn-bg"></DIV>
+                            <DIV CLASS="powerup-recharge"></DIV>
+                            <IMG SRC="./images/assets/airlifticon.svg">
+                        </DIV>
+                        <DIV CLASS="powerup-notify" ID="airlift-notify-icon"></DIV>
+                    </BUTTON>
+                </DIV>
                 <DIV CLASS="endscreen" ID="endscreen">
                     <DIV CLASS="endscreen-bg"></DIV>
                     <DIV CLASS="endscreen-inner">
@@ -251,7 +263,7 @@
                 </DIV>
             </DIV>
             <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">
-                <DIV ID="map" STYLE="transform: translate(0px, 0px);"><DIV ID="svg-map-bg" class="svg-map-bg"><DIV ID="mapl2"></DIV><DIV ID="maploading"><DIV STYLE="font-size: 22px; font-weight: bold; color: #ffffff">Loading...</DIV></DIV></DIV></DIV>
+                <DIV ID="map" STYLE="transform: translate(0px, 0px);"><DIV ID="svg-map-bg" class="svg-map-bg"><DIV ID="mapl2"></DIV><DIV ID="mapl1"></DIV><DIV ID="maploading"><DIV STYLE="font-size: 22px; font-weight: bold; color: #ffffff">Loading...</DIV></DIV></DIV></DIV>
             </DIV>
         </DIV>
     </BODY>

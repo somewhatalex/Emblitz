@@ -16,7 +16,7 @@ function game() {
                 let mapdict = JSON.parse(mapterritorynames);
                 let mapstate = {};
                 let playerstate = [];
-                for(let [key, value] of Object.entries(mapdict)) {
+                for(let [key] of Object.entries(mapdict)) {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
                 games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false});
@@ -135,14 +135,27 @@ function game() {
         self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
         self.emit("startAttackPhase", [roomid, "ok"]);
         delete gameDeployTimers[roomid];
+
+        //initiate powerup cooldown timers
+        let allplayers = games.get(roomid).playerstate;
+        allplayers_length = Object.keys(games.get(roomid).playerstate).length;
+        for(let i=0; i<allplayers_length; i++) {
+            setTimeout(function() {
+                if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
+                    games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.airlift = true;
+                    self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "airlift"]);
+                }
+            }, 20000);
+        }
     }
 
     this.addTroopsPassively = function(roomid) {
         attackIntervals[roomid] = setInterval(function() {
-            let allterritories= Object.keys(games.get(roomid).mapstate);
-            allterritories_length = allterritories.length;
+            if(games.get(roomid).hasended) return;
+            let allterritories = Object.keys(games.get(roomid).mapstate);
+            let allterritories_length = allterritories.length;
             for(let i=0; i<allterritories_length; i++) {
-                if(games.get(roomid).mapstate[allterritories[i]].player != null) {
+                if(games.get(roomid).mapstate[allterritories[i]].player != null && !games.get(roomid).mapstate[allterritories[i]].territory.startsWith("plane-")) {
                     let troopaddamount = Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * 0.1) + 1;
                     if(troopaddamount > 5) {
                         troopaddamount = 5;
@@ -189,6 +202,7 @@ function game() {
     }
 
     this.attackTerritory = function(roomid, playerid, start, target, trooppercent) {
+        if(!games.get(roomid)) return;
         if(games.get(roomid).hasended) return;
         if(games.get(roomid).phase === "attack") {
             let starttroops = games.get(roomid).mapstate[start].troopcount;
@@ -254,7 +268,7 @@ function game() {
                 if(istargetdead) {
                     checkterritories = Object.keys(games.get(roomid).mapstate);
                     checkterritories_length = checkterritories.length;
-                    let totalplayersinroom = []
+                    let totalplayersinroom = [];
                     for(let i = 0; i < checkterritories_length; i++) {
                         if(games.get(roomid).mapstate[checkterritories[i]].player && !totalplayersinroom.includes(games.get(roomid).mapstate[checkterritories[i]].player)) {
                             totalplayersinroom.push(games.get(roomid).mapstate[checkterritories[i]].player);
@@ -277,6 +291,62 @@ function game() {
         }
     }
 
+    //id = plane id ex. 69420
+    //playerid = id of the player that sent it
+    this.airlift = function(start, target, distance, id, roomid, playerid, amount) {
+        let parent = this;
+        try {
+            if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == true) {
+                games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = false;
+                
+                //create a "ghost territory" to serve as the plane
+                let planeterritory = "plane-" + id + "-" + playerid;
+                games.get(roomid).mapstate[planeterritory] = ({"territory": planeterritory, "player": playerid, "troopcount": 0});
+                //then move troops to the ghost territory
+                this.attackTerritory(roomid, playerid, start, planeterritory, amount);
+
+                setTimeout(function() {
+                    if(games.get(roomid)) {
+                        if(games.get(roomid).playerstate.find(item => item.id === playerid)) {
+                            games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = true;
+                            self.emit("powerup_cooldownended", [roomid, playerid, "airlift"]);
+                        }
+                    }
+                }, 20000);
+
+                self.emit("powerup_initairlift", [roomid, start, target, id]);
+
+                /*
+                the plane travels 120px a second, so to get the traveltime
+                you'll have to divide the total distance in pixels by 120
+                */
+
+                //85 is subtracted to accomodate the length of the plane
+                let traveltime = ((distance-105)/120)*1000;
+
+                //500ms is the deploy time, so the travel time can't be less than around 500ms
+                if(traveltime < 500) {
+                    traveltime = 500;
+                }
+
+                setTimeout(function() {
+                    //triggers both plane sync and paratrooper animation
+                    self.emit("airliftarrived", [roomid, target, id]);
+
+                    //paratroopers take 5s to reach the ground
+                    setTimeout(function() {
+                        //move all troops off the plane
+                        parent.attackTerritory(roomid, playerid, planeterritory, target, 100);
+                        //delete the plane "ghost" territory
+                        delete games.get(roomid).mapstate[planeterritory]
+                    }, 5000)
+                }, traveltime);
+            }
+        } catch(e) {
+            //console.log(e);
+        }
+    }
+
     function checkForWin(roomid) {
         let checkterritories = Object.keys(games.get(roomid).mapstate);
         checkterritories_length = checkterritories.length;
@@ -290,7 +360,9 @@ function game() {
         if(totalplayersinroom.length == 1) {
             if(!games.get(roomid).isprivate && games.get(roomid)) {
                 auth.editPlayerGameStats(1, games.get(roomid).totalplayers, idToPubkey(roomid, totalplayersinroom[0])).then(function(result) {
-                    games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
+                    if(games.get(roomid)) {
+                        games.get(roomid).playerstate.find(item => item.id === totalplayersinroom[0]).isaccounted = true;
+                    }
                     self.emit("pstatschange", [roomid, totalplayersinroom[0], result]);
                 });
             }
@@ -356,7 +428,7 @@ function game() {
 
     this.addPlayer = function(roomid, id, pubkey) {
         return new Promise(function(resolve) {
-            games.get(roomid).playerstate.push({"id": id, "pubkey": pubkey, "isaccounted": false});
+            games.get(roomid).playerstate.push({"id": id, "pubkey": pubkey, "isaccounted": false, "powerups_status": {"airlift": false}});
             resolve("ok");
         });
     }

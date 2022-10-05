@@ -59,6 +59,8 @@ function inithomepage() {
         localStorage.setItem("hasvisited", true);
     }
 
+    document.getElementById("mapl1").innerHTML = "";
+
     loadPosts("refresh");
     getUserInfo();
 
@@ -129,6 +131,10 @@ function resetAll() {
     previousmobilezoom = null;
 
     p_startindex = 0;
+
+    document.getElementById("mapl1").innerHTML = "";
+
+    resetPowerupBars();
 }
 
 function hidegamenews() {
@@ -292,6 +298,7 @@ function initializeMap() {
                 if(attackPhase === "deploy") {
                     deployTroops(d.currentTarget);
                 } else if(attackPhase === "attack") {
+                    //reset all lines
                     let currentAttackLines = document.getElementsByClassName("attack-line");
                     while(currentAttackLines[0]) {
                         currentAttackLines[0].parentNode.removeChild(currentAttackLines[0])
@@ -304,6 +311,44 @@ function initializeMap() {
                         allregions[i].style.strokeWidth = "2px";
                         allregions[i].style.strokeLinejoin = "round";
                     }
+
+                    //can move troops? if not, check if a powerup is blocking it
+                    if(!canMoveTroops) {
+                        //see if a powerup is active
+                        if(powerupType === "airlift") {
+                            let territory = d.currentTarget;
+                            //is a territory already selected?
+                            if(selectedRegion !== territory && selectedRegion !== "") {
+                                sendAirlift(selectedRegion, territory);
+                                selectedRegion = "";
+                                infobar("hide");
+                                setTimeout(function() {
+                                    document.getElementById("infobar").style.display = "none";
+                                }, 400);
+                                return;
+                            }
+                            if(territory.getAttribute("data-color") !== myColor || selectedRegion === territory) {
+                                if(selectedRegion === territory) {
+                                    territory.style.stroke = "#004ab3";
+                                    territory.style.strokeWidth = "5px";
+                                    territory.style.strokeLinejoin = "round";
+                                }
+                                return;
+                            }
+                            selectedRegion = territory;
+
+                            territory.style.stroke = "#004ab3";
+                            territory.style.strokeWidth = "5px";
+                            territory.style.strokeLinejoin = "round";
+
+                            //set notification to selected notification
+                            document.getElementById("eventstimer").style.display = "none";
+                            document.getElementById("eventstimer").style.width = "0%";
+                            infobar("show");
+                            document.getElementById("statustext").innerHTML = "<B>Airlift Powerup:</B> Select any destination territory to move troops to.";
+                        }
+                        return;
+                    };
 
                     let territory = d.currentTarget;
                     if(selectedRegion !== territory) {
@@ -347,7 +392,7 @@ function initializeMap() {
                         t_targeted.style.strokeLinejoin = "round";
                     }
 
-                    if(selectedRegion != territory) {
+                    if(selectedRegion !== territory) {
                         selectedRegion = territory;
                         territory.style.stroke = "#004ab3";
                         territory.style.strokeWidth = "5px";
@@ -983,50 +1028,49 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         let playerstats = {};
                         for(let i=0; i<reslength; i++) {
                             let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
-                            let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
-                            if(!document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase())) {
-                                console.log(c_update_map_info.territory.toLowerCase());
-                            }
-                            let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
-                            let initialcolor = selectterritory.getAttribute("data-color");
-                            document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
-                            if(c_update_map_info.player != null) {
-                                selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
-                                selectterritory.setAttribute("fill", getColor(selectterritory, false));
-                            } else {
-                                selectterritory.setAttribute("data-color", "default");
-                                selectterritory.setAttribute("fill", getColor(selectterritory, false));
-                            }
-
-                            if(selectterritory.getAttribute("data-color") === myColor) {
-                                playertotaltroops = playertotaltroops + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText);
-                                playeroccupied++;
-                            } else if(selectterritory.getAttribute("data-color") !== "default"){
-                                if(!playerstats.hasOwnProperty(selectterritory.getAttribute("data-color"))) {
-                                    playerstats[selectterritory.getAttribute("data-color")] = [Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), 1];
+                            if(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase())) {
+                                let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
+                                let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
+                                let initialcolor = selectterritory.getAttribute("data-color");
+                                document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
+                                if(c_update_map_info.player != null) {
+                                    selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
+                                    selectterritory.setAttribute("fill", getColor(selectterritory, false));
                                 } else {
-                                    playerstats[selectterritory.getAttribute("data-color")] = [playerstats[selectterritory.getAttribute("data-color")][0] + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), playerstats[selectterritory.getAttribute("data-color")][1] + 1];
+                                    selectterritory.setAttribute("data-color", "default");
+                                    selectterritory.setAttribute("fill", getColor(selectterritory, false));
                                 }
-                            }
 
-                            if(attackPhase === "attack") {
-                                if(initialcolor === selectterritory.getAttribute("data-color")) {
-                                    if(c_update_map_info.troopcount - initialtroops != 0) {
-                                        troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
+                                if(selectterritory.getAttribute("data-color") === myColor) {
+                                    playertotaltroops = playertotaltroops + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText);
+                                    playeroccupied++;
+                                } else if(selectterritory.getAttribute("data-color") !== "default"){
+                                    if(!playerstats.hasOwnProperty(selectterritory.getAttribute("data-color"))) {
+                                        playerstats[selectterritory.getAttribute("data-color")] = [Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), 1];
+                                    } else {
+                                        playerstats[selectterritory.getAttribute("data-color")] = [playerstats[selectterritory.getAttribute("data-color")][0] + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), playerstats[selectterritory.getAttribute("data-color")][1] + 1];
                                     }
-                                } else {
+                                }
+
+                                if(attackPhase === "attack") {
+                                    if(initialcolor === selectterritory.getAttribute("data-color")) {
+                                        if(c_update_map_info.troopcount - initialtroops != 0) {
+                                            troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
+                                        }
+                                    } else {
+                                        troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
+                                    }
+
+                                    if(selectedRegion) {
+                                        let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
+                                        if(troopmoveamount < 1) {
+                                            troopmoveamount = 1;
+                                        }
+                                        document.getElementById("sendamount").innerText = troopmoveamount + " troops";
+                                    }
+                                } else if(attackPhase === "deploy" && c_update_map_info.troopcount - initialtroops != 0 && selectterritory.getAttribute("data-color") !== "default") {
                                     troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                                 }
-
-                                if(selectedRegion) {
-                                    let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
-                                    if(troopmoveamount < 1) {
-                                        troopmoveamount = 1;
-                                    }
-                                    document.getElementById("sendamount").innerText = troopmoveamount + " troops";
-                                }
-                            } else if(attackPhase === "deploy" && c_update_map_info.troopcount - initialtroops != 0 && selectterritory.getAttribute("data-color") !== "default") {
-                                troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                             }
                         }
 
@@ -1082,6 +1126,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                     } else if(response.startAttackPhase) {
                         attackPhase = "attack";
 
+                        resetPowerupCooldowns();
                         troopTimerBar();
                         
                         setTimeout(function() {
@@ -1096,6 +1141,10 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                                 }, 400);
                             }, 7000));
                         }, 1000);
+                    } else if(response.powerup_cooldownended) {
+                        if(response.player === uid) {
+                            syncPowerupCooldown(response.powerup_cooldownended);
+                        }
                     } else if(response.syncTroopTimer) {
                         troopTimerBar();
                     } else if(response.error) {
@@ -1194,6 +1243,25 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             //document.getElementById("e-medal-change").style.display = "block";
                             console.log("tagged xp: " + response.amount);
                         }
+                    //a player initiated an air lift
+                    } else if(response.sendairlift) {
+                        let start = document.getElementById("t_origin_" + response.start.toLowerCase());
+                        let target = document.getElementById("t_origin_" + response.target.toLowerCase());
+                        airliftPlaneAnimation(start, target, response.plane_id);
+                    } else if(response.airliftarrived) {
+                        let targetplane = document.getElementById("powerup_plane_" + response.plane_id);
+
+                        //get coordinates of the second territory
+                        var off2 = getOffset(document.getElementById("t_origin_" + response.airliftarrived.toLowerCase()));
+                        var x2 = off2.left + off2.width+20;
+                        var y2 = off2.top + off2.height+20;
+
+                        //sync plane with server timing
+                        targetplane.style.left = x2 + "px";
+                        targetplane.style.top = y2 + "px";
+
+                        //play the parachute animation (since the plane just arrived)
+                        airliftParachuteAnimation(x2, y2);
                     }
                 }
             });

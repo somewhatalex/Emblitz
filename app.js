@@ -43,7 +43,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.3.6 | 9/20/2022";
+const gameversion = "1.3.8 | 10/4/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -1022,6 +1022,18 @@ gameevents.on("pstatschange", function(result) {
     sendRoomMsg(result[0], {"playerxpchange": result[1], "amount": result[2][1]});
 });
 
+gameevents.on("airliftarrived", function(result) {
+    sendRoomMsg(result[0], {"airliftarrived": result[1], "plane_id": result[2]});
+});
+
+gameevents.on("powerup_cooldownended", function(result) {
+    sendRoomMsg(result[0], {"powerup_cooldownended": result[2], "player": result[1]});
+});
+
+gameevents.on("powerup_initairlift", function(result) {
+    sendRoomMsg(result[0], {"sendairlift": true, "start": result[1], "target": result[2], "plane_id": result[3], "roomid": result[0]});
+});
+
 //passively send messages to all users in room w/o request
 //format: sendRoomMsg("room69", {"bobux": "momento"});
 
@@ -1192,6 +1204,8 @@ wss.on("connection", (ws) => {
                     client.send(JSON.stringify(message));
                 }
 
+                let msg = JSON.parse(message);
+
                 //begin possible inbound commands
                 if(action === "mapready") {
                     sendmsg({"usersready": rooms[i]["playersready"]});
@@ -1202,6 +1216,8 @@ wss.on("connection", (ws) => {
                     }
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
+                } else if(action === "powerup-airlift") {
+                    game.airlift(msg.start, msg.target, msg.distance, msg.plane_id, msg.roomid, msg.uid, msg.amount);
                 }
             }
         });
