@@ -1654,11 +1654,11 @@ input { /*override default styles*/
     border: none;
     padding: 5px;
     border-radius: 10px;
-    overflow: hidden;
     text-align: center;
     display: block;
     cursor: pointer;
     margin-bottom: 6px;
+    float: right;
 }
 
 .powerup-btn:hover {
@@ -1668,19 +1668,29 @@ input { /*override default styles*/
 }
 
 .powerup-btn img {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
 }
 
 .powerup-btn-bg {
     position: absolute;
     top: 0;
     bottom: 0;
-    opacity: 0.7;
+    opacity: 0.8;
     width: 100%;
     background: var(--dark);
     z-index: -1;
     left: 0;
+}
+
+.powerup-label {
+    color: var(--light);
+    margin-bottom: 15px;
+    font-size: 15px;
+    background: var(--dark);
+    opacity: 0.9;
+    padding: 5px;
+    border-radius: 10px;
 }
 
 .powerup-recharge {
@@ -1692,6 +1702,24 @@ input { /*override default styles*/
     background: var(--green);
     z-index: -1;
     left: 0;
+}
+
+.powerup-notify {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #ff3333;
+    top: -10px;
+    right: -10px;
+    border-radius: 50%;
+    display: none;
+}
+
+.powerup-nooverflow {
+    overflow: hidden;
+    border-radius: 8px;
+    position: relative;
+    margin: -5px
 }
 
 .l-stats {

@@ -29,11 +29,20 @@ function randomnumber(min, max) {
 
 //do this at the start of every new round
 function resetPowerupBars() {
-    let powerupbutton = document.getElementById("airlift-powerup");
-    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
-    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "0%";
-    powerupbutton.style.cursor = "no-drop";
-    powerupbutton.setAttribute("disabled", "disabled");
+    //reset all the powerup buttons
+    let powerupbuttons = document.getElementsByClassName("powerup-btn");
+    for(let i=0; i<powerupbuttons.length; i++) {
+        powerupbuttons[i].getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
+        powerupbuttons[i].getElementsByClassName("powerup-recharge")[0].style.height = "0%";
+        powerupbuttons[i].style.cursor = "no-drop";
+        powerupbuttons[i].setAttribute("disabled", "disabled");
+    }
+
+    //disable the red notification icons
+    let powerupnotify = document.getElementsByClassName("powerup-notify");
+    for(let i=0; i<powerupnotify.length; i++) {
+        powerupnotify[i].style.display = "none";
+    }
 }
 
 function resetPowerupCooldowns() {
@@ -44,6 +53,7 @@ function resetPowerupCooldowns() {
 //duration is in seconds
 //call this function whenever a powerup is used
 function triggerPowerupCooldown(item, duration) {
+    document.getElementById(item + "-notify-icon").style.display = "none";
     duration = duration*1000; //convert to ms
 
     //get the button that triggers the powerup
@@ -69,8 +79,11 @@ function syncPowerupCooldown(item) {
     let powerupbutton = document.getElementById(item + "-powerup");
     powerupbutton.removeAttribute("disabled");
     powerupbutton.style.cursor = "pointer";
-    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear"; //subtract 100ms to account for css trick delay
-    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "100%";
+    document.getElementById(item + "-notify-icon").style.display = "block";
+    powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
+    setTimeout(function() {
+        powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "100%";
+    }, 50);
 }
 
 //triggers airlift

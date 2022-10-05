@@ -240,10 +240,14 @@
                 </DIV>
                 <!-- powerups bar -->
                 <DIV CLASS="powerupbar">
+                    <DIV CLASS="powerup-label">Powerups</DIV>
                     <BUTTON CLASS="powerup-btn" ID="airlift-powerup" ONCLICK="airlift()">
-                        <DIV CLASS="powerup-btn-bg"></DIV>
-                        <DIV CLASS="powerup-recharge"></DIV>
-                        <IMG SRC="./images/assets/airlifticon.svg">
+                        <DIV CLASS="powerup-nooverflow">
+                            <DIV CLASS="powerup-btn-bg"></DIV>
+                            <DIV CLASS="powerup-recharge"></DIV>
+                            <IMG SRC="./images/assets/airlifticon.svg">
+                        </DIV>
+                        <DIV CLASS="powerup-notify" ID="airlift-notify-icon"></DIV>
                     </BUTTON>
                 </DIV>
                 <DIV CLASS="endscreen" ID="endscreen">

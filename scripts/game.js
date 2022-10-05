@@ -151,10 +151,11 @@ function game() {
 
     this.addTroopsPassively = function(roomid) {
         attackIntervals[roomid] = setInterval(function() {
-            let allterritories= Object.keys(games.get(roomid).mapstate);
-            allterritories_length = allterritories.length;
+            if(games.get(roomid).hasended) return;
+            let allterritories = Object.keys(games.get(roomid).mapstate);
+            let allterritories_length = allterritories.length;
             for(let i=0; i<allterritories_length; i++) {
-                if(games.get(roomid).mapstate[allterritories[i]].player != null) {
+                if(games.get(roomid).mapstate[allterritories[i]].player != null && !games.get(roomid).mapstate[allterritories[i]].territory.startsWith("plane-")) {
                     let troopaddamount = Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * 0.1) + 1;
                     if(troopaddamount > 5) {
                         troopaddamount = 5;
@@ -201,6 +202,7 @@ function game() {
     }
 
     this.attackTerritory = function(roomid, playerid, start, target, trooppercent) {
+        if(!games.get(roomid)) return;
         if(games.get(roomid).hasended) return;
         if(games.get(roomid).phase === "attack") {
             let starttroops = games.get(roomid).mapstate[start].troopcount;
@@ -304,9 +306,11 @@ function game() {
                 this.attackTerritory(roomid, playerid, start, planeterritory, amount);
 
                 setTimeout(function() {
-                    if(games.get(roomid).playerstate.find(item => item.id === playerid)) {
-                        games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = true;
-                        self.emit("powerup_cooldownended", [roomid, playerid, "airlift"]);
+                    if(games.get(roomid)) {
+                        if(games.get(roomid).playerstate.find(item => item.id === playerid)) {
+                            games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = true;
+                            self.emit("powerup_cooldownended", [roomid, playerid, "airlift"]);
+                        }
                     }
                 }, 20000);
 
@@ -339,7 +343,7 @@ function game() {
                 }, traveltime);
             }
         } catch(e) {
-            console.log(e)
+            //console.log(e);
         }
     }
 
