@@ -21,7 +21,6 @@ const { initDB } = require("./scripts/auth.js");
 const badges = require("./scripts/badges.js");
 const { response } = require("express");
 const colorData = require("./scripts/colorData.js");
-const nocache = require("nocache");
 const badwords = require("bad-words");
 const emblitzBot = require("./scripts/bot.js")
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
@@ -43,7 +42,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.3.8 | 10/4/2022";
+const gameversion = "1.4.0 | 10/18/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -215,7 +214,6 @@ App can't have pages caching because too much of it is dynamic
 and changes very frequently. Plus, webpages are small enough
 to not suffer a noticably slower load time as a result.
 */
-app.use(nocache());
 
 //enable req.body to be used
 app.use(bodyParser.urlencoded({
@@ -226,6 +224,14 @@ app.use(cookieParser());
 
 app.all("/", (req, res) => {
     let getuuid = req.cookies.uuid;
+
+    res.setHeader("Surrogate-Control", "no-store");
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
 
     //for now, create a new game id (GID) every time a page loads for security
     //this way, leaking the game id won't compromise a player's "account"
@@ -348,6 +354,14 @@ app.get("/authapi", (req, res) => {
 
 app.get("/login", (req, res) => {
     let uuid = req.cookies.uuid;
+
+    res.setHeader("Surrogate-Control", "no-store");
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
         
     if(uuid) {
         auth.getUserInfo(uuid).then(function(userinfo) {
@@ -374,12 +388,28 @@ app.get("/tutorial", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
+    res.setHeader("Surrogate-Control", "no-store");
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
     res.render("admin");
 });
 
 app.get("/settings", (req, res) => {
     let uuid = req.cookies.uuid;
         
+    res.setHeader("Surrogate-Control", "no-store");
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+
     if(uuid) {
         auth.getUserInfo(uuid).then(function(userinfo) {
             res.render("settings", {
@@ -1217,7 +1247,7 @@ wss.on("connection", (ws) => {
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 } else if(action === "powerup-airlift") {
-                    game.airlift(msg.start, msg.target, msg.distance, msg.plane_id, msg.roomid, msg.uid, msg.amount);
+                    game.airlift(msg.start, msg.target, msg.plane_id, msg.roomid, msg.uid, msg.amount);
                 }
             }
         });

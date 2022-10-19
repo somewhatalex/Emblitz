@@ -3,6 +3,7 @@ const fs = require("fs");
 const self = new emitter();
 const games = new Map();
 const auth = require("./auth.js");
+const territory_centers = require("./territory_centers.js");
 var attackIntervals = {};
 var gameLobbyTimers = {};
 var gameLobbyTimerHandlers = {};
@@ -19,7 +20,7 @@ function game() {
                 for(let [key] of Object.entries(mapdict)) {
                     mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false});
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false, "mapname": roommap});
                 resolve("ok");
             });
         });
@@ -293,7 +294,7 @@ function game() {
 
     //id = plane id ex. 69420
     //playerid = id of the player that sent it
-    this.airlift = function(start, target, distance, id, roomid, playerid, amount) {
+    this.airlift = function(start, target, id, roomid, playerid, amount) {
         let parent = this;
         try {
             if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == true) {
@@ -321,8 +322,15 @@ function game() {
                 you'll have to divide the total distance in pixels by 120
                 */
 
-                //85 is subtracted to accomodate the length of the plane
-                let traveltime = ((distance-105)/120)*1000;
+                let x1 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][1];
+                let y1 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][0];
+                let x2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
+                let y2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
+
+                //pythag theorum
+                let distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+                
+                let traveltime = ((distance-50)/120)*1000;
 
                 //500ms is the deploy time, so the travel time can't be less than around 500ms
                 if(traveltime < 500) {

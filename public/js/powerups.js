@@ -105,12 +105,11 @@ function airlift() {
 function sendAirlift(start, target) {
     triggerPowerupCooldown("airlift", 20);
     let plane_id = randomnumber(0, 99999);
-    let distance = getDistance(start, target);
     start = start.getAttribute("data-code");
     target = target.getAttribute("data-code");
     console.log("[DEBUG] Sent airlift from " + start + " to " + target);
 
-    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "distance": distance, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid, "amount": Math.round(document.getElementById("troopslider").value)}));
+    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid, "amount": Math.round(document.getElementById("troopslider").value)}));
     canMoveTroops = true;
 }
 

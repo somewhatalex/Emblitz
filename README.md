@@ -37,6 +37,5 @@ npm i dotenv
 npm i express-rate-limit
 npm i nodemailer
 npm i password-hash
-npm i nocache
 npm i bad-words
 ```

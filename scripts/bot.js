@@ -136,11 +136,12 @@ class emblitzBot {
       
       //wyatt write your attack ai here
       Object.keys(mapdata).forEach((key) => {
-        if(mapdata[key].player == parent.id){
-          ownedTerritories.push(mapdata[key]);
-        }else{
-          unownedTerritories.push(mapdata[key]);
-        }
+        if(!key.startsWith("plane-"))
+          if(mapdata[key].player == parent.id){
+            ownedTerritories.push(mapdata[key]);
+          }else{
+            unownedTerritories.push(mapdata[key]);
+          }
       });
 
       //Find out what territories are borders and put them into borderTerritories array
@@ -163,7 +164,9 @@ class emblitzBot {
       });
       
       //Launch an attack
-      path.push(borderTerritories[randomnumber(0, borderTerritories.length - 1)].territory); // Select a random territory owned to start at
+      if(borderTerritories[randomnumber(0, borderTerritories.length - 1)]) {
+        path.push(borderTerritories[randomnumber(0, borderTerritories.length - 1)].territory); // Select a random territory owned to start at
+      }
       for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
           workingVariable = parent.moves[i].split(" ");
           if(workingVariable[0] == path[0]){
@@ -190,9 +193,11 @@ class emblitzBot {
 
       bestOptionCount = (bestOptionCount + troopaddamount) * 1.2;*/
 
-      if(mapdata[path[0]].troopcount > bestOptionCount){
-         game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, 100); // 100 is temporary, am tired
-       }
+      if(mapdata[path[0]]) {
+        if(mapdata[path[0]].troopcount > bestOptionCount){
+          game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, 100); // 100 is temporary, am tired
+        }
+      }
 
        //Move troops internally
       if(internalTerritories.length > 0){
@@ -220,8 +225,8 @@ class emblitzBot {
         }
       }
 
-      if(randomnumber(0, 12) == 1 && internalTerritories.length > 0){
-        game.airlift(internalTerritories[randomnumber(0, internalTerritories.length - 1)].territory, unownedTerritories[randomnumber(0, unownedTerritories.length - 1)].territory, 80, randomnumber(0, 9999999), parent.roomid, parent.id, 99);
+      if(randomnumber(0, 12) == 1 && internalTerritories.length > 0 && internalTerritories[randomnumber(0, internalTerritories.length - 1)]){
+        game.airlift(internalTerritories[randomnumber(0, internalTerritories.length - 1)].territory, unownedTerritories[randomnumber(0, unownedTerritories.length - 1)].territory, randomnumber(0, 999999), parent.roomid, parent.id, 90);
       }
 
     }, randomnumber(125, 1200));
