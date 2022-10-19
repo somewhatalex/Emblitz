@@ -369,8 +369,8 @@ module.exports = {
     getUserInfoNoReject: getUserInfoNoReject,
     getPublicUserInfo: getPublicUserInfo,
     deleteUnusedAccounts: deleteUnusedAccounts,
-    awardBadge, awardBadge,
-    editPlayerGameStats, editPlayerGameStats,
-    runSQLQuery, runSQLQuery,
-    changePlayerColor, changePlayerColor
+    awardBadge: awardBadge,
+    editPlayerGameStats: editPlayerGameStats,
+    runSQLQuery: runSQLQuery,
+    changePlayerColor: changePlayerColor
 };
