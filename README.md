@@ -15,7 +15,7 @@ Be sure to set production mode to `no` if testing locally. Verification and logi
 You need to set up a postgresql server and create the `.env` file for the project yourself.
 Host should be `127.0.0.1` if testing locally. Database, the config file (.env), and packages are not included if you download this repo.
 
-Here's the .env template (you can just copy/paste this in and edit it accordingly.
+Here's the .env template (you can just copy/paste this in and edit it accordingly).
 ```
 HOSTNAME=[name here]
 SERVERPORT=[port number here]
