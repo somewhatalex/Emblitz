@@ -241,7 +241,17 @@
                 <!-- powerups bar -->
                 <DIV CLASS="powerupbar">
                     <DIV CLASS="powerup-label">Powerups</DIV>
-                    <BUTTON CLASS="powerup-btn" ID="airlift-powerup" ONCLICK="airlift()">
+                    <!-- nuke -->
+                    <BUTTON CLASS="powerup-btn" ID="nuke-powerup" TITLE="Nuke" ONCLICK="nuke()">
+                        <DIV CLASS="powerup-nooverflow">
+                            <DIV CLASS="powerup-btn-bg"></DIV>
+                            <DIV CLASS="powerup-recharge"></DIV>
+                            <IMG SRC="./images/assets/nukeicon.svg">
+                        </DIV>
+                        <DIV CLASS="powerup-notify" ID="nuke-notify-icon"></DIV>
+                    </BUTTON>
+                    <!-- airlift -->
+                    <BUTTON CLASS="powerup-btn" ID="airlift-powerup" TITLE="Airlift" ONCLICK="airlift()">
                         <DIV CLASS="powerup-nooverflow">
                             <DIV CLASS="powerup-btn-bg"></DIV>
                             <DIV CLASS="powerup-recharge"></DIV>

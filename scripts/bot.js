@@ -103,6 +103,7 @@ class emblitzBot {
     });
   }
 
+  //A is the current algorithm
   initiateAttackAI_A() {
     let parent = this;
 
@@ -225,11 +226,13 @@ class emblitzBot {
         }
       }
 
-      if(randomnumber(0, 12) == 1 && internalTerritories.length > 0 && internalTerritories[randomnumber(0, internalTerritories.length - 1)]){
-        game.airlift(internalTerritories[randomnumber(0, internalTerritories.length - 1)].territory, unownedTerritories[randomnumber(0, unownedTerritories.length - 1)].territory, randomnumber(0, 999999), parent.roomid, parent.id, 90);
+      if(internalTerritories.length > 0) {
+        if(randomnumber(0, 12) == 1 && internalTerritories.length > 0 && internalTerritories[randomnumber(0, internalTerritories.length - 1)]){
+          game.airlift(internalTerritories[randomnumber(0, internalTerritories.length - 1)].territory, unownedTerritories[randomnumber(0, unownedTerritories.length - 1)].territory, randomnumber(0, 999999), parent.roomid, parent.id, 90);
+        }
       }
 
-    }, randomnumber(125, 1200));
+    }, randomnumber(425, 700));
   }
 
   initiateAttackAI_B() {

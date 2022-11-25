@@ -13,9 +13,9 @@ Here's the game trailer:<BR>
 Be sure to set production mode to `no` if testing locally. Verification and logins will still direct you to the home page so you'll have to swap "emblitz.com" in the URL with your IP address.
 
 You need to set up a postgresql server and create the `.env` file for the project yourself.
-Host should be `127.0.0.1` if testing locally. Database, the config file (.env), and packages are not included if you download this repo.
+Host should be `127.0.0.1` if testing locally. Database, the config file (.env), and packages are not included if you download this repo. You can find the admin dashboard at `[your host]/admin` and log in using the admin password you set in `.env`.
 
-Here's the .env template (you can just copy/paste this in and edit it accordingly).
+Here's the .env template (you can find this in the `.env.example` file)
 ```
 HOSTNAME=[name here]
 SERVERPORT=[port number here]

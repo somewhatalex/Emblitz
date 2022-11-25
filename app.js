@@ -42,7 +42,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.4.0 | 10/18/2022";
+const gameversion = "1.4.2 | 11/24/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -124,19 +124,8 @@ var mailTransport = null;
         }
     });
 /*} else {
-    //ADD IN CORRECT CREDENTIALS! (work on cloudmailin integration later)
+    //You got a production mail server?
     console.log("Using production mail server");
-    mailTransport = nodemailer.createTransport({
-        host: hostname,
-        port: 587,
-        secure: false,
-        requireTLS: true,
-        auth: {
-            user: process.env.CLOUDMAILIN_USERNAME,
-            pass: provess.env.CLOUDMAILIN_PASSWORD,
-        },
-        logger: true
-    });
 }
 */
 
@@ -1064,6 +1053,10 @@ gameevents.on("powerup_initairlift", function(result) {
     sendRoomMsg(result[0], {"sendairlift": true, "start": result[1], "target": result[2], "plane_id": result[3], "roomid": result[0]});
 });
 
+gameevents.on("powerup_nuke", function(result) {
+    sendRoomMsg(result[0], {"nuke": true, "target": result[1]});
+});
+
 //passively send messages to all users in room w/o request
 //format: sendRoomMsg("room69", {"bobux": "momento"});
 
@@ -1248,6 +1241,8 @@ wss.on("connection", (ws) => {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 } else if(action === "powerup-airlift") {
                     game.airlift(msg.start, msg.target, msg.plane_id, msg.roomid, msg.uid, msg.amount);
+                } else if(action === "powerup-nuke") {
+                    game.nuke(msg.target, msg.roomid, msg.uid);
                 }
             }
         });

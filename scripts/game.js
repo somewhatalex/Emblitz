@@ -9,6 +9,12 @@ var gameLobbyTimers = {};
 var gameLobbyTimerHandlers = {};
 var gameDeployTimers = {};
 
+function randomnumber(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function game() {
     this.newGame = function(roomid, roommap, deploytime, isprivate) {
         return new Promise(function(resolve, reject) {
@@ -147,6 +153,12 @@ function game() {
                     self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "airlift"]);
                 }
             }, 20000);
+            setTimeout(function() {
+                if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
+                    games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.nuke = true;
+                    self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "nuke"]);
+                }
+            }, 40000);
         }
     }
 
@@ -257,7 +269,7 @@ function game() {
 
             if(targetedplayer) {
                 let checkterritories = Object.keys(games.get(roomid).mapstate);
-                checkterritories_length = checkterritories.length;
+                let checkterritories_length = checkterritories.length;
                 let istargetdead = true;
                 for(let i = 0; i < checkterritories_length; i++) {
                     if(games.get(roomid).mapstate[checkterritories[i]].player === targetedplayer) {
@@ -268,7 +280,7 @@ function game() {
 
                 if(istargetdead) {
                     checkterritories = Object.keys(games.get(roomid).mapstate);
-                    checkterritories_length = checkterritories.length;
+                    let checkterritories_length = checkterritories.length;
                     let totalplayersinroom = [];
                     for(let i = 0; i < checkterritories_length; i++) {
                         if(games.get(roomid).mapstate[checkterritories[i]].player && !totalplayersinroom.includes(games.get(roomid).mapstate[checkterritories[i]].player)) {
@@ -327,7 +339,7 @@ function game() {
                 let x2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
                 let y2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
 
-                //pythag theorum
+                //pythag theoreum
                 let distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
                 
                 let traveltime = ((distance-50)/120)*1000;
@@ -352,6 +364,68 @@ function game() {
             }
         } catch(e) {
             //console.log(e);
+        }
+    }
+
+    this.nuke = function(target, roomid, playerid) {
+        try {
+            if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.nuke == true) {
+                games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.nuke = false;
+                setTimeout(function() {
+                    if(games.get(roomid)) {
+                        if(games.get(roomid).playerstate.find(item => item.id === playerid)) {
+                            games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.nuke = true;
+                            self.emit("powerup_cooldownended", [roomid, playerid, "nuke"]);
+                        }
+                    }
+                }, 40000);
+
+                self.emit("powerup_nuke", [roomid, target]);
+                
+                //splash damage from nuke calculations
+                //import the data of the centers of each territory in the map
+                let mapcenters = territory_centers[games.get(roomid).mapname];
+
+                //get target coords
+                let x1 = mapcenters[target.toLowerCase()][1];
+                let y1 = mapcenters[target.toLowerCase()][0];
+
+                //loop through all other territories, calc distance, and deal damage per algorithm
+                let mapcentersCount = Object.keys(mapcenters).length;
+                for(let i=0; i<mapcentersCount; i++) {
+                    let x2 = mapcenters[Object.keys(mapcenters)[i]][1];
+                    let y2 = mapcenters[Object.keys(mapcenters)[i]][0];
+                    
+                    //pythag theoreum (calc distance)
+                    let distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+
+                    //damage should be 70% at ground 0, decrease by 0.32% per unit
+                    //y=-0.28x+70
+                    let remProportion = 1 - (-0.32*(distance)+70)*0.01; //percent to decimal, then to proportion of troops remaining
+                    
+                    //edge cases in case a bad glitch occurs?
+                    if(remProportion < 0) {
+                        remProportion = 0;
+                    } else if(remProportion > 1) {
+                        remProportion = 1;
+                    }
+
+                    let territoryName = Object.keys(mapcenters)[i].toUpperCase();
+
+                    //deal damage -- with chance of rounding normally or down (or if it's not the target)
+                    if(randomnumber(0, 2) < 2 && Object.keys(mapcenters)[i] !== target.toLowerCase()) {
+                        //2/3 chance of rounding damage normally
+                        games.get(roomid).mapstate[territoryName].troopcount = Math.round(games.get(roomid).mapstate[territoryName].troopcount*remProportion);
+                    } else {
+                        //round down
+                        games.get(roomid).mapstate[territoryName].troopcount = Math.floor(games.get(roomid).mapstate[territoryName].troopcount*remProportion);
+                    }
+                }
+                
+                self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+            }
+        } catch(e) {
+            console.log(e);
         }
     }
 
@@ -436,7 +510,7 @@ function game() {
 
     this.addPlayer = function(roomid, id, pubkey) {
         return new Promise(function(resolve) {
-            games.get(roomid).playerstate.push({"id": id, "pubkey": pubkey, "isaccounted": false, "powerups_status": {"airlift": false}});
+            games.get(roomid).playerstate.push({"id": id, "pubkey": pubkey, "isaccounted": false, "powerups_status": {"airlift": false, "nuke": false}});
             resolve("ok");
         });
     }

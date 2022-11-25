@@ -20,6 +20,12 @@ parachuteAsset.src = "./images/assets/airliftparachute.svg";
 parachuteAsset.className = "powerups-parachute";
 parachuteAsset.style.position = "absolute";
 
+//preload nuke explosion asset
+var nukeExplosionAsset = new Image();
+nukeExplosionAsset.src = "./images/assets/nukeexplosion.svg";
+nukeExplosionAsset.className = "powerups-nuke";
+nukeExplosionAsset.style.position = "absolute";
+
 //random number generator
 function randomnumber(min, max) {
     min = Math.ceil(min);
@@ -47,6 +53,7 @@ function resetPowerupBars() {
 
 function resetPowerupCooldowns() {
     triggerPowerupCooldown("airlift", 20);
+    triggerPowerupCooldown("nuke", 40);
 }
 
 //function to control the powerup button timers
@@ -93,11 +100,25 @@ function airlift() {
         powerupType = "airlift";
         selectedRegion = "";
 
-        //show the notification
+        //show the notification (with timer disabled)
         document.getElementById("eventstimer").style.display = "none";
         document.getElementById("eventstimer").style.width = "0%";
         infobar("show");
         document.getElementById("statustext").innerHTML = "<B>Airlift Powerup:</B> Select a starting territory that you own to move troops from.";
+    }
+}
+
+//triggers nuke
+function nuke() {
+    if(attackPhase === "attack") {
+        canMoveTroops = false;
+        powerupType = "nuke";
+
+        //show the notification (with timer disabled)
+        document.getElementById("eventstimer").style.display = "none";
+        document.getElementById("eventstimer").style.width = "0%";
+        infobar("show");
+        document.getElementById("statustext").innerHTML = "<B>Nuke Powerup:</B> Select an ENEMY territory you want to nuke. WARNING: Nuke does splash damage and friendly fire.";
     }
 }
 
@@ -111,6 +132,76 @@ function sendAirlift(start, target) {
 
     websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid, "amount": Math.round(document.getElementById("troopslider").value)}));
     canMoveTroops = true;
+}
+
+//requests nuke (animation, ws message)
+function sendNuke(target) {
+    triggerPowerupCooldown("nuke", 40);
+    target = target.getAttribute("data-code");
+    console.log("[DEBUG] Sent nuke to " + target);
+
+    websocket.send(JSON.stringify({"action": "powerup-nuke", "target": target, "uid": uid, "roomid": roomid, "gid": gid}));
+    canMoveTroops = true;
+}
+
+//nuke explosion
+function nukeAnimation(target) {
+    //create the explosion
+    //calculate x and y of target
+    var offset = getOffset(target);
+    var x = offset.left + offset.width + 20;
+    var y = offset.top + offset.height + 20;
+
+    let nukeExplosion = nukeExplosionAsset.cloneNode(true);
+
+    nukeExplosion.style.left = x + "px";
+    nukeExplosion.style.top = y + "px";
+
+    nukeExplosion.style.width = "20px";
+    nukeExplosion.style.marginTop = "-15px";
+    nukeExplosion.style.marginLeft = "-10px";
+
+    nukeExplosion.style.opacity = 0;
+
+    //shockwave div
+    let shockwave = document.createElement("div");
+    shockwave.className = "powerups-shockwave";
+    shockwave.style.marginTop = "-20px";
+    shockwave.style.marginLeft = "-20px";
+    shockwave.style.opacity = 0.6;
+    shockwave.style.left = x + "px";
+    shockwave.style.top = y + "px";
+
+    document.getElementById("mapl1").append(shockwave);
+    document.getElementById("mapl1").append(nukeExplosion);
+
+    setTimeout(function() {
+        nukeExplosion.style.width = "120px";
+        nukeExplosion.style.marginTop = "-115px";
+        nukeExplosion.style.marginLeft = "-60px";
+        nukeExplosion.style.opacity = 1;
+
+        shockwave.style.height = "360px";
+        shockwave.style.width = "360px";
+        shockwave.style.marginTop = "-180px";
+        shockwave.style.marginLeft = "-180px";
+        shockwave.style.opacity = 0.8;
+
+        setTimeout(function() {
+            nukeExplosion.style.width = "140px";
+            nukeExplosion.style.marginTop = "-135px";
+            nukeExplosion.style.marginLeft = "-70px";
+            nukeExplosion.style.opacity = 0;
+
+            shockwave.style.opacity = 0;
+
+            //delete nuke after 3 seconds
+            setTimeout(function() {
+                nukeExplosion.remove();
+                shockwave.remove();
+            }, 1500);
+        }, 2000);
+    }, 50);
 }
 
 //airlift animation for the plane only
@@ -165,6 +256,40 @@ function airliftPlaneAnimation(start, target, id) {
     plane.style.left = x + "px";
     plane.style.top = y + "px";
 
+    /*
+    NEW ALGORITHM based off of animation frames
+    Faster performance, less smooth
+    */
+    let animationstart;
+    //trigger the moveplane function
+    window.requestAnimationFrame(movePlane);
+
+    function movePlane(timestamp) {
+        //run every 500ms
+        if(!animationstart) {
+            animationstart = timestamp;
+        }
+        if(timestamp - animationstart > 500) {
+            //vector calculation to determine change in x and y
+            x = parseInt(plane.style.left.replace("px", ""));
+            y = parseInt(plane.style.top.replace("px", ""));
+            x -= deltax*((timestamp-animationstart)/500);
+            y -= deltay*((timestamp-animationstart)/500);
+
+            plane.style.left = x + "px";
+            plane.style.top = y + "px";
+
+            iterations++;
+            if(iterations > 65) {
+                plane.remove();
+            }
+            animationstart = timestamp;
+        }
+
+        if(iterations <= 65) window.requestAnimationFrame(movePlane);
+    }
+
+    /*--OLD ALGORITHM--
     let planeinterval = setInterval(function() {
         //vector calculation to determine change in x and y
         x = parseInt(plane.style.left.replace("px", ""));
@@ -181,6 +306,7 @@ function airliftPlaneAnimation(start, target, id) {
             plane.remove();
         }
     }, 500);
+    */
 }
 
 function airliftParachuteAnimation(x, y) {

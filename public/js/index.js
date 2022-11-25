@@ -346,6 +346,15 @@ function initializeMap() {
                             document.getElementById("eventstimer").style.width = "0%";
                             infobar("show");
                             document.getElementById("statustext").innerHTML = "<B>Airlift Powerup:</B> Select any destination territory to move troops to.";
+                        } else if(powerupType === "nuke") {
+                            if(d.currentTarget.getAttribute("data-color") === myColor) { //Don't nuke your own territories!
+                                return;
+                            }
+                            sendNuke(d.currentTarget);
+                            infobar("hide");
+                            setTimeout(function() {
+                                document.getElementById("infobar").style.display = "none";
+                            }, 400);
                         }
                         return;
                     };
@@ -1262,6 +1271,9 @@ function gameConnect(inputroomid, pmap, createnewroom) {
 
                         //play the parachute animation (since the plane just arrived)
                         airliftParachuteAnimation(x2, y2);
+                    } else if(response.nuke) {
+                        let target = document.getElementById("t_origin_" + response.target.toLowerCase());
+                        nukeAnimation(target);
                     }
                 }
             });
