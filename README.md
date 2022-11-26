@@ -27,8 +27,8 @@ DATABASE_PASSWORD=[db password]
 DATABASE_NAME=[db name]
 DATABASE_PORT=[db port]
 ADMINMASTERPASSWORD=[master admin password]
-MAILUSER=[dm me for mail user]
-MAILPASSWORD=[dm me for mail user password]
+MAILUSER=[email username]
+MAILPASSWORD=[email password]
 ```
 
 Install the required npm packages with this command:
