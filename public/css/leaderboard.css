@@ -1,0 +1,85 @@
+/* leaderboard styles begin with lb- (NOT lb_)! */
+
+.lb-divider {
+    width: calc(100% - 10px);
+    height: 2px;
+    border: none;
+    background: var(--light);
+    margin: 5px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.lb-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--dark);
+    overflow: hidden;
+}
+
+.lb-scroll-container {
+    display: block;
+    height: 200px;
+    width: calc(100% - 10px);
+    background: var(--dark);
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.lb-tcontainer {
+    display: block;
+    height: 200px;
+    overflow-y: auto;
+    border-radius: 10px;
+}
+
+.lb-header {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: -10px;
+    margin-top: 15px;
+    font-weight: normal;
+}
+
+.lb-footnote a {
+    color: var(--light);
+    text-decoration: underline;
+}
+
+.lb-footnote a:hover {
+    color: var(--medium);
+}
+
+.lb-footnote a:visited {
+    color: var(--light);
+}
+
+.lb-footnote a:visited:hover {
+    color: var(--medium);
+}
+
+.lb-footnote {
+    text-align: left;
+    margin-left: 5px;
+    margin-top: -5px;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.lb-table tbody {
+    width: 100%;
+}
+
+.lb-table td, th {
+    font-size: 16px;
+    text-align: center;
+    padding: 7px;
+}
+
+.lb-table th {
+    background: var(--green);
+    color: var(--light);
+}

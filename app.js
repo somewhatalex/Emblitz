@@ -770,6 +770,10 @@ app.post("/api", (req, res) => {
             res.clearCookie("uuid");
             res.clearCookie("publickey");
             res.send("logged out");
+        } else if(req.body.action === "getleaderboard") {
+            auth.fetchLeaderboard().then(function(result) {
+                res.send(result)
+            })
         } else {
             res.json({"error": "invalid form body"});
             res.end();

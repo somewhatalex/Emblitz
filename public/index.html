@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <LINK REL="stylesheet" HREF="./css/style.css">
+        <LINK REL="stylesheet" HREF="./css/leaderboard.css">
         <link rel="canonical" href="https://www.emblitz.com">
 
         <meta name="title" content="Emblitz | Multiplayer Strategy Game">
@@ -131,6 +132,34 @@
                             <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                             <BR>
                         </DIV>
+
+                        <!-- leaderboard -->
+                        <DIV CLASS="lb-divider"></DIV>
+                        
+                        <H3 CLASS="lb-header">Global Leaderboard</H3>
+                        <DIV CLASS="lb-scroll-container">
+                            <DIV CLASS="lb-tcontainer">
+                                <TABLE CLASS="lb-table">
+                                    <THEAD>
+                                        <TR>
+                                            <TH>#</TH>
+                                            <TH>Username</TH>
+                                            <TH>Medals</TH>
+                                            <TH>Wins</TH>
+                                            <TH>Losses</TH>
+                                        </TR>
+                                    </THEAD>
+                                    <TBODY ID="lb-tablebody">
+                                        <!-- fill leaderboard with loadLeaderboard() -->
+                                    </TBODY>
+                                </TABLE>
+                            </DIV>
+                        </DIV>
+
+                        <DIV CLASS="lb-footnote">Want to join the global leaderboard? <A HREF="./login?action=register" TARGET="_blank">Make an account</A> if you haven't already and start battling to earn medals!</DIV>
+
+                        <DIV CLASS="lb-divider"></DIV>
+
                         <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Game Tutorial</A> | <A HREF="./privacy" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Privacy Policy</A><BR><BR>
                         <!-- discord -->
                         <DIV CLASS="mobile-socials">

@@ -356,6 +356,15 @@ function fetchAnnouncements(start, amount) {
     });
 }
 
+function fetchLeaderboard() {
+    return new Promise((resolve, reject) => {
+        app.db.query(`SELECT username, medals, wins, losses FROM users ORDER BY medals DESC LIMIT 10`, function (err, result) {
+            if (err) console.log(err);
+            resolve(result.rows);
+        });
+    });
+}
+
 module.exports = {
     getUserInfo: getUserInfo,
     postAnnouncement: postAnnouncement,
@@ -372,5 +381,6 @@ module.exports = {
     awardBadge: awardBadge,
     editPlayerGameStats: editPlayerGameStats,
     runSQLQuery: runSQLQuery,
-    changePlayerColor: changePlayerColor
+    changePlayerColor: changePlayerColor,
+    fetchLeaderboard, fetchLeaderboard
 };

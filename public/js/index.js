@@ -45,7 +45,6 @@ window.onload = function() {
         }
     }
 
-    getUserInfo();
     inithomepage();
 }
 
@@ -63,6 +62,7 @@ function inithomepage() {
 
     loadPosts("refresh");
     getUserInfo();
+    loadLeaderboard();
 
     for(let i=0; i<mapDescriptions.length; i++) {
         if(mapDescriptions[i][3] === localStorage.getItem("map")) {
@@ -860,6 +860,19 @@ function getUserInfo() {
             if(document.getElementById("ms_medals")) {
                 document.getElementById("ms_medals").innerText = result.medals;
                 document.getElementById("ms_badges").innerText = Object.keys(JSON.parse(result.badges)).length;
+            }
+        });
+    });
+}
+
+function loadLeaderboard() {
+    document.getElementById("lb-tablebody").innerHTML = "<TD>--</TD><TD>Loading...</TD><TD>Loading...</TD><TD>---</TD><TD>---</TD>";
+    fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getleaderboard"})}).then(response => {
+        response.json().then(function(result) {
+            let reslength = result.length;
+            document.getElementById("lb-tablebody").innerHTML = "";
+            for(let i=0; i<reslength; i++) {
+                document.getElementById("lb-tablebody").innerHTML += `<TR><TD>${i+1}</TD><TD>${result[i]["username"]}</TD><TD>${result[i]["medals"]}</TD><TD>${result[i]["wins"]}</TD><TD>${result[i]["losses"]}</TD></TR>`;
             }
         });
     });
