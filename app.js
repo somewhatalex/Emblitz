@@ -17,7 +17,6 @@ const { resolve } = require("path");
 const { rateLimit } = require("express-rate-limit");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const { initDB } = require("./scripts/auth.js");
 const badges = require("./scripts/badges.js");
 const { response } = require("express");
 const colorData = require("./scripts/colorData.js");
@@ -42,7 +41,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.4.2 | 11/24/2022";
+const gameversion = "1.4.3 | 11/28/2022";
 
 //mapname, maxplayers
 const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
@@ -105,6 +104,7 @@ pool.connect(function(err) {
     console.log("Connected to database!");
     auth.initDB().then(function() {
         console.log("Finished initializing database");
+        console.log("--- Server launched, begin logging. ---")
         
         setInterval(function() {
             auth.deleteUnusedAccounts();
@@ -772,7 +772,7 @@ app.post("/api", (req, res) => {
             res.send("logged out");
         } else if(req.body.action === "getleaderboard") {
             auth.fetchLeaderboard().then(function(result) {
-                res.send(result)
+                res.send(result);
             })
         } else {
             res.json({"error": "invalid form body"});

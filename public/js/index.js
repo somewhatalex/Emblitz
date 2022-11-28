@@ -872,7 +872,7 @@ function loadLeaderboard() {
             let reslength = result.length;
             document.getElementById("lb-tablebody").innerHTML = "";
             for(let i=0; i<reslength; i++) {
-                document.getElementById("lb-tablebody").innerHTML += `<TR><TD>${i+1}</TD><TD>${result[i]["username"]}</TD><TD>${result[i]["medals"]}</TD><TD>${result[i]["wins"]}</TD><TD>${result[i]["losses"]}</TD></TR>`;
+                document.getElementById("lb-tablebody").innerHTML += `<TR TITLE="${result[i]["username"]}'s profile" ONCLICK="window.open('./user/${result[i]["username"]}', '_blank')"><TD>${i+1}</TD><TD>${result[i]["username"]}</TD><TD>${result[i]["medals"]}</TD><TD>${result[i]["wins"]}</TD><TD>${((result[i]["wins"]/(result[i]["wins"] + result[i]["losses"]))*100).toFixed(2)}%</TD></TR>`;
             }
         });
     });

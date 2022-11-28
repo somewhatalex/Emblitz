@@ -83,3 +83,11 @@
     background: var(--green);
     color: var(--light);
 }
+
+#lb-tablebody tr {
+    cursor: pointer;
+}
+
+#lb-tablebody tr:hover {
+    background: #1d1d1d;
+}
