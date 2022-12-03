@@ -309,7 +309,7 @@ function game() {
     this.airlift = function(start, target, id, roomid, playerid, amount) {
         let parent = this;
         try {
-            if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == true) {
+            if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == true && games.get(roomid).mapstate[start].troopcount > 0) {
                 games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = false;
                 
                 //create a "ghost territory" to serve as the plane
