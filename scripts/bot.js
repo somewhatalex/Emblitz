@@ -226,15 +226,28 @@ class emblitzBot {
         }
       }
 
-      if(internalTerritories.length > 0) {
-        if(randomnumber(0, 12) == 1 && internalTerritories.length > 0 && internalTerritories[randomnumber(0, internalTerritories.length - 1)]){
+      //Attempt to use an airlift
+      if(internalTerritories.length > 0 && randomnumber(0, 3) == 1 && internalTerritories.length > 0 && internalTerritories[randomnumber(0, internalTerritories.length - 1)]) {
           game.airlift(internalTerritories[randomnumber(0, internalTerritories.length - 1)].territory, unownedTerritories[randomnumber(0, unownedTerritories.length - 1)].territory, randomnumber(0, 999999), parent.roomid, parent.id, 90);
+      }
+
+      //Attempt to nuke players
+      if(ownedTerritories.length > 0 && randomnumber(0, 5) == 1){
+        let targetedTerritory = unownedTerritories[0];
+
+        for(let x = 0; x < unownedTerritories.length; x++){
+          if(targetedTerritory.troopcount < unownedTerritories[x].troopcount){
+            targetedTerritory = unownedTerritories[x];
+          }
         }
+
+        game.nuke(targetedTerritory.territory, parent.roomid, parent.id);
       }
 
     }, randomnumber(425, 700));
   }
 
+  /*
   initiateAttackAI_B() {
     let parent = this;
 
@@ -308,6 +321,7 @@ class emblitzBot {
       }
     }, randomnumber(900, 1100));
   }
+  
 
   initiateAttackAI_C() {
     let parent = this;
@@ -349,9 +363,9 @@ class emblitzBot {
       
       aggression += 0.05; //slightly increase aggression each iteration
 
-      /*aggression score: the higher it is, the more willing the bot is
-      to attack other players' territories
-      */
+      //aggression score: the higher it is, the more willing the bot is
+      //to attack other players' territories
+      
 
       //----PRIORITY ALGORITHM----//
 
@@ -462,10 +476,10 @@ class emblitzBot {
             bestOptionCount = mapdata[possibleMoves[i]].troopcount;
           }
         }
-        /*let troopaddamount = (bestOptionCount * 0.1) + 1;
-        if(troopaddamount > 5) {
-          troopaddamount = 5;
-        }*/
+        //let troopaddamount = (bestOptionCount * 0.1) + 1;
+        //if(troopaddamount > 5) {
+        //  troopaddamount = 5;
+        //}
         bestOptionCount = (bestOptionCount + 1) * 1.2;
 
         let neededtroops_percent = (bestOptionCount/mapdata[path[0]].troopcount) * 100;
@@ -496,6 +510,7 @@ class emblitzBot {
       }
     }, randomnumber(900, 1200));
   }
+  */
 
   initiateDeployAI() {
     let parent = this;
