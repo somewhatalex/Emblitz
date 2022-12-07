@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 261 291" width="261" height="291" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <radialGradient id="gradient-1-0" gradientUnits="userSpaceOnUse" cx="130.612" cy="145.682" r="128.612" xlink:href="#gradient-1"/>
+    <linearGradient id="gradient-1" bx:pinned="true">
+      <stop offset="0" style="stop-color: rgb(96, 141, 255);"/>
+      <stop offset="0.944" style="stop-color: rgb(31, 77, 194);"/>
+    </linearGradient>
+  </defs>
+  <path d="M 113.892 6.827 Q 130.612 -2.826 147.332 6.827 L 242.504 61.775 Q 259.224 71.428 259.224 90.734 L 259.224 200.63 Q 259.224 219.936 242.504 229.589 L 147.332 284.537 Q 130.612 294.19 113.892 284.537 L 18.72 229.589 Q 2 219.936 2 200.63 L 2 90.734 Q 2 71.428 18.72 61.775 Z" style="stroke-width: 3px; stroke: rgb(247, 247, 247); fill: url(#gradient-1-0);" bx:shape="n-gon 130.612 145.682 148.508 148.508 6 0.13 1@1e1ccf2a"/>
+  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 180.8px; white-space: pre;" x="35.137" y="208.597">x2</text>
+</svg>

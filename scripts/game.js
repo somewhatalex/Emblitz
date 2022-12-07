@@ -8,6 +8,7 @@ var attackIntervals = {};
 var gameLobbyTimers = {};
 var gameLobbyTimerHandlers = {};
 var gameDeployTimers = {};
+const allmaps = require("./mapconfig.js");
 
 function randomnumber(min, max) {
     min = Math.ceil(min);
@@ -17,16 +18,31 @@ function randomnumber(min, max) {
 
 function game() {
     this.newGame = function(roomid, roommap, deploytime, isprivate) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function(resolve) {
             gameTimingEvents(roomid, deploytime);
             fs.readFile("./mapdata/" + roommap + "/mapdict.json", "utf8", function(err, mapterritorynames) {
                 let mapdict = JSON.parse(mapterritorynames);
                 let mapstate = {};
                 let playerstate = [];
-                for(let [key] of Object.entries(mapdict)) {
-                    mapstate[key] = {"territory": key, "player": null, "troopcount": 1};
+
+                //select boosted territories
+                let availableterritories = Object.keys(mapdict);
+                let selectedterritories = [];
+                
+                for(let i=0; i<allmaps[roommap]; i++) {
+                    let territoryindex = Math.floor(Math.random()*availableterritories.length);
+                    selectedterritories.push(availableterritories[territoryindex]);
+                    availableterritories.splice(territoryindex, 1);
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false, "mapname": roommap});
+
+                for(let [key] of Object.entries(mapdict)) {
+                    if(selectedterritories.includes(key)) {
+                        mapstate[key] = {"territory": key, "player": null, "troopcount": 10, "troopmultiplier": 2};
+                    } else {
+                        mapstate[key] = {"territory": key, "player": null, "troopcount": 1, "troopmultiplier": 1};
+                    }
+                }
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false, "mapname": roommap, "boostedterritories": selectedterritories});
                 resolve("ok");
             });
         });
@@ -98,7 +114,7 @@ function game() {
 
                 games.get(roomid).phase = "deploy";
                 games.get(roomid).totalplayers = games.get(roomid).playerstate.length;
-                self.emit("startDeployPhase", [roomid, deploytime, "ok"]);
+                self.emit("startDeployPhase", [roomid, deploytime, games.get(roomid).boostedterritories]);
                 gameDeployTimers[roomid] = setTimeout(function() {endDeployPhase(roomid)}, deploytime);
             };
         }
@@ -173,6 +189,7 @@ function game() {
                     if(troopaddamount > 5) {
                         troopaddamount = 5;
                     }
+                    troopaddamount = troopaddamount * games.get(roomid).mapstate[allterritories[i]].troopmultiplier;
                     games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + troopaddamount;
                 }
             }
@@ -183,7 +200,7 @@ function game() {
 
     this.deployTroops = function(roomid, playerid, location) {
         if(games.get(roomid)) {
-            if(games.get(roomid).phase === "deploy") {
+            if(games.get(roomid).phase === "deploy" && !games.get(roomid).boostedterritories.includes(location)) {
                 let mapstatejson = games.get(roomid).mapstate;
                 let targetterritory = Object.keys(games.get(roomid).mapstate);
                 let targetlength = targetterritory.length;

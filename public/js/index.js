@@ -26,6 +26,7 @@ var showlb = false; //mobile only
 var previoustouch;
 var previousmobilezoom;
 var p_startindex = 0;
+var boostedterritories = [];
 
 //mobile detection
 window.onload = function() {
@@ -250,14 +251,14 @@ function initializeMap() {
             document.getElementById("mapl2").innerHTML += `
             <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35+adjustamount[1]}px; left: ${labelpos.left+25+adjustamount[0]}px">
                 <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
-                <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
+                <DIV CLASS="t_name"><SPAN ID="t_boosts_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"></SPAN>${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
                 <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
             </DIV>`
         } else {
             document.getElementById("mapl2").innerHTML += `
             <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
                 <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
-                <DIV CLASS="t_name">${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
+                <DIV CLASS="t_name"><SPAN ID="t_boosts_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"></SPAN>${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
                 <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
             </DIV>`
         }
@@ -616,6 +617,10 @@ function attackTerritory(start, target) {
 
 function deployTroops(target) {
     console.log("[DEBUG] Deployed troops to " + target.getAttribute("data-code"));
+    if(boostedterritories.includes(target.getAttribute("data-code"))) {
+        notification("error", "Pick Another Territory", "You can't deploy troops in boosted territories; please select another one to begin in.", 4);
+        return;
+    }
     if(target.getAttribute("data-color") === "default") {
         target.setAttribute("data-color", myColor);
         target.setAttribute("fill", getColor(target, false));
@@ -1008,6 +1013,13 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             alltimeouts.push(setTimeout(function() {
                                 infobar("hide");
                             }, deploytime*1000));
+
+                            boostedterritories = response.boostedterritories;
+                            for(let i=0; i<boostedterritories.length; i++) {
+                                document.getElementById("t_origin_" + boostedterritories[i].toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = 10;
+                                document.getElementById("t_origin_" + boostedterritories[i].toLowerCase()).style.background = "rgb(80 129 255)";
+                                document.getElementById("t_boosts_" + boostedterritories[i].toLowerCase()).innerHTML = `<img src="./images/assets/doubletroopsicon.svg" style="display: inline; width: 28px; position: absolute; top: 0; margin-left: -32px; margin-top: -5px;">`;
+                            }
 
                             document.getElementById("troopslider").addEventListener("input", function() {
                                 let value = document.getElementById("troopslider").value;

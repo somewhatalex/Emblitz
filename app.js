@@ -44,7 +44,7 @@ var port = process.env.SERVERPORT;
 const gameversion = "1.4.3 | 11/28/2022";
 
 //mapname, maxplayers
-const allmaps = {"miniworld": 3, "michigan": 6, "florida": 6};
+const allmaps = require("./scripts/mapconfig.js");
 //-- end configs --
 
 //-- version --
@@ -1012,7 +1012,8 @@ gameevents.on("startAttackPhase", function(result) {
 });
 
 gameevents.on("startDeployPhase", function(result) {
-    sendRoomMsg(result[0], {"startgame": true, "deploytime": result[1]/1000});
+    //boostedterritories = territories that have a x2 troop boost
+    sendRoomMsg(result[0], {"startgame": true, "deploytime": result[1]/1000, "boostedterritories": result[2]});
     let roomcount = rooms.length;
     for(let i=0; i<roomcount; i++) {
         if(rooms[i].id === result[0]) {
