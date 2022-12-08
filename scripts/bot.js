@@ -514,6 +514,7 @@ class emblitzBot {
 
   initiateDeployAI() {
     let parent = this;
+    let boostedTerritories = game.getBoostedTerritories(parent.roomid);
     let deployiterations = 0;
     let iterationsneeded = randomnumber(1, 5); //iterations until bot can deploy troops
     let hasdeployedtroops = false; //has deployed troops initially
@@ -527,7 +528,7 @@ class emblitzBot {
         //deploy ai code
         let availableterritories = [];
         Object.keys(mapdata).forEach((key) => {
-          if(mapdata[key].player == null) {
+          if(mapdata[key].player == null && !boostedTerritories.includes(mapdata[key])) {
               availableterritories.push(mapdata[key]);
           }
         });

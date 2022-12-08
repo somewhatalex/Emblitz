@@ -57,6 +57,11 @@ function game() {
         return games.get(roomid).mapstate;
     }
 
+    this.getBoostedTerritories = function(roomid) {
+        if(!games.get(roomid)) return "no room";
+        return games.get(roomid).boostedterritories;
+      }
+
     //lobby timer controls
     this.pauseLobbyTimer = function(roomid) {
         gameLobbyTimerHandlers[roomid].pause(gameLobbyTimers[roomid]);
