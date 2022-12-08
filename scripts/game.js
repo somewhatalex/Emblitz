@@ -147,7 +147,7 @@ function game() {
         //then assign them a random unclaimed territory
         let availableterritories = [];
         for(let i=0; i<targetlength; i++) {
-            if(games.get(roomid).mapstate[targetterritory[i]].player == null) {
+            if(games.get(roomid).mapstate[targetterritory[i]].player == null && !games.get(roomid).boostedterritories.includes(targetterritory[i])) {
                 availableterritories.push(targetterritory[i]);
             }
         }

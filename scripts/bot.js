@@ -528,7 +528,7 @@ class emblitzBot {
         //deploy ai code
         let availableterritories = [];
         Object.keys(mapdata).forEach((key) => {
-          if(mapdata[key].player == null && !boostedTerritories.includes(mapdata[key])) {
+          if(mapdata[key].player == null && !boostedTerritories.includes(key)) {
               availableterritories.push(mapdata[key]);
           }
         });
