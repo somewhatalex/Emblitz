@@ -52,6 +52,13 @@ function game() {
         return games.get(roomid).phase;
     }
 
+    this.isPlayerDead = function(roomid, playerid) {
+        if(!games.get(roomid)) return;
+        if(!games.get(roomid).playerstate) return;
+        
+        return games.get(roomid).playerstate.find(item => item.id === playerid).isdead;
+    }
+
     this.getMapState = function(roomid) {
         if(!games.get(roomid)) return "no room";
         return games.get(roomid).mapstate;
@@ -169,15 +176,19 @@ function game() {
         allplayers_length = Object.keys(games.get(roomid).playerstate).length;
         for(let i=0; i<allplayers_length; i++) {
             setTimeout(function() {
-                if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
-                    games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.airlift = true;
-                    self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "airlift"]);
+                if(games.get(roomid).playerstate) {
+                    if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
+                        games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.airlift = true;
+                        self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "airlift"]);
+                    }
                 }
             }, 20000);
             setTimeout(function() {
-                if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
-                    games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.nuke = true;
-                    self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "nuke"]);
+                if(games.get(roomid).playerstate) {
+                    if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
+                        games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.nuke = true;
+                        self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "nuke"]);
+                    }
                 }
             }, 40000);
         }
@@ -317,6 +328,7 @@ function game() {
                         });
                     }
                     self.emit("playerdead", [roomid, targetedplayer, totalplayersinroom.length+1]);
+                    games.get(roomid).playerstate.find(item => item.id === targetedplayer).isdead = true;
                 }
             }
 
@@ -331,6 +343,8 @@ function game() {
     this.airlift = function(start, target, id, roomid, playerid, amount) {
         let parent = this;
         try {
+            if(games.get(roomid).hasended) return;
+            
             if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == true && (games.get(roomid).mapstate[start].troopcount * (amount / 100)) > 0) {
                 games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = false;
                 
@@ -380,7 +394,44 @@ function game() {
                         //move all troops off the plane
                         parent.attackTerritory(roomid, playerid, planeterritory, target, 100);
                         //delete the plane "ghost" territory
-                        delete games.get(roomid).mapstate[planeterritory]
+                        delete games.get(roomid).mapstate[planeterritory];
+
+                        /*
+                        --death detection--
+                        Triggers death if you fail to capture territory and have 0 territories left.
+                        Normally you won't die if you fail an attack, but airlifts work differently.
+                        */
+                        let checkterritories = Object.keys(games.get(roomid).mapstate);
+                        let checkterritories_length = checkterritories.length;
+                        let isplayerdead = true;
+                        for(let i = 0; i < checkterritories_length; i++) {
+                            if(games.get(roomid).mapstate[checkterritories[i]].player === playerid) {
+                                isplayerdead = false;
+                                break;
+                            }
+                        }
+        
+                        if(isplayerdead) {
+                            checkterritories = Object.keys(games.get(roomid).mapstate);
+                            let checkterritories_length = checkterritories.length;
+                            let totalplayersinroom = [];
+                            for(let i = 0; i < checkterritories_length; i++) {
+                                if(games.get(roomid).mapstate[checkterritories[i]].player && !totalplayersinroom.includes(games.get(roomid).mapstate[checkterritories[i]].player)) {
+                                    totalplayersinroom.push(games.get(roomid).mapstate[checkterritories[i]].player);
+                                }
+                            }
+        
+                            if(!games.get(roomid).isprivate) {
+                                auth.editPlayerGameStats(totalplayersinroom.length+1, games.get(roomid).totalplayers, idToPubkey(roomid, playerid)).then(function(result) {
+                                    games.get(roomid).playerstate.find(item => item.id === playerid).isaccounted = true;
+                                    self.emit("pstatschange", [roomid, playerid, result]);
+                                });
+                            }
+                            self.emit("playerdead", [roomid, playerid, totalplayersinroom.length+1]);
+                            games.get(roomid).playerstate.find(item => item.id === playerid).isdead = true;
+                        }
+            
+                        checkForWin(roomid);
                     }, 5000)
                 }, traveltime);
             }
@@ -391,6 +442,8 @@ function game() {
 
     this.nuke = function(target, roomid, playerid) {
         try {
+            if(games.get(roomid).hasended) return;
+
             if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.nuke == true) {
                 games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.nuke = false;
                 setTimeout(function() {
@@ -452,8 +505,10 @@ function game() {
     }
 
     function checkForWin(roomid) {
+        if(games.get(roomid).hasended) return;
+
         let checkterritories = Object.keys(games.get(roomid).mapstate);
-        checkterritories_length = checkterritories.length;
+        let checkterritories_length = checkterritories.length;
         let totalplayersinroom = []
         for(let i = 0; i < checkterritories_length; i++) {
             if(games.get(roomid).mapstate[checkterritories[i]].player && !totalplayersinroom.includes(games.get(roomid).mapstate[checkterritories[i]].player)) {
@@ -532,7 +587,8 @@ function game() {
 
     this.addPlayer = function(roomid, id, pubkey) {
         return new Promise(function(resolve) {
-            games.get(roomid).playerstate.push({"id": id, "pubkey": pubkey, "isaccounted": false, "powerups_status": {"airlift": false, "nuke": false}});
+            //isaccounted = is dead or spectating (means player is marked as not being alive)
+            games.get(roomid).playerstate.push({"id": id, "pubkey": pubkey, "isaccounted": false, "isdead": false, "powerups_status": {"airlift": false, "nuke": false}});
             resolve("ok");
         });
     }

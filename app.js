@@ -41,7 +41,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.4.3 | 11/28/2022";
+const gameversion = "1.4.4 | 12/19/2022";
 
 //mapname, maxplayers
 const allmaps = require("./scripts/mapconfig.js");
@@ -1245,8 +1245,10 @@ wss.on("connection", (ws) => {
                 } else if(action === "userconfirm") {
                     sendmsg({"confirmedusers": rooms[i]["playersconfirmed"]});
                 } else if(action === "powerup-airlift") {
+                    if(game.isPlayerDead(msg.roomid, msg.uid)) return;
                     game.airlift(msg.start, msg.target, msg.plane_id, msg.roomid, msg.uid, msg.amount);
                 } else if(action === "powerup-nuke") {
+                    if(game.isPlayerDead(msg.roomid, msg.uid)) return;
                     game.nuke(msg.target, msg.roomid, msg.uid);
                 }
             }
