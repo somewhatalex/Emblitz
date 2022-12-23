@@ -1,12 +1,25 @@
+var deviceSettings = {};
+
 window.addEventListener("load", function() {
     setAvatarColor();
-
     setColor(playercolor, document.getElementById(playercolor + "-colorselect"));
+    getDeviceSettings();
 });
 
 function setAvatarColor() {
     document.getElementById("avatar-frame").style.border = "5px solid " + playercolor;
     document.getElementById("avatar-frame").style.background = colorData[playercolor].normal;
+}
+
+function getDeviceSettings() {
+    if(localStorage.getItem("devicesettings")) {
+        deviceSettings = JSON.parse(localStorage.getItem("devicesettings"));
+
+        let checkboxes = document.getElementsByClassName("DSvalue");
+        for(let i=0; i<checkboxes.length; i++) {
+            checkboxes[i].checked = deviceSettings[checkboxes[i].id];
+        }
+    }
 }
 
 function setColor(color, button) {
@@ -60,6 +73,12 @@ function submitUserSettings() {
     } else {
         notification("notify", "Saved changes", "Your changes were successfully saved!", 5);
     }
+
+    let checkboxes = document.getElementsByClassName("DSvalue");
+    for(let i=0; i<checkboxes.length; i++) {
+        deviceSettings[checkboxes[i].id] = checkboxes[i].checked;
+    }
+    localStorage.setItem("devicesettings", JSON.stringify(deviceSettings));
 }
 
 function editPlayerColor(color) {
@@ -93,6 +112,13 @@ window.addEventListener("beforeunload", function (e) {
     if(or_playercolor !== playercolor) {
         unsavedchanges = true;
     }
+
+    let checkboxes = document.getElementsByClassName("DSvalue");
+    for(let i=0; i<checkboxes.length; i++) {
+        deviceSettings[checkboxes[i].id] = checkboxes[i].checked;
+    }
+
+    if(localStorage.getItem("devicesettings") !== JSON.stringify(deviceSettings)) unsavedchanges = true;
 
     console.log(unsavedchanges)
 

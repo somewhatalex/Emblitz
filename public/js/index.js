@@ -27,6 +27,7 @@ var previoustouch;
 var previousmobilezoom;
 var p_startindex = 0;
 var boostedterritories = [];
+var mapHighlights = true;
 
 //mobile detection
 window.onload = function() {
@@ -57,6 +58,22 @@ function inithomepage() {
     if(!localStorage.getItem("hasvisited")) {
         showtutorialtt();
         localStorage.setItem("hasvisited", true);
+    }
+
+    if(localStorage.getItem("devicesettings")) {
+        let devicesettings = JSON.parse(localStorage.getItem("devicesettings"));
+
+        for(let key in devicesettings) {
+            if(key === "low-graphics") {
+                if(devicesettings[key] == false) break;
+
+                document.getElementsByClassName("mapcontainer")[0].style.shapeRendering = "optimizeSpeed";
+            } else if(key === "no-highlighting") {
+                if(devicesettings[key] == false) break;
+
+                mapHighlights = false;
+            }
+        }
     }
 
     document.getElementById("mapl1").innerHTML = "";
@@ -261,6 +278,13 @@ function initializeMap() {
                 <DIV CLASS="t_name"><SPAN ID="t_boosts_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"></SPAN>${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
                 <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
             </DIV>`
+        }
+
+        if(!mapHighlights) {
+            let highlightareas = document.getElementsByClassName("region-shadow-container");
+            for(let i=0; i< highlightareas.length; i++) {
+                highlightareas[i].classList.remove("region-shadow-container");
+            }
         }
 
         //show outline

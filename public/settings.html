@@ -59,6 +59,26 @@
                 </DIV>
             </DIV>
 
+            <DIV CLASS="s-devicesettings">
+                <DIV CLASS="s-area-header">Device Settings:</DIV>
+                <DIV CLASS="s-divider" STYLE="margin-top: 5px; margin-bottom: 10px;"></DIV>
+                <DIV CLASS="s-area-info">Device settings save to this device only and don't sync between devices.</DIV>
+                <DIV CLASS="s-ds-setting">
+                    <LABEL CLASS="settingstoggle">
+                        <INPUT TYPE="checkbox" CLASS="DSvalue" ID="low-graphics">
+                        <SPAN CLASS="slider"></SPAN>
+                    </LABEL>
+                    Low graphics mode
+                </DIV>
+                <DIV CLASS="s-ds-setting">
+                    <LABEL CLASS="settingstoggle">
+                        <INPUT TYPE="checkbox" CLASS="DSvalue" ID="no-highlighting">
+                        <SPAN CLASS="slider"></SPAN>
+                    </LABEL>
+                    No map highlighting <SPAN STYLE="font-size: 14px">(also helps with performance)</SPAN>
+                </DIV>
+            </DIV>
+
             <DIV CLASS="s-more-tt">More settings and profile customization options coming soon!</DIV>
             <BUTTON CLASS="save-button jb_green" ID="save-button" onclick="submitUserSettings()">Save Changes</BUTTON>
 

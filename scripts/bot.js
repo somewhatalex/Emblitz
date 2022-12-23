@@ -119,7 +119,6 @@ class emblitzBot {
     let bestOption = '';
     let bestOptionCount = 0;
     let workingVariable = '';
-    let switchVar = [];
     if(mapdata === "no room") clearTimeout(parent.attacktimer);
 
     this.attacktimer = setInterval(function() {
@@ -138,7 +137,7 @@ class emblitzBot {
       //wyatt write your attack ai here
       Object.keys(mapdata).forEach((key) => {
         if(!key.startsWith("plane-"))
-          if(mapdata[key].player == parent.id){
+          if(mapdata[key].player === parent.id){
             ownedTerritories.push(mapdata[key]);
           }else{
             unownedTerritories.push(mapdata[key]);
@@ -147,18 +146,18 @@ class emblitzBot {
 
       //Find out what territories are borders and put them into borderTerritories array
       Object.keys(ownedTerritories).forEach((key) => {
-        for(let i = 0; i < moveslength; i++){
+        for(let i = 0; i < moveslength; i++) {
           workingVariable = parent.moves[i].split(" ");
-          if(workingVariable[0] == ownedTerritories[key].territory && mapdata[workingVariable[1]].player != parent.id){
+          if(workingVariable[0] === ownedTerritories[key].territory && mapdata[workingVariable[1]].player !== parent.id){
             borderTerritories.push(ownedTerritories[key]);
-          }else if(workingVariable[1] == ownedTerritories[key].territory){
-            switchVar = workingVariable[1];
+          } else if(workingVariable[1] === ownedTerritories[key].territory) {
+            let switchVar = workingVariable[1];
             workingVariable[1] = workingVariable[0];
             workingVariable[0] = switchVar;
-            if(mapdata[workingVariable[1]].player != parent.id){
+            if(mapdata[workingVariable[1]].player !== parent.id) {
               borderTerritories.push(ownedTerritories[key]);
             }
-          }else{
+          } else {
             internalTerritories.push(ownedTerritories[key]);
           }
         }
@@ -170,19 +169,16 @@ class emblitzBot {
       }
       for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
           workingVariable = parent.moves[i].split(" ");
-          if(workingVariable[0] == path[0]){
+          if(workingVariable[0] === path[0]){
             possibleMoves.push(workingVariable[1]);
-          }else if(workingVariable[1] == path[0]){
-            switchVar = workingVariable[1];
-            workingVariable[1] = workingVariable[0];
-            workingVariable[0] = switchVar;
-            possibleMoves.push(workingVariable[1]);
+          } else if(workingVariable[1] === path[0]){
+            possibleMoves.push(workingVariable[0]);
           }
       }
 
       bestOptionCount = Infinity;
       for(let i = 0; i < possibleMoves.length; i++){ // Find which enemy is the weakest
-        if((mapdata[possibleMoves[i]].troopcount < bestOptionCount) && (mapdata[possibleMoves[i]].player != parent.id)){
+        if((mapdata[possibleMoves[i]].troopcount < bestOptionCount) && (mapdata[possibleMoves[i]].player !== parent.id)){
           bestOption = possibleMoves[i];
           bestOptionCount = mapdata[possibleMoves[i]].troopcount;
         }
@@ -194,45 +190,58 @@ class emblitzBot {
 
       bestOptionCount = (bestOptionCount + troopaddamount) * 1.2;*/
 
+      let movedDuringCycle = false; //has bot moved during this check cycle?
+
       if(mapdata[path[0]]) {
-        if(mapdata[path[0]].troopcount > bestOptionCount){
-          game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, 100); // 100 is temporary, am tired
+        if(mapdata[path[0]].troopcount > bestOptionCount) {
+          if(internalTerritories.includes(path[0])) {
+            //move more troops if is internal territory
+            game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, randomnumber(70, 120)); //go over 100 to maximize rng for 100 (since everything above it is set to 100)
+          } else {
+            let moveAmount = ((bestOptionCount / (bestOptionCount + mapdata[path[0]].troopcount)) * 100) + 20 + randomnumber(10, 60);
+            game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, moveAmount);
+          }
+          movedDuringCycle = true;
         }
       }
 
-       //Move troops internally
-      if(internalTerritories.length > 0){
+      //Move troops internally
+      if(internalTerritories.length > 0) {
+        path = [];
         path.push(internalTerritories[randomnumber(0, (internalTerritories.length - 1))].territory); // Select a random territory owned to start at
-      for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
+        possibleMoves = [];
+        for(let i = 0; i < moveslength; i++) { // Gather up the possible moves
           workingVariable = parent.moves[i].split(" ");
-          if(workingVariable[0] == path[0]){
+          if(workingVariable[0] === path[0]) {
             possibleMoves.push(workingVariable[1]);
-          }else if(workingVariable[1] == path[0]){
-            switchVar = workingVariable[1];
-              workingVariable[1] = workingVariable[0];
-              workingVariable[0] = switchVar;
-              possibleMoves.push(workingVariable[1]);
-            }
+          } else if(workingVariable[1] === path[0]) {
+            possibleMoves.push(workingVariable[0]);
+          }
         }
 
-       for(let i = 0; i < possibleMoves.length; i++){
-          if(mapdata[possibleMoves[i]].troopcount > bestOptionCount){
+        bestOption = possibleMoves[0];
+        bestOptionCount = 0;
+        for(let i = 0; i < possibleMoves.length; i++) {
+          if(mapdata[possibleMoves[i]].troopcount > bestOptionCount && mapdata[bestOption].player === parent.id) {
             bestOption = possibleMoves[i];
             bestOptionCount = mapdata[possibleMoves[i]].length;
-         }
+          }
         }
-        if(bestOption !== '') {
-          game.attackTerritory(parent.roomid, parent.id, workingVariable[0], bestOption, 95); // 95 is temporary, am tired
+
+        if(mapdata[bestOption]) {
+          if(movedDuringCycle == false && mapdata[bestOption].player === parent.id && randomnumber(0, 2) <= 1) {
+            game.attackTerritory(parent.roomid, parent.id, path[0], bestOption, randomnumber(80, 100));
+          }
         }
       }
 
       //Attempt to use an airlift
-      if(internalTerritories.length > 0 && randomnumber(0, 3) == 1 && internalTerritories.length > 0 && internalTerritories[randomnumber(0, internalTerritories.length - 1)]) {
+      if(internalTerritories.length > 0 && randomnumber(0, 5) == 1 && internalTerritories.length > 0 && internalTerritories[randomnumber(0, internalTerritories.length - 1)]) {
           game.airlift(internalTerritories[randomnumber(0, internalTerritories.length - 1)].territory, unownedTerritories[randomnumber(0, unownedTerritories.length - 1)].territory, randomnumber(0, 999999), parent.roomid, parent.id, 90);
       }
 
       //Attempt to nuke players
-      if(ownedTerritories.length > 0 && randomnumber(0, 5) == 1){
+      if(ownedTerritories.length > 0 && randomnumber(0, 6) == 1){
         let targetedTerritory = unownedTerritories[0];
 
         for(let x = 0; x < unownedTerritories.length; x++){
@@ -244,7 +253,7 @@ class emblitzBot {
         game.nuke(targetedTerritory.territory, parent.roomid, parent.id);
       }
 
-    }, randomnumber(425, 700));
+    }, randomnumber(625, 820));
   }
 
   /*
