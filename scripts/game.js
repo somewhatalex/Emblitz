@@ -321,7 +321,7 @@ function game() {
                         }
                     }
 
-                    if(!games.get(roomid).isprivate) {
+                    if(!games.get(roomid).isprivate && !games.get(roomid).playerstate.find(item => item.id === targetedplayer).isaccounted) {
                         auth.editPlayerGameStats(totalplayersinroom.length+1, games.get(roomid).totalplayers, idToPubkey(roomid, targetedplayer)).then(function(result) {
                             games.get(roomid).playerstate.find(item => item.id === targetedplayer).isaccounted = true;
                             self.emit("pstatschange", [roomid, targetedplayer, result]);
@@ -556,24 +556,17 @@ function game() {
 
             if(games.get(roomid).phase !== "lobby") {
                 let allterritories = Object.keys(games.get(roomid).mapstate);
-                allterritories_length = allterritories.length;
+                let allterritories_length = allterritories.length;
                 for(let i=0; i<allterritories_length; i++) {
                     if(games.get(roomid).mapstate[allterritories[i]].player === id) {
                         games.get(roomid).mapstate[allterritories[i]].player = null;
                     }
                 }
 
-                checkterritories = Object.keys(games.get(roomid).mapstate);
-                checkterritories_length = checkterritories.length;
-                let totalplayersinroom = [];
-                for(let i = 0; i < checkterritories_length; i++) {
-                    if(games.get(roomid).mapstate[checkterritories[i]].player && !totalplayersinroom.includes(games.get(roomid).mapstate[checkterritories[i]].player)) {
-                        totalplayersinroom.push(games.get(roomid).mapstate[checkterritories[i]].player);
-                    }
-                }
+                let totalplayersinroom = games.get(roomid).playerstate.length;
 
                 if(!isplayeraccounted && !games.get(roomid).isprivate) {
-                    auth.editPlayerGameStats(totalplayersinroom.length+1, games.get(roomid).totalplayers, playerpubkey);
+                    auth.editPlayerGameStats(totalplayersinroom+1, games.get(roomid).totalplayers, playerpubkey);
                 }
                 self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
             }

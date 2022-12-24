@@ -78,9 +78,12 @@ function inithomepage() {
 
     document.getElementById("mapl1").innerHTML = "";
 
-    loadPosts("refresh");
-    getUserInfo();
-    loadLeaderboard();
+    //give server 200ms to catch up
+    setTimeout(function() {
+        loadPosts("refresh");
+        getUserInfo();
+        loadLeaderboard();
+    }, 200)
 
     for(let i=0; i<mapDescriptions.length; i++) {
         if(mapDescriptions[i][3] === localStorage.getItem("map")) {
