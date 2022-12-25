@@ -1214,7 +1214,6 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             notification("error", "Error: Invalid credentials", "Please reload the page and join a new game. If this problem persists, contact us.", 10);
                         } else if(response.error === "logged in elsewhere") {
                             ws.close();
-                            console.log("buh")
                             exitLobby();
                             notification("error", "Error: already joined elsewhere!", "You've already joined a game from a different tab or device. Please exit that tab or log out from that device first. If this problem persists, contact us.", 10);
                         }
