@@ -154,6 +154,9 @@ function resetAll() {
     p_startindex = 0;
 
     document.getElementById("mapl1").innerHTML = "";
+    document.getElementById("troopslider").value = "75";
+    document.getElementById("trooppercentage").innerText = "75%";
+    document.getElementById("troopslider").style.background = "linear-gradient(to right, var(--green) 0%, var(--green) 75%, var(--medium) 75%, var(--medium) 100%)";
 
     resetPowerupBars();
 }
@@ -1366,6 +1369,9 @@ function spectategame() {
         document.getElementById("endscreen").style.display = "none";
         notification("notify", "Spectating", "You're now spectating the game.", 6);
     }, 3000);
+    document.getElementById("spectatingbar").style.display = "block";
+    document.getElementsByClassName("troopscontrol")[0].style.display = "none";
+    document.getElementsByClassName("powerupbar")[0].style.display = "none";
 }
 
 function leavegame() {
@@ -1393,6 +1399,10 @@ function leavegame() {
 
     document.getElementById("endscreen").style.opacity = "0";
     document.getElementById("endscreen").style.display = "none";
+
+    document.getElementById("spectatingbar").style.display = "none";
+    document.getElementsByClassName("troopscontrol")[0].style.display = "block";
+    document.getElementsByClassName("powerupbar")[0].style.display = "block";
 
     inithomepage()
 }
