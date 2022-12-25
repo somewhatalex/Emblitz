@@ -222,9 +222,7 @@ app.all("/", (req, res) => {
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
 
-    //for now, create a new game id (GID) every time a page loads for security
-    //this way, leaking the game id won't compromise a player's "account"
-    //replacement for user registration FOR NOW
+    //create temporary game id (GID) to combine with pubkey
     let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
     let id = "";
     for(let i=0; i<30; i++) {
@@ -1103,6 +1101,13 @@ wss.on("connection", (ws) => {
             let room = escapeHTML(userinfo.roomid);
             let gid = userinfo.gid;
 
+            for(let client of clients.values()) {
+                if(client.pubkey === pubkey) { 
+                    ws.send(JSON.stringify({"error": "logged in elsewhere"}));
+                    return;
+                }
+            }
+
             //is room full? as a double check measure
             //first add the player to the total room count though before checking
             let totalroomcount = rooms.length;
@@ -1257,6 +1262,12 @@ wss.on("connection", (ws) => {
 
     ws.on("close", () => {
         let removeclient = clients.get(ws);
+
+        //user got disconnected before they were assigned an uid
+        if(!removeclient) {
+            return;
+        }
+        
         let removeclientid = removeclient.uid;
         removeFromArray(userids, removeclientid);
         
