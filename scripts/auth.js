@@ -242,7 +242,7 @@ function awardBadge(pubkey, name) {
             let badgedata = JSON.parse(result.rows[0].badges);
 
             //badge already awarded
-            if(badgedata[name]) {
+            if(badgedata.hasOwnProperty(name)) {
                 resolve("ok");
             }
 
