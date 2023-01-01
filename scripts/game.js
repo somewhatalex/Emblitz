@@ -202,9 +202,9 @@ function game() {
             for(let i=0; i<allterritories_length; i++) {
                 if(games.get(roomid).mapstate[allterritories[i]].player != null && !games.get(roomid).mapstate[allterritories[i]].territory.startsWith("plane-")) {
                     let troopaddamount = Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * 0.1) + 1;
-                    /*if(troopaddamount > 5) {
+                    if(troopaddamount > 5) {
                         troopaddamount = 5;
-                    }*/
+                    }
                     troopaddamount = troopaddamount * games.get(roomid).mapstate[allterritories[i]].troopmultiplier;
                     games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + troopaddamount;
                 }
