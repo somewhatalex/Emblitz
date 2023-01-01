@@ -416,9 +416,9 @@ function initializeMap() {
                         }
                     }
 
-                    let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
-                    if(troopmoveamount < 1) {
-                        troopmoveamount = 1;
+                    let troopmoveamount = Math.round((Number(document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) - 1) * Number(document.getElementById("troopslider").value) * 0.01);
+                    if(troopmoveamount < 0) {
+                        troopmoveamount = 0;
                     }
                     document.getElementById("sendamount").innerText = troopmoveamount + " troops";
 

@@ -202,9 +202,9 @@ function game() {
             for(let i=0; i<allterritories_length; i++) {
                 if(games.get(roomid).mapstate[allterritories[i]].player != null && !games.get(roomid).mapstate[allterritories[i]].territory.startsWith("plane-")) {
                     let troopaddamount = Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * 0.1) + 1;
-                    if(troopaddamount > 5) {
+                    /*if(troopaddamount > 5) {
                         troopaddamount = 5;
-                    }
+                    }*/
                     troopaddamount = troopaddamount * games.get(roomid).mapstate[allterritories[i]].troopmultiplier;
                     games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + troopaddamount;
                 }
@@ -263,13 +263,14 @@ function game() {
                 trooppercent = 1;
             }
 
-            let moveAmount = Math.round(starttroops*trooppercent*0.01);
+            let moveAmount = Math.round((starttroops-1)*trooppercent*0.01);
             if(moveAmount < 1) {
-                if(starttroops >= 1) {
+                return;
+                /*if(starttroops >= 1) {
                     moveAmount = 1;
                 } else {
                     return;
-                }
+                }*/
             }
 
             //TODO - also check if move is valid through moves.json
@@ -391,6 +392,8 @@ function game() {
 
                     //paratroopers take 5s to reach the ground
                     setTimeout(function() {
+                        //Add 1 troop to the plane to account for the subtracted troops from start territory in attackTerritory function
+                        games.get(roomid).mapstate[planeterritory].troopcount += 1;
                         //move all troops off the plane
                         parent.attackTerritory(roomid, playerid, planeterritory, target, 100);
                         //delete the plane "ghost" territory
