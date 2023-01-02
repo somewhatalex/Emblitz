@@ -1287,7 +1287,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             }, 100);
                         }
                     } else if(response.lobbytimer) {
-                        lobbycountdown = response.lobbytimer;
+                        //lobbycountdown = response.lobbytimer; //Commenting out this line fixes timer bug upon new players joining
                         document.getElementById("timeramount").innerText = lobbycountdown;
                     } else if(response.playermedalchange && response.playermedalchange === uid) {
                         if(isNaN(Number(response.amount))) {
