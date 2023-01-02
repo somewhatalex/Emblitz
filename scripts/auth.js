@@ -241,15 +241,15 @@ function awardBadge(pubkey, name) {
         app.db.query(`SELECT * FROM users WHERE publickey=$1`, [pubkey]).then(function(result) {
             let badgedata = JSON.parse(result.rows[0].badges);
 
-            //badge already awarded
-            if(badgedata.hasOwnProperty(name)) {
+            // check if badge has already been awarded
+            if(badgedata[name]) {
                 resolve("ok");
+            }else{
+                badgedata[name] = {"awarded": Date.now()}
+                app.db.query(`UPDATE users SET badges=$1 WHERE publickey=$2`, [badgedata, pubkey]).then(function() {
+                    resolve("ok");
+                })
             }
-
-            badgedata[name] = {"awarded": Date.now()}
-            app.db.query(`UPDATE users SET badges=$1 WHERE publickey=$2`, [badgedata, pubkey]).then(function() {
-                resolve("ok");
-            })
         });
     })
 }

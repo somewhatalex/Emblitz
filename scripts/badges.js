@@ -14,6 +14,14 @@ const badges = {
         "image": "verifiedaccount.png"
     },
 
+    //developer badge
+    "developer": { //Placeholder info
+        "name": "Developer",
+        "level": "Silver",
+        "description": "Contribute to the game\'s development.",
+        "image": "betatester.png"
+    },
+
     //win count badges
     "firstwin": {
         "name": "First Win",
