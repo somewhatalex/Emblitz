@@ -128,6 +128,49 @@ const badges = {
         "level": "Ruby",
         "description": "Have an maximum of 10000 troops in one game.",
         "image": "50wins.png"
+    },
+
+    //total medal count badges
+    "25medals": {
+        "name": "Private",
+        "level": "Bronze",
+        "description": "Reach 25 Emblitz medals.",
+        "image": "50wins.png"
+    },
+
+    "50medals": {
+        "name": "Corporal",
+        "level": "Silver",
+        "description": "Reach 50 Emblitz medals.",
+        "image": "50wins.png"
+    },
+
+    "150medals": {
+        "name": "Sergeant",
+        "level": "Gold",
+        "description": "Reach 150 Emblitz medals.",
+        "image": "50wins.png"
+    },
+
+    "800medals": {
+        "name": "Lieutenant",
+        "level": "Diamond",
+        "description": "Reach 800 Emblitz medals.",
+        "image": "50wins.png"
+    },
+
+    "2000medals": {
+        "name": "Captain",
+        "level": "Ruby",
+        "description": "Reach 2000 Emblitz medals.",
+        "image": "50wins.png"
+    },
+
+    "10000totaltroops": {
+        "name": "RadioactiveBox",
+        "level": "Uranium",
+        "description": "Reach 4500 Emblitz medals. Named after the #1 Emblitz player when the leaderboard first came out (RadioactiveBox).",
+        "image": "4500medals.png"
     }
 }
 

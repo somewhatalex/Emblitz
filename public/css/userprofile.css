@@ -233,7 +233,7 @@ body {
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 710px) {
     .up1, .up2 {
         display: block;
         border: none !important;
