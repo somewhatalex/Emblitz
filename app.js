@@ -982,14 +982,6 @@ httpserver.listen(port, function() {
     console.log("Server started on port " + port);
 });
 
-/* test:
-setTimeout(function() {
-    [...clients.keys()].forEach((client) => {
-        client.send(JSON.stringify({"fard": "success"}));
-    });
-}, 10000);
-*/
-
 //send json message to all members in a room w/o request
 function sendRoomMsg(roomid, message) {
     [...clients.keys()].forEach((client) => {
@@ -1067,19 +1059,22 @@ wss.on("connection", (ws) => {
     //passively send message to single player w/o request
     ws.send(JSON.stringify({"connection": "success"}));
 
-    //send json message to all members in a room w/o request
-    function sendRoomMsg(roomid, message) {
-        [...clients.keys()].forEach((client) => {
-            let clientdata = clients.get(client);
-            if(clientdata["room"] === roomid) {
-                //do everything in here
-                client.send(JSON.stringify(message));
-            }
-        });
-    }
+    //ping the websocket every 15 seconds to check for a connection
+    ws.isAlive = true;
+    ws.on("pong", function() {
+        ws.isAlive = true;
+    });
 
-    //passively send messages to all users in room w/o request
-    //format: sendRoomMsg("room69", {"bobux": "momento"});
+    var pingInterval = setInterval(function() {
+        if(!ws.isAlive) {
+            clearInterval(pingInterval);
+            ws.terminate();
+            return;
+        }
+        ws.isAlive = false;
+        ws.ping();
+        ws.send(JSON.stringify({"ping": true}));
+    }, 15000);
 
     ws.on("message", (response) => {
         //RESPONDS TO A SINGULAR PLAYER REQUEST
@@ -1090,6 +1085,7 @@ wss.on("connection", (ws) => {
         if(action !== "userlogin") {
             if(clients.get(ws).gid !== JSON.parse(message).gid || clients.get(ws).uid !== JSON.parse(message).uid) {
                 ws.send(JSON.stringify({"error": "invalid credentials"}));
+                ws.close();
                 return;
             }
         }
@@ -1104,6 +1100,7 @@ wss.on("connection", (ws) => {
             for(let client of clients.values()) {
                 if(client.pubkey === pubkey) { 
                     ws.send(JSON.stringify({"error": "logged in elsewhere"}));
+                    ws.close();
                     return;
                 }
             }

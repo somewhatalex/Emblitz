@@ -930,8 +930,21 @@ function gameConnect(inputroomid, pmap, createnewroom) {
 
                 ws.onmessage = (message) => {
                     let response = JSON.parse(message.data);
-                    if(response.mapdata) {
-                        
+                    if(response.ping) {
+                        /*
+                        make it so that when 2 pings are missed in a row,
+                        use the notification function to send a notification that
+                        the client was disconnected
+                        */
+                        //the ping event is received every 15 seconds
+                        /*NOTE -- there will be a slight delay which is why I'm
+                        using the 2 pings missed in a row thing.
+                        See my implementation in app.js for a possible approach.
+                        It begins on line 1062.
+
+                        DELETE THIS NOTE WHEN DONE
+                        */
+                        //console.log("ping")
                     } else if(response.mapname) {
                         document.getElementById("mapname").innerText = mapnames[response.mapname];
                         mapname = mapnames[response.mapname];
