@@ -28,6 +28,8 @@ var previousmobilezoom;
 var p_startindex = 0;
 var boostedterritories = [];
 var mapHighlights = true;
+var websocketAlive = Date.now();
+var pingInterval;
 
 //mobile detection
 window.onload = function() {
@@ -927,24 +929,21 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                 confirmJoinGame().then(function() {
                     ws.send(JSON.stringify({"action": "userconfirm", "roomid": roomid, "uid": uid, "gid": gid}));
                 });
+                
+                websocketAlive = Date.now();
+                pingInterval = setInterval(() => {
+                    if(Date.now() - websocketAlive >= timeoutDuration * 2) {
+                        notification("error", "Disconnected", "Error: you were disconnected from the game. Try checking your internet and joining a new game.", 8);
+                        clearInterval(pingInterval);
+                    } else if(Date.now() - websocketAlive >= timeoutDuration * 1.5) {
+                        notification("error", "Attempting to reconnect...", "Your connection is unstable. Please wait, we're trying to get you back into the game.", 4);
+                    }
+                }, timeoutDuration);
 
                 ws.onmessage = (message) => {
                     let response = JSON.parse(message.data);
                     if(response.ping) {
-                        /*
-                        make it so that when 2 pings are missed in a row,
-                        use the notification function to send a notification that
-                        the client was disconnected
-                        */
-                        //the ping event is received every 15 seconds
-                        /*NOTE -- there will be a slight delay which is why I'm
-                        using the 2 pings missed in a row thing.
-                        See my implementation in app.js for a possible approach.
-                        It begins on line 1062.
-
-                        DELETE THIS NOTE WHEN DONE
-                        */
-                        //console.log("ping")
+                        websocketAlive = Date.now();
                     } else if(response.mapname) {
                         document.getElementById("mapname").innerText = mapnames[response.mapname];
                         mapname = mapnames[response.mapname];
@@ -1389,6 +1388,11 @@ function spectategame() {
 
 function leavegame() {
     websocket.close();
+
+    if(pingInterval) {
+        clearInterval(pingInterval);
+    }
+
     for (let i=0; i<alltimeouts.length; i++) {
         clearTimeout(alltimeouts[i]);
     }
@@ -1459,6 +1463,9 @@ function changeMapSelect(direction) {
 function exitLobby() {
     if(websocket) {
         websocket.close();
+        if(pingInterval) {
+            clearInterval(pingInterval);
+        }
     }
     for (let i=0; i<alltimeouts.length; i++) {
         clearTimeout(alltimeouts[i]);

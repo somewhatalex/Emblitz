@@ -22,6 +22,7 @@ const { response } = require("express");
 const colorData = require("./scripts/colorData.js");
 const badwords = require("bad-words");
 const emblitzBot = require("./scripts/bot.js")
+const configs = require("./configs.json")
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
 Update 7/27/22: passport.js creates a lot of hosting compatibility issues
@@ -256,6 +257,7 @@ app.all("/", (req, res) => {
             host_name: hostname,
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
+            timeoutDuration: configs.timeoutDuration,
             profile_output: profileoutput
         });
     } else if(!getuuid.startsWith("guest-")) {
@@ -294,6 +296,7 @@ app.all("/", (req, res) => {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
+                timeoutDuration: configs.timeoutDuration,
                 profile_output: profileoutput
             });
         }).catch(function() {
@@ -315,6 +318,7 @@ app.all("/", (req, res) => {
                 host_name: hostname,
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
+                timeoutDuration: configs.timeoutDuration,
                 profile_output: profileoutput
             });
         });
@@ -324,6 +328,7 @@ app.all("/", (req, res) => {
             host_name: hostname,
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
+            timeoutDuration: configs.timeoutDuration,
             profile_output: profileoutput
         });
     }
@@ -909,7 +914,7 @@ function joinroom(map, createroom) {
     }
 
     let maxplayers = allmaps[roommap];
-    let deploytime = 10;
+    let deploytime = configs.deployStageTime;
 
     let isprivate = false;
     if(createroom) {
