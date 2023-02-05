@@ -334,6 +334,11 @@ app.all("/", (req, res) => {
     }
 });
 
+app.get("/*.html", (req, res) => {
+    let path = req.originalUrl.replace(/.html$/, "");
+    res.redirect(301, path);
+});
+
 httpserver.on("request", app);
 
 app.get("/api", (req, res) => {
@@ -418,6 +423,18 @@ app.get("/privacy", (req, res) => {
     res.render("privacy");
 });
 
+app.get("/tutorial/*", (req, res) => {
+    let filePath = path.join(__dirname, `./public/tutorial/${req.path.split("/")[2]}.html`);
+    fs.stat(filePath, (err) => {
+        if(err) {
+            res.render("./errorpages/404");
+            res.status(404);
+            return;
+        }
+        res.render("./tutorial/" + req.path.split("/")[2]);
+    });
+});
+
 app.get("/user/*", (req, res) => {
     let username = req.path.split("/")[2];
 
@@ -428,7 +445,8 @@ app.get("/user/*", (req, res) => {
             playercolorbg: colorData[result.playercolor].normal
         });
     }).catch(function() {
-        res.render("./errorpages/404")
+        res.render("./errorpages/404");
+        res.status(404);
     });
 });
 

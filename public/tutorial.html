@@ -4,6 +4,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <LINK REL="stylesheet" HREF="./css/style.css">
+        <LINK REL="stylesheet" HREF="./css/tutorial.css">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <meta name="title" content="Emblitz | Tutorial">
         <meta name="description" content="Learn to play Emblitz, a real-time strategy game, with this comprehensive tutorial! You'll quickly learn the basics to the game, as well as important gameplay mechanics and rules.">
@@ -16,189 +18,33 @@
         <TITLE>Emblitz | Tutorial</TITLE>
     </HEAD>
     <BODY>
-        <!-- tutorial page only styles  -->
-        <STYLE>
-            body {
-                background: var(--night);
-                overflow-x: none;
-            }
-
-            .content {
-                max-width: 700px;
-                margin: auto;
-                margin-top: 100px;
-                padding: 20px;
-                background: var(--dark);
-                color: var(--light);
-            }
-
-            @media only screen and (max-width: 750px) {
-                .content {
-                    width: 100%;
-                    max-width: 750px;
-                }
-
-                .paragraph {
-                    display: inline-block;
-                }
-            }
-
-            @media only screen and (max-width: 500px) {
-                .mainimage {
-                    width: calc(100% - 40px) !important;
-                    margin-top: 15px;
-                    margin-bottom: 15px;
-                    margin-right: 40px !important;
-                    float: none;
-                }
-
-                .logoimg {
-                    width: 200px !important;
-                }
-            }
-
-            .content-text {
-                text-align: left;
-                margin-left: 7px;
-                margin-top: 0px;
-            }
-
-            .header {
-                font-size: 35px;
-                font-weight: bold;
-                text-align: left;
-                margin: 0px;
-                padding: 0px;
-                padding-bottom: 20px;
-            }
-
-            .paragraph {
-                display: block;
-                float: none;
-                margin-right: 30px;
-                font-size: 17px;
-            }
-
-            .logoimg {
-                width: 300px;
-            }
-
-            .mainimage {
-                width: 300px;
-                margin-right: 20px;
-                padding-left: 10px;
-                padding-bottom: 10px
-            }
-
-            .cimage {
-                width: 300px;
-                margin-right: 20px;
-                padding-left: 10px;
-                padding-bottom: 10px
-            }
-
-            a {
-                color: var(--light);
-            }
-
-            a:hover {
-                color: var(--medium);
-            }
-
-            a:visited {
-                color: var(--light);
-            }
-
-            a:visited:hover {
-                color: var(--medium);
-            }
-            
-            ul {
-                margin-top: -10px;
-            }
-
-            li {
-                margin-bottom: 5px;
-            }
-        </STYLE>
-        <DIV CLASS="content">
+        <DIV CLASS="container t-container">
             <A HREF="../"><IMG CLASS="logoimg" SRC="./images/logo.png"></A>
             <DIV CLASS="content-text">
-                <DIV CLASS="header">Game Tutorial</DIV>
-                <IMG CLASS="mainimage" STYLE="float: right" SRC="./images/tutorial/imgintro.JPG">
-                <P CLASS="paragraph">Thanks for playing Emblitz! Emblitz is an online fast-paced real time strategy game. Players can battle each other out on maps. Some maps include scale real-world places for you to fight over! The game mechanics are simple, but there's a lot of strategy involved. Good luck, and have fun playing!</P>
-                <P CLASS="paragraph">Table of contents:
-                    <UL>
-                        <LI><A HREF="#objectives">Objectives</A></LI>
-                        <LI><A HREF="#controls">Controls</A></LI>
-                        <LI><A HREF="#gmechanics">Game Mechanics</A></LI>
-                        <LI><A HREF="#pinteraction">Player Interaction</A></LI>
-                        <LI><A HREF="#faqs">Frequently Asked Questions (FAQs)</A></LI>
-                    </UL>
-                </P>
-                <DIV ID="objectives">
-                    <br>
-                    <h2>Objectives</h2>
-                    <IMG CLASS="cimage" STYLE="float: right" SRC="./images/tutorial/domination.jpg">
-                    <p CLASS="paragraph">The main objective of Emblitz is to conquer the world by capturing all the other players' territories and becoming the last person standing.</p>
+                <IMG CLASS="img-fluid img-thumbnail" STYLE="float: right" SRC="./images/tutorial/imgintro.JPG">
+                <DIV CLASS="row">
+                    <H1 CLASS="header" STYLE="margin-left: 0px !important; margin-top: 10px; margin-bottom: 10px; text-align: left">Game Tutorial</H1>
                 </DIV>
-                <DIV ID="controls">
-                    <br>
-                    <h2>Controls</h2>
-                    <IMG CLASS="cimage" STYLE="float: right; padding-bottom: 25px; padding-left: 60px;" SRC="./images/tutorial/menuButtons.jpg">
-                    <IMG CLASS="cimage" STYLE="float: right" SRC="./images/tutorial/troopSlider.jpg">
-                    <p CLASS="paragraph">Before discussing the in-game controls, we first need to look at the home menu. Before joining a game, you can first enter a player name (a random name will be assigned if you don’t) and select a preferred color. The color will change your leaderboard and territory color, but will not affect gameplay and is purely cosmetic.
-
-                        <BR><BR>Looking past the username and player color inputs, we have the map selection menu. This will let you choose the type of map you want to play on. You may use the “<” and “>” buttons to navigate between maps. Each map is unique and has its own gameplay and strategies, and we’re going to be adding many more, so have fun exploring!
-                        
-                        <BR><BR>There are 3 buttons that are on the home menu. The green one is to join a random public room. The “Join Game” button allows you to join any room given the room code. The room code is displayed in the game lobby, which you may share with anyone you want. You may also create a private room using the “Create Private Room” button. This’ll create a room that only people with the join code can enter (perfect for playing challenge matches or bing chilling with friends). Once you’re in a lobby, the timer will start counting down when 2 or more players are in a game. Once the timer ends, or all players hit “Ready”, then the game starts.
-                        
-                        <BR><BR>The game controls themselves are fairly simple. In the deploy phase, simply tap on a territory to spawn. You may switch it as long as the deploy phase hasn’t ended. Once the attack phase starts, in order to move troops, you first select a territory that you own (same color as your leaderboard profile background). You’ll see a series of lines showing you where you can move troops to. Next, select a target territory that is highlighted. This’ll let you move troops to it (if it’s your own territory) or attack (if it’s an enemy or neutral territory). The slider bar on the bottom of the screen shows the percentage of troops that you are going to move, along with a bar showing the specific amount. You may adjust this bar according to your needs. Note that a minimum of 1 troop will always be sent, regardless of how low the percentage is (unless there are 0 troops). Finally, you may quit a game anytime by pressing the button on the far-bottom-left corner of the screen with a back arrow, but note that you’ll automatically be defeated if you leave the game.
-                        </p>
+                <DIV CLASS="row">
+                    <DIV CLASS="col">
+                        <P CLASS="paragraph" STYLE="margin-bottom: 25px;">Thanks for playing Emblitz! Emblitz is a fast-paced real time multiplayer strategy game. This terrtorial conquest game is simple, but there's a lot of strategy involved. Good luck, and have fun playing!</P>
+                        <A HREF="./tutorial/rules-and-mechanics" CLASS="btn btn-outline-info" STYLE="margin-bottom: 15px;">Next: Rules and Mechanics <I CLASS="fa fa-chevron-right"></I></A>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped" style="width: 16.7%"></div>
+                        </div>
+                        <DIV STYLE="font-size: 14px; margin-bottom: 25px; margin-top: 5px;">Article 1 of 6</DIV>
+                        <P CLASS="paragraph" STYLE="margin-bottom: 0px; font-size: 18px"><B>Contents:</B></P>
+                        <DIV CLASS="btn-group-vertical">
+                            <A HREF="./tutorial/rules-and-mechanics" CLASS="btn btn-primary t-button-primary">Rules and Mechanics</A>
+                            <A HREF="./tutorial/powerups" CLASS="btn btn-primary t-button-primary">Powerups</A>
+                            <A HREF="./tutorial/rules-and-mechanics" CLASS="btn btn-primary t-button-primary">Player Interactions</A>
+                            <A HREF="./tutorial/rules-and-mechanics" CLASS="btn btn-primary t-button-primary">Strategies</A>
+                            <A HREF="./tutorial/rules-and-mechanics" CLASS="btn btn-primary t-button-primary">Frequenty Asked Questions (FAQs)</A>
+                        </DIV>
+                        <P CLASS="paragraph" STYLE="margin-top: 35px;">&copy; Emblitz 2023</P>
+                        <P CLASS="paragraph" STYLE="margin-top: -10px; margin-bottom: 35px;"><A HREF="privacy.html" CLASS="btn-link" TARGET="_blank">Privacy Policy</P>
+                    </DIV>
                 </DIV>
-                <DIV ID="gmechanics">
-                    <br>
-                    <h2>Game Mechanics</h2>
-                    <IMG CLASS="cimage" STYLE="float: right" SRC="./images/tutorial/attack.jpg">
-                    <IMG CLASS="cimage" STYLE="float: right; padding-bottom: 25px; padding-left: 40px;" SRC="./images/tutorial/fortify.jpg">
-                    <IMG CLASS="cimage" STYLE="float: right; padding-bottom: 25px; padding-left: 40px;" SRC="./images/tutorial/troopchanges.jpg">
-                    <P CLASS="paragraph" STYLE="display: block !important">Main game mechanics in Emblitz include warfare-related functions, such as defending and attacking. The controls for both are mentioned in the “game controls” section. A number reflecting troop number changes will pop up above a territory label every time its troop amount changes.
-
-                        <BR><BR>Defending allows you to fortify existing territories to better prepare for an enemy attack. Defending troops receive a 20% boost over the attacking troops, so it’ll cost an attacking enemy more troops than you if one of your territories is attacked.
-                        
-                        <BR><BR>Attacking allows you to seize other players’ territories and win the game, once you’re the last person standing. All players start out with 10 troops. Every 10 seconds, all territories for all players will gain troops. There’s a timer on the top left corner of the screen so you know when that addition occurs. Territories will gain 1 troop per addition, plus 20% of their current troop count, up to a maximum of 5 troops per 10 seconds. As a result, it may be advantageous to accumulate a large number of troops in certain territories to maximize the benefits of this mechanic. However, it'll also be beneficial to control a lot of territories, since each one has its own troop bonuses. 
-                        </p>
-                </DIV>
-                <DIV ID="pinteraction">
-                    <br>
-                    <h2>Player Interactions</h2>
-                    <p CLASS="paragraph">We're still working on player interaction features, but we hope to add player emotes and preset messages in the future to encourage player collaboration and interaction.</p>
-                </DIV>
-                <DIV ID="faqs">
-                    <BR>
-                    <h2>Frequently Asked Questions (FAQs)</h2>
-                    <p CLASS="paragraph">
-                        <B>Will there be new maps? How about new game content?</B>
-                        <BR>Maps are released frequently, so stay tuned for more maps! We're also rolling out updates as well, since this game is very early in development and we look forward to making more stuff in-game! We also plan on adding user accounts so you can change your profile pic and save your stats and settings.
-                        <BR><BR>
-                        <B>What's with the glitches?</B>
-                        <BR>We are currently aware of several glitches, mostly client-side ones that don't impact gameplay significantly. However, we are doing our best to fix them. Note that we're in early alpha, so this game is still a work in progress.
-                        <BR><BR>
-                        <B>How do I contact the devs, and is there a community?</B>
-                        <BR>We're working on an Emblitz Discord server, and we'll post the link when we're finished.
-                        <BR><BR>
-                        <B>Why can't I play on mobile?</B>
-                        <BR>Mobile phones have touchscreens and have smaller screens in general, which currently isn't very compatible with the current system. We're working on a special version though for users who play on mobile, and it'll be done soon!
-                        <BR><BR>
-                        <B>Will there be ads in the game?</B>
-                        <BR>As the game just released, we haven't put ads on yet. However, we plan on adding ads to help cover hosting costs. Furthermore, we plan on donating most of the profits to a local nonprofit that's dedicated towards providing free bikes for children in need. So, once there are ads, we'll really appreciate it if you disable your adblocker (if you have one)!
-                        <BR><BR>
-                        <B>Who are the devs?</B>
-                        <BR>We're just 2 high school students who like making cool stuff and helping out others at the same time.
-                    </p>
-                </DIV>
-                <BR>
-                <P CLASS="paragraph">&copy; Emblitz 2022</P>
             </DIV>
         </DIV>
     </BODY>

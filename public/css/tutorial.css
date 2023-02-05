@@ -1,0 +1,25 @@
+body {
+    background: var(--dark) !important;
+    color: var(--light) !important;
+}
+
+.t-button-list {
+    display: block;
+}
+
+.t-button-primary {
+    display: block;
+    margin-top: 5px;
+}
+
+.logoimg {
+    max-width: 300px;
+    width: 65%;
+    margin-top: 50px;
+    margin-left: 5px;
+}
+
+.header {
+    float: left;
+    display: block;
+}
