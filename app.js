@@ -212,6 +212,16 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+//remove trailing forward slash
+app.use((req, res, next) => {
+    if (req.path.substr(-1) === '/' && req.path.length > 1) {
+      const query = req.url.slice(req.path.length);
+      res.redirect(301, req.path.slice(0, -1) + query);
+    } else {
+      next();
+    }
+});
+
 app.all("/", (req, res) => {
     let getuuid = req.cookies.uuid;
 
@@ -431,7 +441,7 @@ app.get("/tutorial/*", (req, res) => {
             res.status(404);
             return;
         }
-        res.render("./tutorial/" + req.path.split("/")[2]);
+        res.render("tutorial/" + req.path.split("/")[2]);
     });
 });
 
