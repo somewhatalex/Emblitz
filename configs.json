@@ -1,4 +1,6 @@
 {
+    "gameVersion": "1.5.1",
+    "gameLastUpdated": "2/12/2023",
     "timeoutDuration": 15000,
     "deployStageTime": 10
 }

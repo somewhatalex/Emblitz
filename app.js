@@ -42,7 +42,7 @@ const authsecret = process.env.AUTHSECRET;
 var port = process.env.SERVERPORT;
 
 //GAME VERSION
-const gameversion = "1.5.0 | 2/12/2023";
+const gameversion = configs.gameVersion + " | " + configs.gameLastUpdated;
 
 //mapname, maxplayers
 const allmaps = require("./scripts/mapconfig.js");
