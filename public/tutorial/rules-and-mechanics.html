@@ -38,30 +38,54 @@
                         <DIV STYLE="font-size: 14px; margin-bottom: 25px; margin-top: 5px;">Article 2 of 5</DIV>
 
                         <!-- begin tutorial content here -->
-                        <P CLASS="paragraph" style="margin-bottom: 25px">
+                        <P CLASS="paragraph">
                             <P CLASS="paragraph">
-                            <IMG CLASS="img-fluid img-thumbnail" SRC="../images/tutorial/mainMenu.jpg" STYLE="float: right; height: 390px;" alt="An image of the game menu on the home page">
-                            <B>Game Menus</B><br><br>
-                            Before discussing the in-game controls, we first need to look at the home menu. Before joining a game, you can first enter a player name (a random name will be assigned if you don’t) and select a preferred color. The color will change your leaderboard and territory color, however, is purely cosmetic.<BR><BR>
-                                
-                            Looking past the username and player color inputs, we have the map selection menu. This will let you choose the type of map you want to play on. You may use the “<” and “>” buttons to navigate between maps. Each map is unique and has its own gameplay and strategies, and we’re going to be adding many more, so have fun exploring!<BR><BR>
-    
-                            There are 3 buttons that are on the home menu. The green one is to join a random public room. The “Join Game” button allows you to join any room given the room code. The room code is displayed in the game lobby, which you may share with anyone you want. You may also create a private room using the “Create Private Room” button. This’ll create a room that only people with the join code can enter (perfect for playing challenge matches or bing chilling with friends). Once you’re in a lobby, the timer will start counting down when 2 or more players are in a game. Once the timer ends, or all players hit “Ready”, then the game starts.<BR>
+                            <IMG CLASS="img-fluid img-thumbnail" SRC="../images/tutorial/mainMenu.jpg" STYLE="float: right; height: 390px; margin-left: 10px; margin-bottom: 10px;" alt="An image of the game menu on the home page">
+                            <B>Home Page</B><br>
+                            The home page is divided into a user profile (if you're logged in) and map selection sections. You can select the map you want by using the "<" and ">" buttons.
+
+                            The buttons are as follows:
+                            <style>
+                                .list-group-item {
+                                    background: var(--dark);
+                                    border: 1px solid var(--medium);
+                                    color: var(--light)
+                                }
+                            </style>
+                            <ul class="list-group">
+                                <li class="list-group-item">"Play" - Join a random public room</li>
+                                <li class="list-group-item">"Join Game" - Join a game given that you have its join code</li>
+                                <li class="list-group-item">"Create Private Room" - Create a private lobby</li>
+                            </ul>                          
                         </P>
+                        <p class="paragraph">
+                            <b>Lobby</b><br>
+                            The game starts when the 20-second timer finishes or if all players hit "Ready", whichever happens first. The room join code is shown as well (perfect for playing challenge matches or bing chilling with friends).
+                        </p>
+                        <p class="paragraph">
+                            <b>Objective</b><br>
+                            Take over all enemy territories. The game ends if all your territories are destroyed or invaded.
+                        </p>
+                        <p class="paragraph">
+                            <b>Game Controls</b><br>
+                            The game controls are simple: click, zoom, and drag. You can manipulate the map by simply panning and zooming it around using your mouse, trackpad, or touchscreen.
+                        </p>
+                        <p class="paragraph">
+                            <b>Game Phases</b><br>
+                            The game is split into 2 phases: deploy and attack.
+                            <ol class="list-group list-group-numbered">
+                                <li class="list-group-item">Deploy phase - Select a starting territory before the 10-second timer finishes (if you fail to pick one, you'll start out at a random location). You can't start at a boosted (x2 troops) territory. All players will begin with 10 troops.</li>
+                                <li class="list-group-item">Attack phase - Your goal here is to take over all enemy territories. During this phase, you can attack enemy territories, move troops between your own territories to fortify them, and use powerups.</li>
+                            </ol>
+                        </p>
                         <P CLASS="paragraph">
-                             <BR>
-                            <IMG CLASS="img-thumbnail" SRC="../images/tutorial/controls.jpg" STYLE="float: right; clear: right;" alt="An image of the game attack controls">
-                            <B>Controls</B><br><br>
-                            The game controls themselves are fairly simple. In the deploy phase, simply tap on a territory to spawn. You may switch it as long as the deploy phase hasn’t ended. Once the attack phase starts, in order to move troops, you first select a territory that you own (the same color as your leaderboard profile background). You’ll see a series of lines showing you where you can move troops to. Next, select a target territory that is highlighted. This’ll let you move troops to it (if it’s your own territory) or attack (if it’s an enemy or neutral territory). The slider bar on the bottom of the screen shows the percentage of troops that you are going to move, along with a bar showing the specific amount. You may adjust this bar according to your needs. Note that a minimum of 1 troop will always be sent, regardless of how low the percentage is (none will be sent if there’s only 1 troop in the starting territory). Finally, you may quit a game anytime by pressing the button on the far-bottom-left corner of the screen with a back arrow, but note that you’ll automatically be defeated if you leave the game.<BR>
+                            <B>Gaming Troops</B><br>
+                            Every 10 seconds, all territories (except neutral ones) will gain troops. The number of troops gained is equal to 1 plus 20% of the existing troop count (max of 5). The troop addition timer is on the top left of the screen.
                         </P>
-                        <P CLASS="paragraph">
-                            <BR> 
-                            <B>Game Mechanics</B><br><br>
-                            Main game mechanics in Emblitz include warfare-related functions, such as defending and attacking. The controls for both are mentioned in the “game controls” section. A number reflecting troop number changes will pop up above a territory label every time its troop amount changes.<BR><BR>
-    
-                            Defending allows you to fortify existing territories to better prepare for an enemy attack. Defending troops receive a 20% boost over the attacking troops, so it’ll cost an attacking enemy more troops than you if one of your territories is attacked.<BR><BR>
-    
-                            Attacking allows you to seize other players’ territories and win the game, once you’re the last person standing. All players start out with 10 troops. Every 10 seconds, all territories for all players will gain troops. There’s a timer on the top left corner of the screen so you know when that addition occurs. Territories will gain 1 troop per addition, plus 20% of their current troop count, up to a maximum of 5 troops per 10 seconds. As a result, it may be advantageous to accumulate a large number of troops in certain territories to maximize the benefits of this mechanic. However, it'll also be beneficial to control a lot of territories, since each one has its own troop bonuses.<BR><BR>
+                        <IMG CLASS="img-thumbnail" SRC="../images/tutorial/controls.jpg" STYLE="float: right; clear: right; margin-left: 10px; margin-bottom: 10px; margin-top: 5px;" alt="An image of the game attack controls">
+                        <P CLASS="paragraph" style="margin-bottom: 25px">
+                            <B>Attacking/Defending</B><br>
+                            First, select a territory to move troops from. If you want, you can adjust the slider on the bottom of the screen to change the proportion of troops you want to send. Then, click on a target territory next to it. If it's an enemy or neutral territory, those troops will attack it and deduct troops from it. If it's your own territory, those troops will add towards the total troop count there. Note that territories defending from an attack will have a 10% defender's boost. 1 troop will, by default, remain in every territory until it's killed. Territories with 0 troops will be considered neutral and not count towards any player.
                         </P>
                     </P>
                         <!-- end tutorial content -->
