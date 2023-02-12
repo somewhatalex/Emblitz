@@ -39,18 +39,57 @@
 
                         <!-- begin tutorial content here -->
                         <P CLASS="paragraph" style="margin-bottom: 25px">
+                            <style>
+                                .card {
+                                    display: inline-block;
+                                }
+
+                                .card-text {
+                                    height: 200px;
+                                    overflow: auto;
+                                }
+
+                                .card-img-top {
+                                    height: 175px;
+                                    width: 280px;
+                                    object-fit: cover;
+                                }
+
+                                .badge-container {
+                                    display: grid;
+                                    grid-template-columns: repeat(auto-fit, min(265px));
+                                    gap: 30px 30px;
+                                    margin-bottom: 30px;
+                                }
+                            </style>
                             <P CLASS="paragraph">
                                 Powerups offer strategic advantages in gameplay, but there is a cooldown period between uses. You can activate them using the powerup buttons on the bottom right of the screen after the cooldown period ends. The green bar on each button serves as the cooldown timer for that specific powerup. When the cooldown period ends, a red dot will appear on the button, and you can activate it again. After pushing a powerup button, follow the instructions that pop up to use the powerup.<br><br>
 
-                                <B>Airlift</B><br>
-                                <U>Type:</U> Movement<br>
-                                <U>Cooldown:</U> 20 sec.<br>
-                                The airlift allows players to move troops between any 2 territories, even if they aren’t bordering each other. This lets players funnel troops behind enemy lines, or support isolated friendly regions.<br><br>
+                                <div class="badge-container">
+                                    <div class="card" style="width: 280px; border: var(--medium); overflow: hidden; -webkit-box-shadow: 0px 0px 12px 2px #0a0a0a; box-shadow: 0px 0px 12px 2px #0a0a0a;">
+                                        <img class="card-img-top img-fluid" style="border: none" src="../images/tutorial/airlift_image.PNG" alt="Card image">
+                                        <div class="card-body" style="background: #474747; -webkit-box-shadow: 0px 0px 12px 2px #0a0a0a; box-shadow: 0px 0px 12px 2px #0a0a0a;">
+                                            <h4 class="card-title">Airlift</h4>
+                                            <p class="card-text">
+                                                <U>Type:</U> Movement<br>
+                                                <U>Cooldown:</U> 20 sec.<br>
+                                                The airlift allows players to move troops between any 2 territories, even if they aren’t bordering each other. This lets players funnel troops behind enemy lines, or support isolated friendly regions.<br><br>
+                                            </p>
+                                        </div>
+                                    </div>
 
-                                <B>Nuke</B><br>
-                                <U>Type:</U> Damage<br>
-                                <U>Cooldown:</U> 40 sec.<br>
-                                The nuke does catastrophic splash damage! 70% of all troops at ground zero (the territory targeted) will be wiped out, and damage decreases the further you go. If a territory has 0 troops left, it becomes neutral. Note that this powerup does FRIENDLY FIRE!
+                                    <div class="card" style="width: 280px; border: var(--medium); overflow: hidden; -webkit-box-shadow: 0px 0px 12px 2px #0a0a0a; box-shadow: 0px 0px 12px 2px #0a0a0a;">
+                                        <img class="card-img-top img-fluid" style="border: none" src="../images/tutorial/nuke_image.PNG" alt="Card image">
+                                        <div class="card-body" style="background: #474747; -webkit-box-shadow: 0px 0px 12px 2px #0a0a0a; box-shadow: 0px 0px 12px 2px #0a0a0a;">
+                                            <h4 class="card-title">Nuke</h4>
+                                            <p class="card-text">
+                                                <U>Type:</U> Damage<br>
+                                                <U>Cooldown:</U> 40 sec.<br>
+                                                The nuke does catastrophic splash damage! 70% of all troops at ground zero (the territory targeted) will be wiped out, and damage decreases the further you go. If a territory has 0 troops left, it becomes neutral. Note that this powerup does FRIENDLY FIRE!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </P>
                         </P>
                         <!-- end tutorial content -->
