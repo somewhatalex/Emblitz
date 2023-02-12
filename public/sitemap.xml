@@ -8,13 +8,33 @@
 
 <url>
   <loc>https://www.emblitz.com/</loc>
-  <lastmod>2022-06-24T04:46:43+00:00</lastmod>
+  <lastmod>2023-02-12T20:42:17+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
   <loc>https://www.emblitz.com/tutorial</loc>
-  <lastmod>2022-06-24T04:46:43+00:00</lastmod>
+  <lastmod>2023-02-12T20:42:17+00:00</lastmod>
   <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.emblitz.com/tutorial/rules-and-mechanics</loc>
+  <lastmod>2023-02-12T20:42:17+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://www.emblitz.com/tutorial/powerups</loc>
+  <lastmod>2023-02-12T20:42:17+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://www.emblitz.com/tutorial/player-interaction</loc>
+  <lastmod>2023-02-12T20:42:17+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://www.emblitz.com/tutorial/faq</loc>
+  <lastmod>2023-02-12T20:42:17+00:00</lastmod>
+  <priority>0.64</priority>
 </url>
 
 
