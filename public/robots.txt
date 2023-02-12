@@ -2,8 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 Disallow: /admin
-Disallow: /privacy
-Disallow: /privacy.html
 Disallow: /verify
 Disallow: /verify.html
 Disallow: /settings
