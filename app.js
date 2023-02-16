@@ -198,6 +198,10 @@ app.use(compression());
 app.use("/api/", apiLimiter);
 app.use("/authapi/", adminApiLimiter);
 app.use("/auth2/", mailApiLimiter);
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
 
 /*
 App can't have pages caching because too much of it is dynamic

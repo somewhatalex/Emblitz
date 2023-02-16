@@ -10,7 +10,7 @@
         },
         "googleAnalytics": {
             "enabled": true,
-            "ID": "G-QNCVLQXQCJ"
+            "pubID": "G-QNCVLQXQCJ"
         }
     }
 }
