@@ -2,5 +2,15 @@
     "gameVersion": "1.5.1",
     "gameLastUpdated": "2/12/2023",
     "timeoutDuration": 15000,
-    "deployStageTime": 10
+    "deployStageTime": 10,
+    "commercialSettings": {
+        "googleAdsense": {
+            "enabled": true,
+            "pubID": "2859288291436441"
+        },
+        "googleAnalytics": {
+            "enabled": true,
+            "ID": "G-QNCVLQXQCJ"
+        }
+    }
 }
