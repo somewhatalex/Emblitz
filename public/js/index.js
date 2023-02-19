@@ -50,6 +50,7 @@ window.onload = function() {
     }
 
     inithomepage();
+    detectAdBlock();
 }
 
 function inithomepage() {
@@ -850,10 +851,17 @@ function detectAdBlock() {
             console.log("Adblocker detected.");
 
             //add the popup script here
+            /*
             document.getElementById("adblock-confirm").style.display = "block";
             setTimeout(function() {
                 document.getElementById("adblock-confirm").style.opacity = "1";
             }, 50);
+            */
+
+            let adwarnings = document.getElementsByClassName("ad-warning");
+            for(let i=0; i<adwarnings.length; i++) {
+                adwarnings[i].style.display = "none";
+            }
         }
     } else {
         console.log("> The adblock popup is hidden because the user opted out");
