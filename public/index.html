@@ -134,11 +134,22 @@
                             <BR>
                         </DIV>
 
-                        <DIV STYLE="font-size: 13px; margin-bottom: 5px;" CLASS="ad-warning">Advertisement</DIV>
-                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441" style="height: 60px"
+                        <style>
+                            @media (max-width: 400px) {
+                                .ad-type-responsive {
+                                    display: none;
+                                }
+                                .ad-warning-one {
+                                    display: none;
+                                }
+                            }
+                        </style>
+
+                        <DIV STYLE="font-size: 13px; margin-bottom: 5px;" CLASS="ad-warning ad-warning-one">Advertisement</DIV>
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
                         ></script>
                         <!-- Main menu ad -->
-                        <ins class="adsbygoogle"
+                        <ins class="adsbygoogle ad-type-responsive"
                             style="display:block"
                             data-ad-client="ca-pub-2859288291436441"
                             data-ad-slot="7138740914"
