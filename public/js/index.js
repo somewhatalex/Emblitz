@@ -50,7 +50,6 @@ window.onload = function() {
     }
 
     inithomepage();
-    detectAdBlock();
 }
 
 function inithomepage() {
