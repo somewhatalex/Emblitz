@@ -21,8 +21,8 @@ const badges = require("./scripts/badges.js");
 const { response } = require("express");
 const colorData = require("./scripts/colorData.js");
 const badwords = require("bad-words");
-const emblitzBot = require("./scripts/bot.js")
-const configs = require("./configs.json")
+const emblitzBot = require("./scripts/bot.js");
+const configs = require("./configs.json");
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
 Update 7/27/22: passport.js creates a lot of hosting compatibility issues
@@ -107,9 +107,11 @@ pool.connect(function(err) {
         console.log("Finished initializing database");
         console.log("--- Server launched, begin logging. ---")
         
-        setInterval(function() {
-            auth.deleteUnusedAccounts();
-        }, 900000);
+        if(configs.accountManagement.forceEmailVerification) {
+            setInterval(function() {
+                auth.deleteUnusedAccounts();
+            }, configs.accountManagement.deleteUnusedAccountsInterval);
+        }
     });
 });
 
@@ -942,7 +944,7 @@ function joinroom(map, createroom) {
     }
 
     let maxplayers = allmaps[roommap];
-    let deploytime = configs.deployStageTime;
+    let deploytime = configs.gameSettings.deployStageTime;
 
     let isprivate = false;
     if(createroom) {

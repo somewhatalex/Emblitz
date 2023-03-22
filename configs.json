@@ -1,8 +1,7 @@
 {
-    "gameVersion": "1.5.2",
-    "gameLastUpdated": "2/19/2023",
+    "gameVersion": "1.5.3",
+    "gameLastUpdated": "3/21/2023",
     "timeoutDuration": 15000,
-    "deployStageTime": 10,
     "commercialSettings": {
         "googleAdsense": {
             "enabled": true,
@@ -11,6 +10,28 @@
         "googleAnalytics": {
             "enabled": true,
             "pubID": "G-QNCVLQXQCJ"
+        }
+    },
+    "accountManagement": {
+        "forceEmailVerification": true,
+        "deleteUnusedAccountsInterval": 900000
+    },
+    "gameSettings": {
+        "deployStageTime": 10,
+        "baseDefenseBuff": 1.2,
+        "startingTroopsPerTerritory": 1,
+        "startingTroopsPerBoostedTerritory": 10,
+        "passiveTroopAddRate": 0.1,
+        "maxTroopAddAmount": 5,
+        "powerupSettings": {
+            "airlift": {
+                "cooldown": 20000
+            },
+            "nuke": {
+                "cooldown": 40000,
+                "groundZeroDamage": 70,
+                "damageDecay": 0.32
+            }
         }
     }
 }

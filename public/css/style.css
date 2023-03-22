@@ -1696,7 +1696,7 @@ input { /*override default styles*/
     cursor: pointer;
     margin-bottom: 6px;
     float: right;
-    margin-left: 15px;
+    margin-left: 14px;
 }
 
 .powerup-btn:hover {
@@ -1730,6 +1730,9 @@ input { /*override default styles*/
     padding: 5px;
     border-radius: 10px;
     pointer-events: none;
+    position: relative;
+    right: -75px;
+    width: 110px;
 }
 
 .powerup-recharge {

@@ -1,8 +1,3 @@
-/*note: DO NOT turn the powerup funtions into a class.
-The intended structure of this file is to have
-several functions that'll synchronously run
-powerups
-*/
 var canMoveTroops = true;
 var powerupType = null;
 let p_target1 = null;
@@ -54,6 +49,7 @@ function resetPowerupBars() {
 function resetPowerupCooldowns() {
     triggerPowerupCooldown("airlift", 20);
     triggerPowerupCooldown("nuke", 40);
+    triggerPowerupCooldown("supplydrop", 40);
 }
 
 //function to control the powerup button timers
@@ -119,6 +115,21 @@ function nuke() {
         document.getElementById("eventstimer").style.width = "0%";
         infobar("show");
         document.getElementById("statustext").innerHTML = "<B>Nuke Powerup:</B> Select an ENEMY territory you want to nuke. WARNING: Nuke does splash damage and friendly fire.";
+    }
+}
+
+//triggers supply drop
+function supplyDrop() {
+    if(attackPhase === "attack") {
+        canMoveTroops = false;
+        powerupType = "supplydrop";
+        selectedRegion = "";
+
+        //show the notification (with timer disabled)
+        document.getElementById("eventstimer").style.display = "none";
+        document.getElementById("eventstimer").style.width = "0%";
+        infobar("show");
+        document.getElementById("statustext").innerHTML = "<B>Supply Drop</B> Select a territory that you own to drop supplies to (gives it a defensive boost).";
     }
 }
 

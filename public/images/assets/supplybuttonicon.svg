@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 67 67" width="67" height="67" xmlns="http://www.w3.org/2000/svg">
+  <path style="fill: rgb(255, 255, 255); stroke-width: 2px; stroke: rgb(255, 255, 255);" d="M 21.306 10.819 L 21.817 57.719"/>
+  <path style="fill: rgb(255, 255, 255); stroke-width: 2px; stroke: rgb(255, 255, 255);" d="M 33.149 57.464 L 33.532 10.307"/>
+  <path style="fill: rgb(255, 255, 255); stroke-width: 2px; stroke: rgb(255, 255, 255);" d="M 45.119 10.18 L 45.246 56.697"/>
+  <rect x="62.721" y="83.038" width="67.923" height="7.54" style="stroke: rgb(124, 124, 124); fill: rgb(222, 222, 222);" transform="matrix(0.707107, 0.707107, -0.707107, 0.707107, 26.517794, -96.247253)"/>
+  <path d="M 12.111 12.112 L 54.888 12.112 L 54.888 54.888 L 12.111 54.888 L 12.111 12.112 Z M 5.652 61.348 L 61.348 61.348 L 61.348 5.652 L 5.652 5.652 L 5.652 61.348 Z" style="fill: rgb(222, 222, 222); stroke: rgb(124, 124, 124);"/>
+</svg>

@@ -9,6 +9,7 @@ var gameLobbyTimers = {};
 var gameLobbyTimerHandlers = {};
 var gameDeployTimers = {};
 const allmaps = require("./mapconfig.js");
+const configs = require("../configs.json");
 
 function randomnumber(min, max) {
     min = Math.ceil(min);
@@ -37,9 +38,9 @@ function game() {
 
                 for(let [key] of Object.entries(mapdict)) {
                     if(selectedterritories.includes(key)) {
-                        mapstate[key] = {"territory": key, "player": null, "troopcount": 10, "troopmultiplier": 2};
+                        mapstate[key] = {"territory": key, "player": null, "troopcount": configs.gameSettings.startingTroopsPerBoostedTerritory, "troopmultiplier": 2, "defensemultiplier": 1};
                     } else {
-                        mapstate[key] = {"territory": key, "player": null, "troopcount": 1, "troopmultiplier": 1};
+                        mapstate[key] = {"territory": key, "player": null, "troopcount": configs.gameSettings.startingTroopsPerTerritory, "troopmultiplier": 1, "defensemultiplier": 1};
                     }
                 }
                 games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false, "mapname": roommap, "boostedterritories": selectedterritories});
@@ -182,7 +183,7 @@ function game() {
                         self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "airlift"]);
                     }
                 }
-            }, 20000);
+            }, configs.gameSettings.powerupSettings.airlift.cooldown);
             setTimeout(function() {
                 if(games.get(roomid).playerstate) {
                     if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
@@ -190,7 +191,7 @@ function game() {
                         self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "nuke"]);
                     }
                 }
-            }, 40000);
+            }, configs.gameSettings.powerupSettings.nuke.cooldown);
         }
     }
 
@@ -201,9 +202,11 @@ function game() {
             let allterritories_length = allterritories.length;
             for(let i=0; i<allterritories_length; i++) {
                 if(games.get(roomid).mapstate[allterritories[i]].player != null && !games.get(roomid).mapstate[allterritories[i]].territory.startsWith("plane-")) {
-                    let troopaddamount = Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * 0.1) + 1;
-                    if(troopaddamount > 5) {
-                        troopaddamount = 5;
+                    let troopaddamount = Math.round(games.get(roomid).mapstate[allterritories[i]].troopcount * configs.gameSettings.passiveTroopAddRate) + 1;
+                    
+                    let maxtrooplimiter = configs.gameSettings.maxTroopAddAmount;
+                    if(troopaddamount > maxtrooplimiter) {
+                        troopaddamount = maxtrooplimiter;
                     }
                     troopaddamount = troopaddamount * games.get(roomid).mapstate[allterritories[i]].troopmultiplier;
                     games.get(roomid).mapstate[allterritories[i]].troopcount = games.get(roomid).mapstate[allterritories[i]].troopcount + troopaddamount;
@@ -281,9 +284,9 @@ function game() {
                     games.get(roomid).mapstate[start].troopcount = starttroops - moveAmount;
                 } else {
                     //attacking enemy
-
-                    //boost enemy troop strength temporarily by 1.2 for defense
-                    let targetProxyTroops = targettroops*1.2;
+                    let defenseMultiplier = games.get(roomid).mapstate[target].defensemultiplier;
+                    //boost enemy troop strength temporarily by 1.2 (or whatever is specified in configs.json) * defense multiplier
+                    let targetProxyTroops = targettroops * configs.gameSettings.baseDefenseBuff * defenseMultiplier;
                     targetProxyTroops = targetProxyTroops - moveAmount;
                     targetProxyTroops = Math.round(targetProxyTroops);
                     if(targetProxyTroops > targettroops) {
@@ -367,7 +370,7 @@ function game() {
                             self.emit("powerup_cooldownended", [roomid, playerid, "airlift"]);
                         }
                     }
-                }, 20000);
+                }, configs.gameSettings.powerupSettings.airlift.cooldown);
 
                 self.emit("powerup_initairlift", [roomid, start, target, id]);
 
@@ -461,7 +464,7 @@ function game() {
                             self.emit("powerup_cooldownended", [roomid, playerid, "nuke"]);
                         }
                     }
-                }, 40000);
+                }, configs.gameSettings.powerupSettings.nuke.cooldown);
 
                 self.emit("powerup_nuke", [roomid, target]);
                 
@@ -483,8 +486,9 @@ function game() {
                     let distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
 
                     //damage should be 70% at ground 0, decrease by 0.32% per unit
-                    //y=-0.28x+70
-                    let remProportion = 1 - (-0.32*(distance)+70)*0.01; //percent to decimal, then to proportion of troops remaining
+                    //y=-0.32x+70
+                    //or whatever is specified in configs.json
+                    let remProportion = 1 - (-configs.gameSettings.powerupSettings.nuke.damageDecay*(distance) + configs.gameSettings.powerupSettings.nuke.groundZeroDamage)*0.01; //percent to decimal, then to proportion of troops remaining
                     
                     //edge cases in case a bad glitch occurs?
                     if(remProportion < 0) {
