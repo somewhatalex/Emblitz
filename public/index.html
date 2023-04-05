@@ -30,7 +30,7 @@
         <SCRIPT>
             const hostname = "<%= host_name %>";
             const prod = "<%= prod %>";
-            const timeoutDuration = <%= timeoutDuration %>;
+            const timeoutDuration = "<%= timeoutDuration %>";
         </SCRIPT>
 
         <SCRIPT TYPE="text/javascript" SRC="./js/index.js"></SCRIPT>
@@ -351,6 +351,15 @@
                             <IMG SRC="./images/assets/airlifticon.svg">
                         </DIV>
                         <DIV CLASS="powerup-notify" ID="airlift-notify-icon"></DIV>
+                    </BUTTON>
+                    <!-- supply drop -->
+                    <BUTTON CLASS="powerup-btn" ID="supplydrop-powerup" TITLE="Supply Drop" ONCLICK="supplyDrop()">
+                        <DIV CLASS="powerup-nooverflow">
+                            <DIV CLASS="powerup-btn-bg"></DIV>
+                            <DIV CLASS="powerup-recharge"></DIV>
+                            <IMG SRC="./images/assets/supplydropicon.png">
+                        </DIV>
+                        <DIV CLASS="powerup-notify" ID="supplydrop-notify-icon"></DIV>
                     </BUTTON>
                 </DIV>
                 <DIV CLASS="endscreen" ID="endscreen">
