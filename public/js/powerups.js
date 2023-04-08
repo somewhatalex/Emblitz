@@ -89,6 +89,21 @@ function syncPowerupCooldown(item) {
     }, 50);
 }
 
+//triggers supply drop
+function supplydrop() {
+    if(attackPhase === "attack") {
+        canMoveTroops = false;
+        powerupType = "supplydrop";
+        selectedRegion = "";
+
+        //show the notification (with timer disabled)
+        document.getElementById("eventstimer").style.display = "none";
+        document.getElementById("eventstimer").style.width = "0%";
+        infobar("show");
+        document.getElementById("statustext").innerHTML = "<B>Supply Drop</B> Select a territory that you own to drop supplies to (gives it a defensive boost).";
+    }
+}
+
 //triggers airlift
 function airlift() {
     if(attackPhase === "attack") {
@@ -115,21 +130,6 @@ function nuke() {
         document.getElementById("eventstimer").style.width = "0%";
         infobar("show");
         document.getElementById("statustext").innerHTML = "<B>Nuke Powerup:</B> Select an ENEMY territory you want to nuke. WARNING: Nuke does splash damage and friendly fire.";
-    }
-}
-
-//triggers supply drop
-function supplyDrop() {
-    if(attackPhase === "attack") {
-        canMoveTroops = false;
-        powerupType = "supplydrop";
-        selectedRegion = "";
-
-        //show the notification (with timer disabled)
-        document.getElementById("eventstimer").style.display = "none";
-        document.getElementById("eventstimer").style.width = "0%";
-        infobar("show");
-        document.getElementById("statustext").innerHTML = "<B>Supply Drop</B> Select a territory that you own to drop supplies to (gives it a defensive boost).";
     }
 }
 
@@ -220,36 +220,23 @@ function nukeAnimation(target) {
 function airliftPlaneAnimation(start, target, id) {
     let iterations = 0;
 
-    //calculate starting location
-    var off1 = getOffset(start);
-    var x = off1.left + off1.width + 20;
-    var y = off1.top + off1.height + 20;
+    const off1 = getOffset(start);
+    let x = off1.left + off1.width + 20;
+    let y = off1.top + off1.height + 20;
 
-    //get angle to the destination
-    let angle = getAngle(start, target);
+    const angle = getAngle(start, target);
+    const deltax = Math.cos(angle * (Math.PI / 180)) * 60;
+    const deltay = Math.sin(angle * (Math.PI / 180)) * 60;
 
-    //clone a new instance of the plane
-    let plane = planeAsset.cloneNode(true);
-
-    if(angle < 0) {
-        angle = 360 + angle;
-    }
-
-    let deltax = Math.cos(angle * (Math.PI / 180)) * 60;
-    let deltay = Math.sin(angle * (Math.PI / 180)) * 60;
-
-    //attach unique id for plane
+    const plane = planeAsset.cloneNode(true);
     plane.id = "powerup_plane_" + id;
 
-    //and then style it and spawn it in
     plane.style.transform = "rotate(" + (angle + 180) + "deg)";
     plane.style.left = x + "px";
     plane.style.top = y + "px";
-
     plane.style.width = "20px";
     plane.style.marginTop = "-10px";
     plane.style.marginLeft = "-10px";
-
     plane.style.opacity = 0;
 
     setTimeout(function() {
@@ -259,33 +246,28 @@ function airliftPlaneAnimation(start, target, id) {
         plane.style.opacity = 1;
     }, 50);
 
-    
-    document.getElementById("mapl1").append(plane);
+    const mapl1 = document.getElementById("mapl1");
+    mapl1.append(plane);
 
     x -= deltax;
     y -= deltay;
     plane.style.left = x + "px";
     plane.style.top = y + "px";
 
-    /*
-    NEW ALGORITHM based off of animation frames
-    Faster performance, less smooth
-    */
     let animationstart;
-    //trigger the moveplane function
     window.requestAnimationFrame(movePlane);
 
     function movePlane(timestamp) {
-        //run every 500ms
         if(!animationstart) {
             animationstart = timestamp;
         }
-        if(timestamp - animationstart > 500) {
-            //vector calculation to determine change in x and y
+        const elapsed = timestamp - animationstart;
+
+        if(elapsed > 500) {
             x = parseInt(plane.style.left.replace("px", ""));
             y = parseInt(plane.style.top.replace("px", ""));
-            x -= deltax*((timestamp-animationstart)/500);
-            y -= deltay*((timestamp-animationstart)/500);
+            x -= deltax * (elapsed / 500);
+            y -= deltay * (elapsed / 500);
 
             plane.style.left = x + "px";
             plane.style.top = y + "px";
@@ -299,7 +281,6 @@ function airliftPlaneAnimation(start, target, id) {
 
         if(iterations <= 65) window.requestAnimationFrame(movePlane);
     }
-
     /*--OLD ALGORITHM--
     let planeinterval = setInterval(function() {
         //vector calculation to determine change in x and y

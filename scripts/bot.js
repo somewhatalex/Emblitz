@@ -242,10 +242,19 @@ class emblitzBot {
 
       //Attempt to nuke players
       if(ownedTerritories.length > 0 && randomnumber(0, 6) == 1){
-        let targetedTerritory = unownedTerritories[0];
+        let loopStartIndex;
+        let targetedTerritory;
 
         for(let x = 0; x < unownedTerritories.length; x++){
-          if(targetedTerritory.troopcount < unownedTerritories[x].troopcount){
+          if(unownedTerritories[x].player != null){
+            targetedTerritory = unownedTerritories[x];
+            loopStartIndex = x;
+            break;
+          }
+        }
+
+        for(let x = 0; x < unownedTerritories.length; x++){
+          if(targetedTerritory.troopcount < unownedTerritories[x].troopcount && unownedTerritories[x].player != null){
             targetedTerritory = unownedTerritories[x];
           }
         }
