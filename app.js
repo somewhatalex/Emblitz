@@ -1083,6 +1083,10 @@ gameevents.on("powerup_initairlift", function(result) {
     sendRoomMsg(result[0], {"sendairlift": true, "start": result[1], "target": result[2], "plane_id": result[3], "roomid": result[0]});
 });
 
+gameevents.on("powerup_initsupplydrop", function(result) {
+    sendRoomMsg(result[0], {"sendsupplydrop": true, "start": result[1], "target": result[2], "plane_id": result[3], "roomid": result[0]});
+});
+
 gameevents.on("powerup_nuke", function(result) {
     sendRoomMsg(result[0], {"nuke": true, "target": result[1]});
 });
@@ -1284,6 +1288,10 @@ wss.on("connection", (ws) => {
                 } else if(action === "powerup-airlift") {
                     if(game.isPlayerDead(msg.roomid, msg.uid)) return;
                     game.airlift(msg.start, msg.target, msg.plane_id, msg.roomid, msg.uid, msg.amount);
+                }
+                else if(action === "powerup-supplydrop") {
+                    if(game.isPlayerDead(msg.roomid, msg.uid)) return;
+                    game.supplydrop(msg.start, msg.target, msg.plane_id, msg.roomid, msg.uid, msg.amount);
                 } else if(action === "powerup-nuke") {
                     if(game.isPlayerDead(msg.roomid, msg.uid)) return;
                     game.nuke(msg.target, msg.roomid, msg.uid);

@@ -392,7 +392,7 @@ function initializeMap() {
                             if(d.currentTarget.getAttribute("data-color") !== myColor) { //Only drop supplies on your own territories
                                 return;
                             }
-                            sendSupplyDrop(d.currentTarget);
+                            sendSupplydrop(d.currentTarget);
                             infobar("hide");
                             setTimeout(function() {
                                 document.getElementById("infobar").style.display = "none";

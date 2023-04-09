@@ -43,7 +43,7 @@ function game() {
                         mapstate[key] = {"territory": key, "player": null, "troopcount": configs.gameSettings.startingTroopsPerTerritory, "troopmultiplier": 1, "defensemultiplier": 1};
                     }
                 }
-                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false, "mapname": roommap, "boostedterritories": selectedterritories});
+                games.set(roomid, {"mapstate": mapstate, "playerstate": playerstate, "phase": "lobby", "deploytime": deploytime*1000, "totalplayers": 0, "isprivate": isprivate, "hasended": false, "mapname": roommap, "boostedterritories": selectedterritories, "suppliedterritories": []});
                 resolve("ok");
             });
         });
@@ -287,6 +287,10 @@ function game() {
                     let defenseMultiplier = games.get(roomid).mapstate[target].defensemultiplier;
                     //boost enemy troop strength temporarily by 1.2 (or whatever is specified in configs.json) * defense multiplier
                     let targetProxyTroops = targettroops * configs.gameSettings.baseDefenseBuff * defenseMultiplier;
+                    // Add defense bonus to supplied territories
+                    if(suppliedterritories.contains(target)){
+                        targetProxyTroops *= 2;
+                    }
                     targetProxyTroops = targetProxyTroops - moveAmount;
                     targetProxyTroops = Math.round(targetProxyTroops);
                     if(targetProxyTroops > targettroops) {
@@ -344,6 +348,67 @@ function game() {
             checkForWin(roomid);
 
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
+        }
+    }
+
+    this.supplydrop = function(start, target, id, roomid, playerid) {
+        let parent = this;
+        try {
+            if(games.get(roomid).hasended) return;
+            
+            if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.supplydrop == true) {
+                games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.supplydrop = false;
+                setTimeout(function() {
+                    if(games.get(roomid)) {
+                        if(games.get(roomid).playerstate.find(item => item.id === playerid)) {
+                            games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.supplydrop = true;
+                            self.emit("powerup_cooldownended", [roomid, playerid, "supplydrop"]);
+                        }
+                    }
+                }, configs.gameSettings.powerupSettings.supplydrop.cooldown);
+
+                self.emit("powerup_initsupplydrop", [roomid, start, target, id]);
+
+                /*
+                the plane travels 120px a second, so to get the traveltime
+                you'll have to divide the total distance in pixels by 120
+                */
+
+                let x1 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][1];
+                let y1 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][0];
+                let x2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
+                let y2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
+
+                //pythag theoreum
+                let distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+                
+                let traveltime = ((distance-50)/120)*1000;
+
+                //500ms is the deploy time, so the travel time can't be less than around 500ms
+                if(traveltime < 500) {
+                    traveltime = 500;
+                }
+
+                setTimeout(function() {
+                    //triggers both plane sync and paratrooper animation
+                    self.emit("supplydroparrived", [roomid, target, id]);
+
+                    //paratroopers take 5s to reach the ground
+                    setTimeout(function() {
+                        // Functionality for when the supply crate lands
+                        let index = boostedterritories.length;
+                        boostedterritories.push(target);
+                        setTimeout(function() {
+                            // Remove territory supply once it wears off
+                            if (index > -1) { // only splice array when item is found
+                                array.splice(index, 1);
+                              }
+                        }, 30000)
+                    }, 5000)
+                }, traveltime);
+            }
+        } catch(e) {
+            //console.log(e);
         }
     }
 

@@ -145,6 +145,17 @@ function sendAirlift(start, target) {
     canMoveTroops = true;
 }
 
+function sendSupplydrop(target) {
+    triggerPowerupCooldown("supplydrop", 20);
+    let plane_id = randomnumber(0, 99999);
+    //start = start.getAttribute("data-code");
+    target = target.getAttribute("data-code");
+    console.log("[DEBUG] Sent supplydrop to " + target);
+
+    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": target, "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid}));
+    canMoveTroops = true;
+}
+
 //requests nuke (animation, ws message)
 function sendNuke(target) {
     triggerPowerupCooldown("nuke", 40);
@@ -213,6 +224,117 @@ function nukeAnimation(target) {
             }, 1500);
         }, 2000);
     }, 50);
+}
+
+function supplydropHelicopterAnimation(start, target, id) {
+    let iterations = 0;
+
+    const off1 = getOffset(start);
+    let x = off1.left + off1.width + 20;
+    let y = off1.top + off1.height + 20;
+
+    const angle = getAngle(start, target);
+    const deltax = Math.cos(angle * (Math.PI / 180)) * 60;
+    const deltay = Math.sin(angle * (Math.PI / 180)) * 60;
+
+    const plane = planeAsset.cloneNode(true);
+    plane.id = "powerup_plane_" + id;
+
+    plane.style.transform = "rotate(" + (angle + 180) + "deg)";
+    plane.style.left = x + "px";
+    plane.style.top = y + "px";
+    plane.style.width = "20px";
+    plane.style.marginTop = "-10px";
+    plane.style.marginLeft = "-10px";
+    plane.style.opacity = 0;
+
+    setTimeout(function() {
+        plane.style.width = "210px";
+        plane.style.marginTop = "-105px";
+        plane.style.marginLeft = "-105px";
+        plane.style.opacity = 1;
+    }, 50);
+
+    const mapl1 = document.getElementById("mapl1");
+    mapl1.append(plane);
+
+    x -= deltax;
+    y -= deltay;
+    plane.style.left = x + "px";
+    plane.style.top = y + "px";
+
+    let animationstart;
+    window.requestAnimationFrame(movePlane);
+
+    function movePlane(timestamp) {
+        if(!animationstart) {
+            animationstart = timestamp;
+        }
+        const elapsed = timestamp - animationstart;
+
+        if(elapsed > 500) {
+            x = parseInt(plane.style.left.replace("px", ""));
+            y = parseInt(plane.style.top.replace("px", ""));
+            x -= deltax * (elapsed / 500);
+            y -= deltay * (elapsed / 500);
+
+            plane.style.left = x + "px";
+            plane.style.top = y + "px";
+
+            iterations++;
+            if(iterations > 65) {
+                plane.remove();
+            }
+            animationstart = timestamp;
+        }
+
+        if(iterations <= 65) window.requestAnimationFrame(movePlane);
+    }
+}
+
+function supplydropParachuteAnimation(x, y) {
+    for(let i=0; i<2; i++) {
+        //clone a new parachute asset
+        let parachute = parachuteAsset.cloneNode(true);
+        parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";
+        parachute.style.left = x + "px";
+        parachute.style.top = y + "px";
+
+        parachute.style.width = "20px";
+        parachute.style.marginTop = "-10px";
+        parachute.style.marginLeft = "-10px";
+
+        parachute.style.opacity = 0;
+
+        //once it's styled, prepend it to the div (prepend to make it appear behind planes)
+        document.getElementById("mapl1").prepend(parachute);
+
+        //slight delay to trigger parachute deploy animation
+        setTimeout(function() {
+            parachute.style.width = "80px";
+            parachute.style.marginTop = "-40px";
+            parachute.style.marginLeft = "-40px";
+
+            //randomize origin to stagger parachutes
+            x += randomnumber(-35, 35);
+            y += randomnumber(-35, 35);
+            parachute.style.left = x + "px";
+            parachute.style.top = y + "px";
+
+            parachute.style.opacity = 1;
+            setTimeout(function() {
+                parachute.style.transition = "4s linear";
+                parachute.style.width = "30px";
+                parachute.style.marginTop = "-15px";
+                parachute.style.marginLeft = "-15px";
+            }, 950);
+        }, 50);
+
+        //delete the parachute after 5 seconds
+        setTimeout(function() {
+             parachute.remove();       
+        }, 5000);
+    }
 }
 
 //airlift animation for the plane only
