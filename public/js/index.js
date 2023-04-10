@@ -1358,6 +1358,26 @@ function gameConnect(inputroomid, pmap, createnewroom) {
 
                         //play the parachute animation (since the plane just arrived)
                         airliftParachuteAnimation(x2, y2);
+                    }else if(response.sendsupplydrop) {
+                        console.log("gotHere");
+                        let start = document.getElementById("t_origin_" + response.start.toLowerCase());
+                        let target = document.getElementById("t_origin_" + response.target.toLowerCase());
+                        supplydropHelicopterAnimation(start, target, response.heli_id);
+                    } else if(response.supplydroparrived) {
+                        console.log("gotHere2");
+                        let targetplane = document.getElementById("powerup_plane_" + response.heli_id);
+
+                        //get coordinates of the second territory
+                        var off2 = getOffset(document.getElementById("t_origin_" + response.airliftarrived.toLowerCase()));
+                        var x2 = off2.left + off2.width+20;
+                        var y2 = off2.top + off2.height+20;
+
+                        //sync plane with server timing
+                        targetplane.style.left = x2 + "px";
+                        targetplane.style.top = y2 + "px";
+
+                        //play the parachute animation (since the plane just arrived)
+                        airliftParachuteAnimation(x2, y2);
                     } else if(response.nuke) {
                         let target = document.getElementById("t_origin_" + response.target.toLowerCase());
                         nukeAnimation(target);

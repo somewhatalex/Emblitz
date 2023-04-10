@@ -15,6 +15,17 @@ parachuteAsset.src = "./images/assets/airliftparachute.svg";
 parachuteAsset.className = "powerups-parachute";
 parachuteAsset.style.position = "absolute";
 
+var helicopterAsset = new Image();
+helicopterAsset.src = "./images/assets/supplyhelicopter.png";
+helicopterAsset.className = "powerups-supplydrop";
+helicopterAsset.style.position = "absolute";
+
+//preload parachute asset
+var supplydropparachuteAsset = new Image();
+supplydropparachuteAsset.src = "./images/assets/supplydropparachute.svg";
+supplydropparachuteAsset.className = "powerups-supplycrate";
+supplydropparachuteAsset.style.position = "absolute";
+
 //preload nuke explosion asset
 var nukeExplosionAsset = new Image();
 nukeExplosionAsset.src = "./images/assets/nukeexplosion.svg";
@@ -152,7 +163,7 @@ function sendSupplydrop(target) {
     target = target.getAttribute("data-code");
     console.log("[DEBUG] Sent supplydrop to " + target);
 
-    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": target, "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid}));
+    websocket.send(JSON.stringify({"action": "powerup-supplydrop", "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid}));
     canMoveTroops = true;
 }
 
@@ -237,7 +248,7 @@ function supplydropHelicopterAnimation(start, target, id) {
     const deltax = Math.cos(angle * (Math.PI / 180)) * 60;
     const deltay = Math.sin(angle * (Math.PI / 180)) * 60;
 
-    const plane = planeAsset.cloneNode(true);
+    const plane = helicopterAsset.cloneNode(true);
     plane.id = "powerup_plane_" + id;
 
     plane.style.transform = "rotate(" + (angle + 180) + "deg)";
@@ -295,7 +306,7 @@ function supplydropHelicopterAnimation(start, target, id) {
 function supplydropParachuteAnimation(x, y) {
     for(let i=0; i<2; i++) {
         //clone a new parachute asset
-        let parachute = parachuteAsset.cloneNode(true);
+        let parachute = supplydropparachuteAsset.cloneNode(true);
         parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";
         parachute.style.left = x + "px";
         parachute.style.top = y + "px";

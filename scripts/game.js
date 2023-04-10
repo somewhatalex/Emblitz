@@ -68,7 +68,12 @@ function game() {
     this.getBoostedTerritories = function(roomid) {
         if(!games.get(roomid)) return "no room";
         return games.get(roomid).boostedterritories;
-      }
+    }
+
+    this.getSuppliedTerritories = function(roomid) {
+        if(!games.get(roomid)) return "no room";
+        return games.get(roomid).suppliedterritories;
+    }
 
     //lobby timer controls
     this.pauseLobbyTimer = function(roomid) {
@@ -187,6 +192,14 @@ function game() {
             setTimeout(function() {
                 if(games.get(roomid).playerstate) {
                     if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
+                        games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.supplydrop = true;
+                        self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "supplydrop"]);
+                    }
+                }
+            }, configs.gameSettings.powerupSettings.supplydrop.cooldown);
+            setTimeout(function() {
+                if(games.get(roomid).playerstate) {
+                    if(games.get(roomid).playerstate.find(item => item.id === allplayers[i].id)) {
                         games.get(roomid).playerstate.find(item => item.id === allplayers[i].id).powerups_status.nuke = true;
                         self.emit("powerup_cooldownended", [roomid, allplayers[i].id, "nuke"]);
                     }
@@ -288,7 +301,7 @@ function game() {
                     //boost enemy troop strength temporarily by 1.2 (or whatever is specified in configs.json) * defense multiplier
                     let targetProxyTroops = targettroops * configs.gameSettings.baseDefenseBuff * defenseMultiplier;
                     // Add defense bonus to supplied territories
-                    if(suppliedterritories.contains(target)){
+                    if((games.get(roomid).suppliedterritories).includes(target)){
                         targetProxyTroops *= 2;
                     }
                     targetProxyTroops = targetProxyTroops - moveAmount;
@@ -351,9 +364,42 @@ function game() {
         }
     }
 
-    this.supplydrop = function(start, target, id, roomid, playerid) {
+    this.supplydrop = function(target, id, roomid, playerid) {
         let parent = this;
         try {
+            let mapdata = this.getMapState(roomid);
+            let start = target;
+            let distance;
+
+            {
+                console.log("supplydrop called");
+                let pathDistance = Infinity;
+                let x1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
+                let y1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
+                Object.keys(mapdata).forEach((key) => {
+                    if(!key.startsWith("plane-") && mapdata[key].player === playerid){
+                        let x2 = territory_centers[games.get(roomid).mapname][key.toLowerCase()][1];
+                        let y2 = territory_centers[games.get(roomid).mapname][key.toLowerCase()][0];
+
+                        //pythag theoreum
+                        distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+
+                        console.log("In the loop ;), distance is " + distance + " pathDistance is " + pathDistance + " target is " + target + " and the mapdata[key] is " + mapdata[key] + " and start is " + start);
+                        if(pathDistance > distance && key !== target){
+                            pathDistance = distance;
+                            start = key;
+                        }
+                    }
+                });
+                if(pathDistance === Infinity){
+                    console.log("Goodbye (inf) :(");
+                    return;
+                }
+
+                distance = pathDistance;
+            }
+            console.log("Passed the loop");
+
             if(games.get(roomid).hasended) return;
             
             if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.supplydrop == true) {
@@ -367,20 +413,10 @@ function game() {
                     }
                 }, configs.gameSettings.powerupSettings.supplydrop.cooldown);
 
+                console.log("Ooooh, almost there!");
                 self.emit("powerup_initsupplydrop", [roomid, start, target, id]);
 
-                /*
-                the plane travels 120px a second, so to get the traveltime
-                you'll have to divide the total distance in pixels by 120
-                */
-
-                let x1 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][1];
-                let y1 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][0];
-                let x2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
-                let y2 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
-
-                //pythag theoreum
-                let distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+                // the plane travels 120px a second, so to get the traveltime you'll have to divide the total distance in pixels by 120
                 
                 let traveltime = ((distance-50)/120)*1000;
 
@@ -396,19 +432,19 @@ function game() {
                     //paratroopers take 5s to reach the ground
                     setTimeout(function() {
                         // Functionality for when the supply crate lands
-                        let index = boostedterritories.length;
-                        boostedterritories.push(target);
+                        let index = games.get(roomid).suppliedterritories.length;
+                        suppliedTerritories.push(target);
                         setTimeout(function() {
                             // Remove territory supply once it wears off
                             if (index > -1) { // only splice array when item is found
-                                array.splice(index, 1);
+                                games.get(roomid).suppliedterritories.splice(index, 1);
                               }
                         }, 30000)
                     }, 5000)
                 }, traveltime);
             }
         } catch(e) {
-            //console.log(e);
+            console.log(e);
         }
     }
 

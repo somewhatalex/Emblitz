@@ -24,6 +24,11 @@
         "passiveTroopAddRate": 0.1,
         "maxTroopAddAmount": 5,
         "powerupSettings": {
+            "supplydrop": {
+                "cooldown": 20000,
+                "groundZeroDamage": 70,
+                "damageDecay": 0.32
+            },
             "airlift": {
                 "cooldown": 20000
             },

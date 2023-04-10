@@ -134,7 +134,7 @@ class emblitzBot {
       workingVariable = '';
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
-      //wyatt write your attack ai here
+      //Wyatt's attack ai
       Object.keys(mapdata).forEach((key) => {
         if(!key.startsWith("plane-"))
           if(mapdata[key].player === parent.id){
