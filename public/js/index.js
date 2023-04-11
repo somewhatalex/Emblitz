@@ -161,6 +161,8 @@ function resetAll() {
     document.getElementById("troopslider").style.background = "linear-gradient(to right, var(--green) 0%, var(--green) 75%, var(--medium) 75%, var(--medium) 100%)";
 
     resetPowerupBars();
+
+    audioPlayer.play("main_menu_theme.mp3", true, true);
 }
 
 function hidegamenews() {
@@ -649,15 +651,14 @@ function connect(div1, div2, color, thickness) {
 }
 
 function attackTerritory(start, target) {
-    console.log("[DEBUG] Attacking from " + start.getAttribute("data-code") + " to " + target.getAttribute("data-code"));
     let trooppercent = Math.round(document.getElementById("troopslider").value);
     if(start.getAttribute("data-color") === myColor) { //once again, it's super scuffed but it should do for basic client-side validation
+        audioPlayer.play("troops_move_selected.mp3");
         websocket.send(JSON.stringify({"action": "attack", "start": start.getAttribute("data-code"), "target": target.getAttribute("data-code"), "trooppercent": trooppercent, "uid": uid, "roomid": roomid, "gid": gid}));
     }
 }
 
 function deployTroops(target) {
-    console.log("[DEBUG] Deployed troops to " + target.getAttribute("data-code"));
     if(boostedterritories.includes(target.getAttribute("data-code"))) {
         notification("error", "Pick Another Territory", "You can't deploy troops in boosted territories; please select another one to begin in.", 4);
         return;
@@ -665,6 +666,7 @@ function deployTroops(target) {
     if(target.getAttribute("data-color") === "default") {
         target.setAttribute("data-color", myColor);
         target.setAttribute("fill", getColor(target, false));
+        audioPlayer.play("starting_point_select.mp3")
         websocket.send(JSON.stringify({"action": "deploy", "target": target.getAttribute("data-code"), "uid": uid, "roomid": roomid, "gid": gid}));
     }
 }
@@ -935,6 +937,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
     showLoadingScreen().then(function() {
         document.getElementById("gamescreen").style.display = "none";
         document.getElementById("gamelobby").style.display = "block";
+        audioPlayer.play("lobby_start_main_theme_stop.mp3", true, true)
         joinGame(inputroomid, pmap, createnewroom).then(function() {
             connectToServer().then(function(ws) {
                 hideLoadingScreen(false);
@@ -996,6 +999,14 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             } else {
                                 document.getElementById("proomdisplay").style.display = "none";
                             }
+
+                            /*
+                            NOTE - this will play the sound whenever a change in the total #
+                            of players occurs, even if a player leaves. However this is the
+                            least of my concerns rn and it isn't worth the trouble fixing.
+                            */
+                            audioPlayer.play("player_join_lobby.mp3");
+
                             for(let i=0; i<response.users.length; i++) {
                                 if(response.users[i].id === uid) {
                                     if(response.users[i].name.startsWith("Player ")) {
@@ -1071,6 +1082,8 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             alltimeouts.push(setTimeout(function() {
                                 infobar("hide");
                             }, deploytime*1000));
+
+                            audioPlayer.play("deploy_phase.mp3");
 
                             boostedterritories = response.boostedterritories;
                             for(let i=0; i<boostedterritories.length; i++) {
@@ -1220,6 +1233,8 @@ function gameConnect(inputroomid, pmap, createnewroom) {
 
                         resetPowerupCooldowns();
                         troopTimerBar();
+
+                        audioPlayer.play("attack_phase.mp3")
                         
                         setTimeout(function() {
                             document.getElementById("eventstimer").style.display = "none";
@@ -1235,10 +1250,12 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         }, 1000);
                     } else if(response.powerup_cooldownended) {
                         if(response.player === uid) {
+                            audioPlayer.play("power_up_ready.mp3")
                             syncPowerupCooldown(response.powerup_cooldownended);
                         }
                     } else if(response.syncTroopTimer) {
                         troopTimerBar();
+                        audioPlayer.play("troops_increase.mp3");
                     } else if(response.error) {
                         if(response.error === "invalid credentials") {
                             ws.close();
@@ -1281,6 +1298,7 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                                 default:
                                     yourplace += "th";
                             }
+                            audioPlayer.play("loss_fanfare.mp3", true, true);
                             document.getElementById("e-place").innerText = yourplace;
                             document.getElementById("e-map").innerText = mapname;
                             document.getElementById("e-header").innerText = "You were defeated";
@@ -1299,7 +1317,9 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                             winname = winname[0].name;
                             notification("notify", winname + " won the game!", winname + " defeated all other players and is the last player standing!", 6)
                         } else {
-                            //you died
+                            //you won
+                            audioPlayer.play("win_fanfare.mp3", true, true)
+
                             document.getElementById("endscreen").style.display = "block";
                             document.getElementById("endscreen").style.opacity = "0";
                             document.getElementById("e-troops").innerText = lifetimepeaktroops;
@@ -1469,6 +1489,8 @@ function toggleqcvisibility() {
 }
 
 function changeMapSelect(direction) {
+    audioPlayer.play("switch_map_arrow_click.mp3");
+
     if(direction === "left") {
         mapselectindex--;
         if(mapselectindex < 0) {
@@ -1507,6 +1529,7 @@ function exitLobby() {
         clearTimeout(alltimeouts[i]);
     }
     clearInterval(lobbytimeinterval);
+    audioPlayer.play("main_menu_theme.mp3", true, true, true);
     lobbycountdown = 20;
     document.getElementById("lobbyscreen").style.display = "block";
     document.getElementById("gamescreen").style.display = "none";

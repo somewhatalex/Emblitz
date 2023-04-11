@@ -43,7 +43,7 @@ function randomnumber(min, max) {
 function resetPowerupBars() {
     //reset all the powerup buttons
     let powerupbuttons = document.getElementsByClassName("powerup-btn");
-    for(let i=0; i<powerupbuttons.length; i++) {
+    for (let i = 0; i < powerupbuttons.length; i++) {
         powerupbuttons[i].getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
         powerupbuttons[i].getElementsByClassName("powerup-recharge")[0].style.height = "0%";
         powerupbuttons[i].style.cursor = "no-drop";
@@ -52,7 +52,7 @@ function resetPowerupBars() {
 
     //disable the red notification icons
     let powerupnotify = document.getElementsByClassName("powerup-notify");
-    for(let i=0; i<powerupnotify.length; i++) {
+    for (let i = 0; i < powerupnotify.length; i++) {
         powerupnotify[i].style.display = "none";
     }
 }
@@ -68,22 +68,22 @@ function resetPowerupCooldowns() {
 //call this function whenever a powerup is used
 function triggerPowerupCooldown(item, duration) {
     document.getElementById(item + "-notify-icon").style.display = "none";
-    duration = duration*1000; //convert to ms
+    duration = duration * 1000; //convert to ms
 
     //get the button that triggers the powerup
     let powerupbutton = document.getElementById(item + "-powerup");
 
     //slight timeout to trigger css
-    setTimeout(function() {
+    setTimeout(function () {
         powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
         powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "0%";
     }, 50);
-    
+
     powerupbutton.style.cursor = "no-drop";
     powerupbutton.setAttribute("disabled", "disabled");
 
-    setTimeout(function() {
-        powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = (duration-250)/1000 + "s linear"; //subtract 100ms to account for css trick delay
+    setTimeout(function () {
+        powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = (duration - 250) / 1000 + "s linear"; //subtract 100ms to account for css trick delay
         powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "100%";
     }, 250); //accounts for previous timeout and 0.2s transition
 }
@@ -95,14 +95,15 @@ function syncPowerupCooldown(item) {
     powerupbutton.style.cursor = "pointer";
     document.getElementById(item + "-notify-icon").style.display = "block";
     powerupbutton.getElementsByClassName("powerup-recharge")[0].style.transition = "0.2s linear";
-    setTimeout(function() {
+    setTimeout(function () {
         powerupbutton.getElementsByClassName("powerup-recharge")[0].style.height = "100%";
     }, 50);
 }
 
 //triggers supply drop
 function supplydrop() {
-    if(attackPhase === "attack") {
+    if (attackPhase === "attack") {
+        audioPlayer.play("powerup_button_press.mp3");
         canMoveTroops = false;
         powerupType = "supplydrop";
         selectedRegion = "";
@@ -117,7 +118,8 @@ function supplydrop() {
 
 //triggers airlift
 function airlift() {
-    if(attackPhase === "attack") {
+    if (attackPhase === "attack") {
+        audioPlayer.play("powerup_button_press.mp3");
         canMoveTroops = false;
         powerupType = "airlift";
         selectedRegion = "";
@@ -132,7 +134,8 @@ function airlift() {
 
 //triggers nuke
 function nuke() {
-    if(attackPhase === "attack") {
+    if (attackPhase === "attack") {
+        audioPlayer.play("powerup_button_press.mp3");
         canMoveTroops = false;
         powerupType = "nuke";
 
@@ -152,7 +155,7 @@ function sendAirlift(start, target) {
     target = target.getAttribute("data-code");
     console.log("[DEBUG] Sent airlift from " + start + " to " + target);
 
-    websocket.send(JSON.stringify({"action": "powerup-airlift", "start": start, "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid, "amount": Math.round(document.getElementById("troopslider").value)}));
+    websocket.send(JSON.stringify({ "action": "powerup-airlift", "start": start, "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid, "amount": Math.round(document.getElementById("troopslider").value) }));
     canMoveTroops = true;
 }
 
@@ -163,7 +166,7 @@ function sendSupplydrop(target) {
     target = target.getAttribute("data-code");
     console.log("[DEBUG] Sent supplydrop to " + target);
 
-    websocket.send(JSON.stringify({"action": "powerup-supplydrop", "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid}));
+    websocket.send(JSON.stringify({ "action": "powerup-supplydrop", "target": target, "plane_id": plane_id, "uid": uid, "roomid": roomid, "gid": gid }));
     canMoveTroops = true;
 }
 
@@ -173,12 +176,14 @@ function sendNuke(target) {
     target = target.getAttribute("data-code");
     console.log("[DEBUG] Sent nuke to " + target);
 
-    websocket.send(JSON.stringify({"action": "powerup-nuke", "target": target, "uid": uid, "roomid": roomid, "gid": gid}));
+    websocket.send(JSON.stringify({ "action": "powerup-nuke", "target": target, "uid": uid, "roomid": roomid, "gid": gid }));
     canMoveTroops = true;
 }
 
 //nuke explosion
 function nukeAnimation(target) {
+    audioPlayer.play("nuke.mp3");
+
     //create the explosion
     //calculate x and y of target
     var offset = getOffset(target);
@@ -208,7 +213,7 @@ function nukeAnimation(target) {
     document.getElementById("mapl1").append(shockwave);
     document.getElementById("mapl1").append(nukeExplosion);
 
-    setTimeout(function() {
+    setTimeout(function () {
         nukeExplosion.style.width = "120px";
         nukeExplosion.style.marginTop = "-115px";
         nukeExplosion.style.marginLeft = "-60px";
@@ -220,7 +225,7 @@ function nukeAnimation(target) {
         shockwave.style.marginLeft = "-180px";
         shockwave.style.opacity = 0.8;
 
-        setTimeout(function() {
+        setTimeout(function () {
             nukeExplosion.style.width = "140px";
             nukeExplosion.style.marginTop = "-135px";
             nukeExplosion.style.marginLeft = "-70px";
@@ -229,7 +234,7 @@ function nukeAnimation(target) {
             shockwave.style.opacity = 0;
 
             //delete nuke after 3 seconds
-            setTimeout(function() {
+            setTimeout(function () {
                 nukeExplosion.remove();
                 shockwave.remove();
             }, 1500);
@@ -259,7 +264,7 @@ function supplydropHelicopterAnimation(start, target, id) {
     plane.style.marginLeft = "-10px";
     plane.style.opacity = 0;
 
-    setTimeout(function() {
+    setTimeout(function () {
         plane.style.width = "210px";
         plane.style.marginTop = "-105px";
         plane.style.marginLeft = "-105px";
@@ -278,12 +283,12 @@ function supplydropHelicopterAnimation(start, target, id) {
     window.requestAnimationFrame(movePlane);
 
     function movePlane(timestamp) {
-        if(!animationstart) {
+        if (!animationstart) {
             animationstart = timestamp;
         }
         const elapsed = timestamp - animationstart;
 
-        if(elapsed > 500) {
+        if (elapsed > 500) {
             x = parseInt(plane.style.left.replace("px", ""));
             y = parseInt(plane.style.top.replace("px", ""));
             x -= deltax * (elapsed / 500);
@@ -293,18 +298,18 @@ function supplydropHelicopterAnimation(start, target, id) {
             plane.style.top = y + "px";
 
             iterations++;
-            if(iterations > 65) {
+            if (iterations > 65) {
                 plane.remove();
             }
             animationstart = timestamp;
         }
 
-        if(iterations <= 65) window.requestAnimationFrame(movePlane);
+        if (iterations <= 65) window.requestAnimationFrame(movePlane);
     }
 }
 
 function supplydropParachuteAnimation(x, y) {
-    for(let i=0; i<2; i++) {
+    for (let i = 0; i < 2; i++) {
         //clone a new parachute asset
         let parachute = supplydropparachuteAsset.cloneNode(true);
         parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";
@@ -321,7 +326,7 @@ function supplydropParachuteAnimation(x, y) {
         document.getElementById("mapl1").prepend(parachute);
 
         //slight delay to trigger parachute deploy animation
-        setTimeout(function() {
+        setTimeout(function () {
             parachute.style.width = "80px";
             parachute.style.marginTop = "-40px";
             parachute.style.marginLeft = "-40px";
@@ -333,7 +338,7 @@ function supplydropParachuteAnimation(x, y) {
             parachute.style.top = y + "px";
 
             parachute.style.opacity = 1;
-            setTimeout(function() {
+            setTimeout(function () {
                 parachute.style.transition = "4s linear";
                 parachute.style.width = "30px";
                 parachute.style.marginTop = "-15px";
@@ -342,8 +347,8 @@ function supplydropParachuteAnimation(x, y) {
         }, 50);
 
         //delete the parachute after 5 seconds
-        setTimeout(function() {
-             parachute.remove();       
+        setTimeout(function () {
+            parachute.remove();
         }, 5000);
     }
 }
@@ -351,6 +356,8 @@ function supplydropParachuteAnimation(x, y) {
 //airlift animation for the plane only
 //todo: add parachute and deploy animations
 function airliftPlaneAnimation(start, target, id) {
+    audioPlayer.play("plane.mp3");
+
     let iterations = 0;
 
     const off1 = getOffset(start);
@@ -372,7 +379,7 @@ function airliftPlaneAnimation(start, target, id) {
     plane.style.marginLeft = "-10px";
     plane.style.opacity = 0;
 
-    setTimeout(function() {
+    setTimeout(function () {
         plane.style.width = "210px";
         plane.style.marginTop = "-105px";
         plane.style.marginLeft = "-105px";
@@ -391,12 +398,12 @@ function airliftPlaneAnimation(start, target, id) {
     window.requestAnimationFrame(movePlane);
 
     function movePlane(timestamp) {
-        if(!animationstart) {
+        if (!animationstart) {
             animationstart = timestamp;
         }
         const elapsed = timestamp - animationstart;
 
-        if(elapsed > 500) {
+        if (elapsed > 500) {
             x = parseInt(plane.style.left.replace("px", ""));
             y = parseInt(plane.style.top.replace("px", ""));
             x -= deltax * (elapsed / 500);
@@ -406,13 +413,13 @@ function airliftPlaneAnimation(start, target, id) {
             plane.style.top = y + "px";
 
             iterations++;
-            if(iterations > 65) {
+            if (iterations > 65) {
                 plane.remove();
             }
             animationstart = timestamp;
         }
 
-        if(iterations <= 65) window.requestAnimationFrame(movePlane);
+        if (iterations <= 65) window.requestAnimationFrame(movePlane);
     }
     /*--OLD ALGORITHM--
     let planeinterval = setInterval(function() {
@@ -435,7 +442,8 @@ function airliftPlaneAnimation(start, target, id) {
 }
 
 function airliftParachuteAnimation(x, y) {
-    for(let i=0; i<2; i++) {
+    audioPlayer.play("parachute.mp3");
+    for (let i = 0; i < 2; i++) {
         //clone a new parachute asset
         let parachute = parachuteAsset.cloneNode(true);
         parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";
@@ -452,7 +460,7 @@ function airliftParachuteAnimation(x, y) {
         document.getElementById("mapl1").prepend(parachute);
 
         //slight delay to trigger parachute deploy animation
-        setTimeout(function() {
+        setTimeout(function () {
             parachute.style.width = "80px";
             parachute.style.marginTop = "-40px";
             parachute.style.marginLeft = "-40px";
@@ -464,7 +472,7 @@ function airliftParachuteAnimation(x, y) {
             parachute.style.top = y + "px";
 
             parachute.style.opacity = 1;
-            setTimeout(function() {
+            setTimeout(function () {
                 parachute.style.transition = "4s linear";
                 parachute.style.width = "30px";
                 parachute.style.marginTop = "-15px";
@@ -473,8 +481,8 @@ function airliftParachuteAnimation(x, y) {
         }, 50);
 
         //delete the parachute after 5 seconds
-        setTimeout(function() {
-             parachute.remove();       
+        setTimeout(function () {
+            parachute.remove();
         }, 5000);
     }
 }
@@ -483,10 +491,10 @@ function airliftParachuteAnimation(x, y) {
 function getAngle(div1, div2) {
     var off1 = getOffset(div1);
     var off2 = getOffset(div2);
-    var x1 = off1.left + off1.width+20;
-    var y1 = off1.top + off1.height+20;
-    var x2 = off2.left + off2.width+20;
-    var y2 = off2.top + off2.height+20;
+    var x1 = off1.left + off1.width + 20;
+    var y1 = off1.top + off1.height + 20;
+    var x2 = off2.left + off2.width + 20;
+    var y2 = off2.top + off2.height + 20;
     return Math.atan2((y1 - y2), (x1 - x2)) * (180 / Math.PI);
 }
 
@@ -494,10 +502,10 @@ function getAngle(div1, div2) {
 function getDistance(div1, div2) {
     var off1 = getOffset(div1);
     var off2 = getOffset(div2);
-    var x1 = off1.left + off1.width+20;
-    var y1 = off1.top + off1.height+20;
-    var x2 = off2.left + off2.width+20;
-    var y2 = off2.top + off2.height+20;
+    var x1 = off1.left + off1.width + 20;
+    var y1 = off1.top + off1.height + 20;
+    var x2 = off2.left + off2.width + 20;
+    var y2 = off2.top + off2.height + 20;
     //pythag theorum
     return Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
 }
