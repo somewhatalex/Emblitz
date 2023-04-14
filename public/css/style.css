@@ -1634,7 +1634,7 @@ input { /*override default styles*/
     text-align: center;
 }
 
-.powerups-airplane {
+.powerups-airplane, .powerups-supplydrop {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
