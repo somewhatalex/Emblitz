@@ -60,7 +60,7 @@ function resetPowerupBars() {
 function resetPowerupCooldowns() {
     triggerPowerupCooldown("airlift", 20);
     triggerPowerupCooldown("nuke", 40);
-    triggerPowerupCooldown("supplydrop", 40);
+    triggerPowerupCooldown("supplydrop", 20);
 }
 
 //function to control the powerup button timers
