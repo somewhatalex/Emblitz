@@ -433,11 +433,13 @@ function game() {
                     setTimeout(function() {
                         // Functionality for when the supply crate lands
                         let index = games.get(roomid).suppliedterritories.length;
-                        suppliedTerritories.push(target);
+                        let suppliedterritoriesArr = games.get(roomid).suppliedterritories;
+                        suppliedterritoriesArr.push(target);
+                        console.log(games.get(roomid).suppliedterritories);
                         setTimeout(function() {
                             // Remove territory supply once it wears off
                             if (index > -1) { // only splice array when item is found
-                                games.get(roomid).suppliedterritories.splice(index, 1);
+                                suppliedterritoriesArr.splice(index, 1);
                               }
                         }, 30000)
                     }, 5000)

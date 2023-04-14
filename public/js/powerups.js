@@ -308,7 +308,8 @@ function supplydropHelicopterAnimation(start, target, id) {
     }
 }
 
-function supplydropParachuteAnimation(x, y) {
+function supplydropParachuteAnimation(x, y, target) {
+    console.log("Dropping a parachute at (" + x + ", " + y + ")");
     for (let i = 0; i < 2; i++) {
         //clone a new parachute asset
         let parachute = supplydropparachuteAsset.cloneNode(true);
@@ -350,6 +351,12 @@ function supplydropParachuteAnimation(x, y) {
         setTimeout(function () {
             parachute.remove();
         }, 5000);
+
+        document.getElementById("t_boosts_" + target).innerHTML = `<img src="./images/assets/suppliedIcon.png" style="display: inline; width: 28px; position: absolute; top: 0; margin-left: -32px; margin-top: -5px;">`;
+
+        setTimeout(function () {
+            document.getElementById("t_boosts_" + target).innerHTML = "";
+        }, 30000)
     }
 }
 
