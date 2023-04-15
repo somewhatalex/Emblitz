@@ -102,7 +102,8 @@ function syncPowerupCooldown(item) {
 
 //triggers supply drop
 function supplydrop() {
-    if (attackPhase === "attack") {
+    console.log("po " + playeroccupied);
+    if (attackPhase === "attack" && playeroccupied > 1) {
         audioPlayer.play("powerup_button_press.mp3");
         canMoveTroops = false;
         powerupType = "supplydrop";
@@ -309,55 +310,54 @@ function supplydropHelicopterAnimation(start, target, id) {
 }
 
 function supplydropParachuteAnimation(x, y, target) {
-    console.log("Dropping a parachute at (" + x + ", " + y + ")");
-    for (let i = 0; i < 2; i++) {
-        //clone a new parachute asset
-        let parachute = supplydropparachuteAsset.cloneNode(true);
-        parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";
+    console.log("Dropping a supply parachute at (" + x + ", " + y + ")");
+
+    //clone a new parachute asset
+    let parachute = supplydropparachuteAsset.cloneNode(true);
+    parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";
+    parachute.style.left = x + "px";
+    parachute.style.top = y + "px";
+
+    parachute.style.width = "20px";
+    parachute.style.marginTop = "-10px";
+    parachute.style.marginLeft = "-10px";
+
+    parachute.style.opacity = 0;
+
+    //once it's styled, prepend it to the div (prepend to make it appear behind planes)
+    document.getElementById("mapl1").prepend(parachute);
+
+    //slight delay to trigger parachute deploy animation
+    setTimeout(function () {
+        parachute.style.width = "80px";
+        parachute.style.marginTop = "-40px";
+        parachute.style.marginLeft = "-40px";
+
+        //randomize origin to stagger parachutes
+        x += randomnumber(-35, 35);
+        y += randomnumber(-35, 35);
         parachute.style.left = x + "px";
         parachute.style.top = y + "px";
 
-        parachute.style.width = "20px";
-        parachute.style.marginTop = "-10px";
-        parachute.style.marginLeft = "-10px";
-
-        parachute.style.opacity = 0;
-
-        //once it's styled, prepend it to the div (prepend to make it appear behind planes)
-        document.getElementById("mapl1").prepend(parachute);
-
-        //slight delay to trigger parachute deploy animation
+        parachute.style.opacity = 1;
         setTimeout(function () {
-            parachute.style.width = "80px";
-            parachute.style.marginTop = "-40px";
-            parachute.style.marginLeft = "-40px";
+            parachute.style.transition = "4s linear";
+            parachute.style.width = "30px";
+            parachute.style.marginTop = "-15px";
+            parachute.style.marginLeft = "-15px";
+        }, 950);
+    }, 50);
 
-            //randomize origin to stagger parachutes
-            x += randomnumber(-35, 35);
-            y += randomnumber(-35, 35);
-            parachute.style.left = x + "px";
-            parachute.style.top = y + "px";
+    //delete the parachute after 5 seconds and add supplied icon
+    setTimeout(function () {
+        parachute.remove();
 
-            parachute.style.opacity = 1;
-            setTimeout(function () {
-                parachute.style.transition = "4s linear";
-                parachute.style.width = "30px";
-                parachute.style.marginTop = "-15px";
-                parachute.style.marginLeft = "-15px";
-            }, 950);
-        }, 50);
-
-        //delete the parachute after 5 seconds
+        let previousBoostIcon = document.getElementById("t_boosts_" + target).innerHTML; // Make sure the boost tags return properly if applicable
+        document.getElementById("t_boosts_" + target).innerHTML = `<img src="./images/assets/shieldbuttonicon.png" style="display: inline; width: 28px; position: absolute; top: 0; margin-left: -32px; margin-top: -5px;">`;
         setTimeout(function () {
-            parachute.remove();
-        }, 5000);
-
-        document.getElementById("t_boosts_" + target).innerHTML = `<img src="./images/assets/suppliedIcon.png" style="display: inline; width: 28px; position: absolute; top: 0; margin-left: -32px; margin-top: -5px;">`;
-
-        setTimeout(function () {
-            document.getElementById("t_boosts_" + target).innerHTML = "";
-        }, 30000)
-    }
+            document.getElementById("t_boosts_" + target).innerHTML = previousBoostIcon;
+        }, 30000);
+    }, 5000);
 }
 
 //airlift animation for the plane only

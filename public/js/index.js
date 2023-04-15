@@ -25,6 +25,7 @@ var mapselectedvalue = "random";
 var showlb = false; //mobile only
 var previoustouch;
 var previousmobilezoom;
+var playeroccupied = 0;
 var p_startindex = 0;
 var boostedterritories = [];
 var mapHighlights = true;
@@ -1126,9 +1127,9 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                     } else if(response.message === "all users loaded") {
                         attackPhase = "deploy";
                     } else if(response.updatemap) {
+                        playeroccupied = 0;
                         let updatemapdata = response.updatemap;
                         let reslength = Object.keys(updatemapdata).length;
-                        let playeroccupied = 0;
                         let playertotaltroops = 0;
                         let playerstats = {};
                         for(let i=0; i<reslength; i++) {

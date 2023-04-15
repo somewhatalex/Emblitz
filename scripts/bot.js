@@ -134,7 +134,7 @@ class emblitzBot {
       workingVariable = '';
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
-      //Wyatt's attack ai
+      //Wyatt's bot attack algorithem
       Object.keys(mapdata).forEach((key) => {
         if(!key.startsWith("plane-"))
           if(mapdata[key].player === parent.id){
@@ -260,6 +260,37 @@ class emblitzBot {
         }
 
         game.nuke(targetedTerritory.territory, parent.roomid, parent.id);
+      }
+
+      //Attempt to supply drop to players
+      if(ownedTerritories.length > 1 && randomnumber(0, 6) == 1){
+        bestOption = -1;
+        //TEMPORARY: Reinforce the weakest territory
+        for(let x = 0; x < borderTerritories.length; x++){
+          if(borderTerritories[x].troopcount < bestOptionCount){
+            bestOption = borderTerritories[x];
+            bestOptionCount = mapdata[borderTerritories[x]].troopcount;
+          }
+          /*possibleMoves = [];
+          workingVariable = [];
+
+          for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
+            workingVariable = parent.moves[i].split(" ");
+            if(workingVariable[0] === borderTerritories[x]){
+              possibleMoves.push(workingVariable[1]);
+            } else if(workingVariable[1] === borderTerritories[x]){
+              possibleMoves.push(workingVariable[0]);
+            }
+        }
+          for(let i = 0; i < possibleMoves.length; i++){ // Find which enemy is the strongest
+            if(mapdata[possibleMoves[i]].troopcount > bestOptionCount && mapdata[possibleMoves[i]].player !== parent.id){
+              bestOption = possibleMoves[i];
+              bestOptionCount = mapdata[possibleMoves[i]].troopcount;
+            }
+          }*/
+        }
+
+        game.supplydrop(bestOption, randomnumber(0, 999999), parent.roomid, parent.id);
       }
 
     }, randomnumber(625, 820));

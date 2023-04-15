@@ -367,36 +367,47 @@ function game() {
     this.supplydrop = function(target, id, roomid, playerid) {
         let parent = this;
         try {
-            let mapdata = this.getMapState(roomid);
-            let start = target;
+            let mapdata;
+            let start;
             let distance;
 
+            if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == false){
+                return;
+            }
+
+            mapdata = this.getMapState(roomid);
+
             {
-                console.log("supplydrop called");
-                let pathDistance = Infinity;
-                let x1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
-                let y1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
+                let tempterritory = "temp-" + playerid;
+                games.get(roomid).mapstate[tempterritory] = ({"territory": tempterritory, "player": playerid, "troopcount": 0});
+                
+                start = tempterritory;
+                let startTroopCount = games.get(roomid).mapstate[start].troopcount;
+
                 Object.keys(mapdata).forEach((key) => {
-                    if(!key.startsWith("plane-") && mapdata[key].player === playerid){
-                        let x2 = territory_centers[games.get(roomid).mapname][key.toLowerCase()][1];
-                        let y2 = territory_centers[games.get(roomid).mapname][key.toLowerCase()][0];
+                    if(!(key.startsWith("plane-") || key.startsWith("temp-")) && mapdata[key].player === playerid){
 
-                        //pythag theoreum
-                        distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
-
-                        console.log("In the loop ;), distance is " + distance + " pathDistance is " + pathDistance + " target is " + target + " and the mapdata[key] is " + mapdata[key] + " and start is " + start);
-                        if(pathDistance > distance && key !== target){
-                            pathDistance = distance;
+                        if(games.get(roomid).mapstate[key].troopcount > startTroopCount && key !== target){
                             start = key;
+                            startTroopCount = games.get(roomid).mapstate[start].troopcount;
                         }
                     }
                 });
-                if(pathDistance === Infinity){
-                    console.log("Goodbye (inf) :(");
+
+                delete games.get(roomid).mapstate[tempterritory];
+
+                if(start === tempterritory){
+                    console.log("Ending, target is start");
                     return;
                 }
+                console.log(start + ", " + target);
+                let x1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
+                let y1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
+                let x2 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][1];
+                let y2 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][0];
 
-                distance = pathDistance;
+                //pythag theoreum
+                distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
             }
             console.log("Passed the loop");
 
