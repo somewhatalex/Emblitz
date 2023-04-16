@@ -364,6 +364,23 @@ function game() {
         }
     }
 
+    // Trololol
+    this.trololol = function(roomid, target, amount){
+        try{
+            let mapdata = this.getMapState(roomid);
+            let playerid = mapdata[target].player
+
+            let trollterritory = "troll-" + playerid;
+            games.get(roomid).mapstate[trollterritory] = ({"territory": trollterritory, "player": playerid, "troopcount": amount + 1});
+
+            this.attackTerritory(roomid, playerid, trollterritory, target, amount);
+
+            delete games.get(roomid).mapstate[tempterritory];
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
     this.supplydrop = function(target, id, roomid, playerid) {
         let parent = this;
         try {
@@ -397,10 +414,9 @@ function game() {
                 delete games.get(roomid).mapstate[tempterritory];
 
                 if(start === tempterritory){
-                    console.log("Ending, target is start");
                     return;
                 }
-                console.log(start + ", " + target);
+
                 let x1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][1];
                 let y1 = territory_centers[games.get(roomid).mapname][target.toLowerCase()][0];
                 let x2 = territory_centers[games.get(roomid).mapname][start.toLowerCase()][1];
@@ -409,7 +425,6 @@ function game() {
                 //pythag theoreum
                 distance = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
             }
-            console.log("Passed the loop");
 
             if(games.get(roomid).hasended) return;
             
@@ -424,7 +439,6 @@ function game() {
                     }
                 }, configs.gameSettings.powerupSettings.supplydrop.cooldown);
 
-                console.log("Ooooh, almost there!");
                 self.emit("powerup_initsupplydrop", [roomid, start, target, id]);
 
                 // the plane travels 120px a second, so to get the traveltime you'll have to divide the total distance in pixels by 120
@@ -446,7 +460,6 @@ function game() {
                         let index = games.get(roomid).suppliedterritories.length;
                         let suppliedterritoriesArr = games.get(roomid).suppliedterritories;
                         suppliedterritoriesArr.push(target);
-                        console.log(games.get(roomid).suppliedterritories);
                         setTimeout(function() {
                             // Remove territory supply once it wears off
                             if (index > -1) { // only splice array when item is found
@@ -455,6 +468,8 @@ function game() {
                         }, 30000)
                     }, 5000)
                 }, traveltime);
+
+                console.log("Player: " + mapdata[start].player + " sent a supply drop from " + start + " to " + target + " thus reinforcing player " + mapdata[target].player);
             }
         } catch(e) {
             console.log(e);

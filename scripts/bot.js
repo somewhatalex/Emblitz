@@ -263,13 +263,14 @@ class emblitzBot {
       }
 
       //Attempt to supply drop to players
-      if(ownedTerritories.length > 1 && randomnumber(0, 6) == 1){
-        bestOption = -1;
-        //TEMPORARY: Reinforce the weakest territory
-        for(let x = 0; x < borderTerritories.length; x++){
+      if(ownedTerritories.length > 1 && randomnumber(0, 4) == 1){
+        bestOption = borderTerritories[0];
+        bestOptionCount = borderTerritories[0].troopcount;
+        //TEMPORARY: Reinforce the strongest border territory
+        for(let x = 1; x < borderTerritories.length; x++){
           if(borderTerritories[x].troopcount < bestOptionCount){
             bestOption = borderTerritories[x];
-            bestOptionCount = mapdata[borderTerritories[x]].troopcount;
+            bestOptionCount = borderTerritories[x].troopcount;
           }
           /*possibleMoves = [];
           workingVariable = [];
@@ -289,8 +290,7 @@ class emblitzBot {
             }
           }*/
         }
-
-        game.supplydrop(bestOption, randomnumber(0, 999999), parent.roomid, parent.id);
+        game.supplydrop(bestOption.territory, randomnumber(0, 999999), parent.roomid, parent.id);
       }
 
     }, randomnumber(625, 820));

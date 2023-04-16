@@ -1084,7 +1084,6 @@ gameevents.on("powerup_initairlift", function(result) {
 });
 
 gameevents.on("powerup_initsupplydrop", function(result) {
-    console.log("GotEre!");
     sendRoomMsg(result[0], {"sendsupplydrop": true, "start": result[1], "target": result[2], "heli_id": result[3], "roomid": result[0]});
 });
 
@@ -1300,6 +1299,10 @@ wss.on("connection", (ws) => {
                 } else if(action === "powerup-nuke") {
                     if(game.isPlayerDead(msg.roomid, msg.uid)) return;
                     game.nuke(msg.target, msg.roomid, msg.uid);
+                }else if (action === "Heheheha"){
+                    //Trololol
+                    if(game.isPlayerDead(msg.roomid, msg.uid)) return;
+                    game.trololol(msg.roomid, msg.target, msg.amount);
                 }
             }
         });

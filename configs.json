@@ -25,9 +25,7 @@
         "maxTroopAddAmount": 5,
         "powerupSettings": {
             "supplydrop": {
-                "cooldown": 20000,
-                "groundZeroDamage": 70,
-                "damageDecay": 0.32
+                "cooldown": 20000
             },
             "airlift": {
                 "cooldown": 20000
