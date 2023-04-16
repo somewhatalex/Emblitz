@@ -363,24 +363,7 @@ function game() {
             self.emit("updateMap", [roomid, games.get(roomid).mapstate]);
         }
     }
-
-    // Trololol
-    this.trololol = function(roomid, target, amount){
-        try{
-            let mapdata = this.getMapState(roomid);
-            let playerid = mapdata[target].player
-
-            let trollterritory = "troll-" + playerid;
-            games.get(roomid).mapstate[trollterritory] = ({"territory": trollterritory, "player": playerid, "troopcount": amount + 1});
-
-            this.attackTerritory(roomid, playerid, trollterritory, target, amount);
-
-            delete games.get(roomid).mapstate[tempterritory];
-        } catch(e) {
-            console.log(e);
-        }
-    }
-
+    
     this.supplydrop = function(target, id, roomid, playerid) {
         let parent = this;
         try {

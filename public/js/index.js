@@ -108,11 +108,6 @@ function inithomepage() {
     }
 }
 
-//Trololol
-function Heheheha(target, amount){
-    websocket.send(JSON.stringify({ "action": "Heheheha", "roomid": roomid, "target": target, "amount": amount }));
-}
-
 function resetAll() {
     document.body.style.touchAction = "pan-y";
     document.getElementById("eventstimer").style.width = "0%";
