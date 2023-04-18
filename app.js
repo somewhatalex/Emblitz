@@ -21,8 +21,8 @@ const badges = require("./scripts/badges.js");
 const { response } = require("express");
 const colorData = require("./scripts/colorData.js");
 const badwords = require("bad-words");
-const emblitzBot = require("./scripts/bot.js")
-const configs = require("./configs.json")
+const emblitzBot = require("./scripts/bot.js");
+const configs = require("./configs.json");
 /*Don't do it yourself, instead, be lazy and find a package that does it for you.
     -Sun Tzu, The Art of War
 Update 7/27/22: passport.js creates a lot of hosting compatibility issues
@@ -107,9 +107,11 @@ pool.connect(function(err) {
         console.log("Finished initializing database");
         console.log("--- Server launched, begin logging. ---")
         
-        setInterval(function() {
-            auth.deleteUnusedAccounts();
-        }, 900000);
+        if(configs.accountManagement.forceEmailVerification) {
+            setInterval(function() {
+                auth.deleteUnusedAccounts();
+            }, configs.accountManagement.deleteUnusedAccountsInterval);
+        }
     });
 });
 
@@ -248,6 +250,55 @@ app.all("/", (req, res) => {
     </DIV>
     `
 
+    let adslot_1 = `<DIV STYLE="font-size: 13px; margin-bottom: 5px;" CLASS="ad-warning ad-warning-one">Advertisement</DIV>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
+    ></script>
+    <!-- Main menu ad -->
+    <ins class="adsbygoogle ad-type-responsive"
+        style="display:block"
+        data-ad-client="ca-pub-2859288291436441"
+        data-ad-slot="7138740914"
+        data-ad-format="horizontal"
+        data-full-width-responsive="true"></ins>
+    <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>`;
+
+    let adslot_2 = `<DIV STYLE="font-size: 13px; margin-bottom: 5px;" CLASS="ad-warning">Advertisement</DIV>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
+    ></script>
+    <!-- Main menu ad -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-2859288291436441"
+        data-ad-slot="7138740914"
+        data-ad-format="horizontal"
+        data-full-width-responsive="true"></ins>
+    <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>`;
+
+    let adslot_3 = `<DIV STYLE="font-size: 13px; margin-bottom: 5px; margin: auto; margin-top: 15px; text-align: center;" CLASS="ad-warning">Advertisement</DIV>
+    <DIV STYLE="text-align: center; width: 100%; min-height: 100px; min-width: 100vw; display: block;">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
+        ></script>
+        <!-- lobby ad 1 -->
+        <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-2859288291436441"
+                data-ad-slot="6903292412"
+                data-full-width-responsive="true"></ins>
+        <script>
+            window.addEventListener("load", function() {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            });
+        </script>
+    </DIV>`;
+
+    if(process.env.ADS_ENABLED === "false") {
+        adslot_1 = adslot_2 = adslot_3 = null;
+    }
+
     if(!getuuid) {
         //guest user
         let guestuuid = "";
@@ -268,7 +319,10 @@ app.all("/", (req, res) => {
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
             timeoutDuration: configs.timeoutDuration,
-            profile_output: profileoutput
+            profile_output: profileoutput,
+            adslot_1,
+            adslot_2,
+            adslot_3
         });
     } else if(!getuuid.startsWith("guest-")) {
         auth.getUserInfo(getuuid).then(function(userinfo) {
@@ -307,7 +361,10 @@ app.all("/", (req, res) => {
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
                 timeoutDuration: configs.timeoutDuration,
-                profile_output: profileoutput
+                profile_output: profileoutput,
+                adslot_1,
+                adslot_2,
+                adslot_3
             });
         }).catch(function() {
             //guest user bc uuid is invalid
@@ -329,7 +386,10 @@ app.all("/", (req, res) => {
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
                 timeoutDuration: configs.timeoutDuration,
-                profile_output: profileoutput
+                profile_output: profileoutput,
+                adslot_1,
+                adslot_2,
+                adslot_3
             });
         });
     } else {
@@ -339,7 +399,10 @@ app.all("/", (req, res) => {
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
             timeoutDuration: configs.timeoutDuration,
-            profile_output: profileoutput
+            profile_output: profileoutput,
+            adslot_1,
+            adslot_2,
+            adslot_3
         });
     }
 });
@@ -942,7 +1005,7 @@ function joinroom(map, createroom) {
     }
 
     let maxplayers = allmaps[roommap];
-    let deploytime = configs.deployStageTime;
+    let deploytime = configs.gameSettings.deployStageTime;
 
     let isprivate = false;
     if(createroom) {
@@ -1079,6 +1142,14 @@ gameevents.on("powerup_cooldownended", function(result) {
 
 gameevents.on("powerup_initairlift", function(result) {
     sendRoomMsg(result[0], {"sendairlift": true, "start": result[1], "target": result[2], "plane_id": result[3], "roomid": result[0]});
+});
+
+gameevents.on("powerup_initsupplydrop", function(result) {
+    sendRoomMsg(result[0], {"sendsupplydrop": true, "start": result[1], "target": result[2], "heli_id": result[3], "roomid": result[0]});
+});
+
+gameevents.on("supplydroparrived", function(result) {
+    sendRoomMsg(result[0], {"supplydroparrived": result[1], "heli_id": result[2]});
 });
 
 gameevents.on("powerup_nuke", function(result) {
@@ -1282,6 +1353,10 @@ wss.on("connection", (ws) => {
                 } else if(action === "powerup-airlift") {
                     if(game.isPlayerDead(msg.roomid, msg.uid)) return;
                     game.airlift(msg.start, msg.target, msg.plane_id, msg.roomid, msg.uid, msg.amount);
+                }
+                else if(action === "powerup-supplydrop") {
+                    if(game.isPlayerDead(msg.roomid, msg.uid)) return;
+                    game.supplydrop(msg.target, msg.plane_id, msg.roomid, msg.uid);
                 } else if(action === "powerup-nuke") {
                     if(game.isPlayerDead(msg.roomid, msg.uid)) return;
                     game.nuke(msg.target, msg.roomid, msg.uid);
@@ -1351,5 +1426,7 @@ wss.on("connection", (ws) => {
 });
 
 process.on("uncaughtException", function(error) {
-    console.log(error.stack);
+    if(process.env.ERROR_LOGGING === "true") {
+        console.log(error.stack);
+    }
 });

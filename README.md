@@ -29,6 +29,8 @@ DATABASE_PORT=[db port]
 ADMINMASTERPASSWORD=[master admin password]
 MAILUSER=[email username]
 MAILPASSWORD=[email password]
+ADS_ENABLED=[true/false]
+ERROR_LOGGING=[true/false]
 ```
 
 Install the required npm packages with this command:

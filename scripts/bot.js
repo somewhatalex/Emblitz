@@ -134,7 +134,7 @@ class emblitzBot {
       workingVariable = '';
       if(mapdata === "no room") clearTimeout(parent.attacktimer);
       
-      //wyatt write your attack ai here
+      //Wyatt's bot attack algorithem
       Object.keys(mapdata).forEach((key) => {
         if(!key.startsWith("plane-"))
           if(mapdata[key].player === parent.id){
@@ -242,15 +242,55 @@ class emblitzBot {
 
       //Attempt to nuke players
       if(ownedTerritories.length > 0 && randomnumber(0, 6) == 1){
-        let targetedTerritory = unownedTerritories[0];
+        let loopStartIndex;
+        let targetedTerritory;
 
         for(let x = 0; x < unownedTerritories.length; x++){
-          if(targetedTerritory.troopcount < unownedTerritories[x].troopcount){
+          if(unownedTerritories[x].player != null){
+            targetedTerritory = unownedTerritories[x];
+            loopStartIndex = x;
+            break;
+          }
+        }
+
+        for(let x = 0; x < unownedTerritories.length; x++){
+          if(targetedTerritory.troopcount < unownedTerritories[x].troopcount && unownedTerritories[x].player != null){
             targetedTerritory = unownedTerritories[x];
           }
         }
 
         game.nuke(targetedTerritory.territory, parent.roomid, parent.id);
+      }
+
+      //Attempt to supply drop to players
+      if(ownedTerritories.length > 1 && randomnumber(0, 4) == 1){
+        bestOption = borderTerritories[0];
+        bestOptionCount = borderTerritories[0].troopcount;
+        //TEMPORARY: Reinforce the strongest border territory
+        for(let x = 1; x < borderTerritories.length; x++){
+          if(borderTerritories[x].troopcount < bestOptionCount){
+            bestOption = borderTerritories[x];
+            bestOptionCount = borderTerritories[x].troopcount;
+          }
+          /*possibleMoves = [];
+          workingVariable = [];
+
+          for(let i = 0; i < moveslength; i++){ // Gather up the possible moves
+            workingVariable = parent.moves[i].split(" ");
+            if(workingVariable[0] === borderTerritories[x]){
+              possibleMoves.push(workingVariable[1]);
+            } else if(workingVariable[1] === borderTerritories[x]){
+              possibleMoves.push(workingVariable[0]);
+            }
+        }
+          for(let i = 0; i < possibleMoves.length; i++){ // Find which enemy is the strongest
+            if(mapdata[possibleMoves[i]].troopcount > bestOptionCount && mapdata[possibleMoves[i]].player !== parent.id){
+              bestOption = possibleMoves[i];
+              bestOptionCount = mapdata[possibleMoves[i]].troopcount;
+            }
+          }*/
+        }
+        game.supplydrop(bestOption.territory, randomnumber(0, 999999), parent.roomid, parent.id);
       }
 
     }, randomnumber(625, 820));
