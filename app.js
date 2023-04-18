@@ -250,6 +250,55 @@ app.all("/", (req, res) => {
     </DIV>
     `
 
+    let adslot_1 = `<DIV STYLE="font-size: 13px; margin-bottom: 5px;" CLASS="ad-warning ad-warning-one">Advertisement</DIV>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
+    ></script>
+    <!-- Main menu ad -->
+    <ins class="adsbygoogle ad-type-responsive"
+        style="display:block"
+        data-ad-client="ca-pub-2859288291436441"
+        data-ad-slot="7138740914"
+        data-ad-format="horizontal"
+        data-full-width-responsive="true"></ins>
+    <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>`;
+
+    let adslot_2 = `<DIV STYLE="font-size: 13px; margin-bottom: 5px;" CLASS="ad-warning">Advertisement</DIV>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
+    ></script>
+    <!-- Main menu ad -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-2859288291436441"
+        data-ad-slot="7138740914"
+        data-ad-format="horizontal"
+        data-full-width-responsive="true"></ins>
+    <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>`;
+
+    let adslot_3 = `<DIV STYLE="font-size: 13px; margin-bottom: 5px; margin: auto; margin-top: 15px; text-align: center;" CLASS="ad-warning">Advertisement</DIV>
+    <DIV STYLE="text-align: center; width: 100%; min-height: 100px; min-width: 100vw; display: block;">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
+        ></script>
+        <!-- lobby ad 1 -->
+        <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-2859288291436441"
+                data-ad-slot="6903292412"
+                data-full-width-responsive="true"></ins>
+        <script>
+            window.addEventListener("load", function() {
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            });
+        </script>
+    </DIV>`;
+
+    if(process.env.ADS_ENABLED === "false") {
+        adslot_1 = adslot_2 = adslot_3 = null;
+    }
+
     if(!getuuid) {
         //guest user
         let guestuuid = "";
@@ -270,7 +319,10 @@ app.all("/", (req, res) => {
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
             timeoutDuration: configs.timeoutDuration,
-            profile_output: profileoutput
+            profile_output: profileoutput,
+            adslot_1,
+            adslot_2,
+            adslot_3
         });
     } else if(!getuuid.startsWith("guest-")) {
         auth.getUserInfo(getuuid).then(function(userinfo) {
@@ -309,7 +361,10 @@ app.all("/", (req, res) => {
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
                 timeoutDuration: configs.timeoutDuration,
-                profile_output: profileoutput
+                profile_output: profileoutput,
+                adslot_1,
+                adslot_2,
+                adslot_3
             });
         }).catch(function() {
             //guest user bc uuid is invalid
@@ -331,7 +386,10 @@ app.all("/", (req, res) => {
                 prod: process.env.PRODUCTION,
                 gameversion: gameversion,
                 timeoutDuration: configs.timeoutDuration,
-                profile_output: profileoutput
+                profile_output: profileoutput,
+                adslot_1,
+                adslot_2,
+                adslot_3
             });
         });
     } else {
@@ -341,7 +399,10 @@ app.all("/", (req, res) => {
             prod: process.env.PRODUCTION,
             gameversion: gameversion,
             timeoutDuration: configs.timeoutDuration,
-            profile_output: profileoutput
+            profile_output: profileoutput,
+            adslot_1,
+            adslot_2,
+            adslot_3
         });
     }
 });
@@ -1365,5 +1426,7 @@ wss.on("connection", (ws) => {
 });
 
 process.on("uncaughtException", function(error) {
-    console.log(error.stack);
+    if(process.env.ERROR_LOGGING === "true") {
+        console.log(error.stack);
+    }
 });

@@ -302,7 +302,7 @@ function game() {
                     let targetProxyTroops = targettroops * configs.gameSettings.baseDefenseBuff * defenseMultiplier;
                     // Add defense bonus to supplied territories
                     if((games.get(roomid).suppliedterritories).includes(target)){
-                        targetProxyTroops *= 2;
+                        targetProxyTroops *= 1.4;
                     }
                     targetProxyTroops = targetProxyTroops - moveAmount;
                     targetProxyTroops = Math.round(targetProxyTroops);
@@ -365,7 +365,6 @@ function game() {
     }
     
     this.supplydrop = function(target, id, roomid, playerid) {
-        let parent = this;
         try {
             let mapdata;
             let start;
@@ -424,9 +423,9 @@ function game() {
 
                 self.emit("powerup_initsupplydrop", [roomid, start, target, id]);
 
-                // the plane travels 120px a second, so to get the traveltime you'll have to divide the total distance in pixels by 120
+                // the plane travels 72px a second, so to get the traveltime you'll have to divide the total distance in pixels by 120
                 
-                let traveltime = ((distance-50)/120)*1000;
+                let traveltime = ((distance-50)/72)*1000;
 
                 //500ms is the deploy time, so the travel time can't be less than around 500ms
                 if(traveltime < 500) {
@@ -451,11 +450,9 @@ function game() {
                         }, 30000)
                     }, 5000)
                 }, traveltime);
-
-                console.log("Player: " + mapdata[start].player + " sent a supply drop from " + start + " to " + target + " thus reinforcing player " + mapdata[target].player);
             }
         } catch(e) {
-            console.log(e);
+            //console.log(e);
         }
     }
 

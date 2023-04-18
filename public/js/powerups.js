@@ -102,7 +102,6 @@ function syncPowerupCooldown(item) {
 
 //triggers supply drop
 function supplydrop() {
-    console.log("po " + playeroccupied);
     if (attackPhase === "attack" && playeroccupied > 1) {
         audioPlayer.play("powerup_button_press.mp3");
         canMoveTroops = false;
@@ -251,8 +250,8 @@ function supplydropHelicopterAnimation(start, target, id) {
     let y = off1.top + off1.height + 20;
 
     const angle = getAngle(start, target);
-    const deltax = Math.cos(angle * (Math.PI / 180)) * 60;
-    const deltay = Math.sin(angle * (Math.PI / 180)) * 60;
+    const deltax = Math.cos(angle * (Math.PI / 180)) * 36;
+    const deltay = Math.sin(angle * (Math.PI / 180)) * 36;
 
     const plane = helicopterAsset.cloneNode(true);
     plane.id = "powerup_plane_" + id;
@@ -305,13 +304,11 @@ function supplydropHelicopterAnimation(start, target, id) {
             animationstart = timestamp;
         }
 
-        if (iterations <= 65) window.requestAnimationFrame(movePlane);
+        if (iterations <= 108) window.requestAnimationFrame(movePlane);
     }
 }
 
 function supplydropParachuteAnimation(x, y, target) {
-    console.log("Dropping a supply parachute at (" + x + ", " + y + ")");
-
     //clone a new parachute asset
     let parachute = supplydropparachuteAsset.cloneNode(true);
     parachute.style.transform = "rotate(" + randomnumber(0, 30) + "deg)";

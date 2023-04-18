@@ -1380,12 +1380,10 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         //play the parachute animation (since the plane just arrived)
                         airliftParachuteAnimation(x2, y2);
                     }else if(response.sendsupplydrop) {
-                        console.log("gotHere");
                         let start = document.getElementById("t_origin_" + response.start.toLowerCase());
                         let target = document.getElementById("t_origin_" + response.target.toLowerCase());
                         supplydropHelicopterAnimation(start, target, response.heli_id);
                     } else if(response.supplydroparrived) {
-                        console.log("gotHere2");
                         let targetplane = document.getElementById("powerup_plane_" + response.heli_id);
                         let target = response.supplydroparrived.toLowerCase();
 

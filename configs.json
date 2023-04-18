@@ -1,14 +1,12 @@
 {
-    "gameVersion": "1.5.3",
-    "gameLastUpdated": "3/21/2023",
+    "gameVersion": "1.5.4",
+    "gameLastUpdated": "4/17/2023",
     "timeoutDuration": 15000,
     "commercialSettings": {
         "googleAdsense": {
-            "enabled": true,
             "pubID": "2859288291436441"
         },
         "googleAnalytics": {
-            "enabled": true,
             "pubID": "G-QNCVLQXQCJ"
         }
     },
