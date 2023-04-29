@@ -1,5 +1,6 @@
 //for badge storage
 const badges = {
+    //note: as of 4/29/23 (long overdue), this badge is no longer obtainable
     "betatester": {
         "name": "Beta Tester",
         "level": "Silver",
@@ -19,7 +20,7 @@ const badges = {
         "name": "Developer",
         "level": "Silver",
         "description": "Contribute to the game\'s development.",
-        "image": "betatester.png"
+        "image": "developer.png"
     },
 
     //win count badges
@@ -130,6 +131,85 @@ const badges = {
         "image": "50wins.png"
     },
 
+    //challenges
+    "expertplayer": {
+        "name": "Expert Player",
+        "level": "Uranium",
+        "description": "Become one of the top 10 players on the leaderboard at any point in time.",
+        "image": "expertplayer.png"
+    },
+
+    "thegoat": {
+        "name": "The GOAT",
+        "level": "Uranium",
+        "description": "Become one of the top 3 players on the leaderboard at any point in time.",
+        "image": "thegoat.png"
+    },
+
+    "diplomat": {
+        "name": "Diplomat",
+        "level": "Gold",
+        "description": "Host 20 private games and invite other players to join. Only completed games count.",
+        "image": "diplomat.png"
+    },
+
+    //powerup mastery badges
+    "newbiepilot": {
+        "name": "Newbie Pilot",
+        "level": "Bronze",
+        "description": "Airlift a total of 747 troops.",
+        "image": "newbiepilot.png"
+    },
+
+    "veteranpilot": {
+        "name": "Veteran Pilot",
+        "level": "Diamond",
+        "description": "Airlift a total of 15000 troops.",
+        "image": "veteranpilot.png"
+    },
+
+    "pyromaniac": {
+        "name": "Pyromaniac",
+        "level": "Silver",
+        "description": "Drop a total of 50 nukes.",
+        "image": "pyromaniac.png"
+    },
+
+    "thebigbang": {
+        "name": "The Big Bang",
+        "level": "Diamond",
+        "description": "Drop a total of 1000 nukes.",
+        "image": "thebigbang.png"
+    },
+
+    "collateraldamage": {
+        "name": "Collateral Damage",
+        "level": "Gold",
+        "description": "Kill a total of 1000 of your own troops due to friendly fire from nukes.",
+        "image": "collateraldamage.png"
+    },
+
+    "expertlogistics": {
+        "name": "Expert Logistics",
+        "level": "Bronze",
+        "description": "Use the supply drop powerup 15 times.",
+        "image": "expertlogistics.png"
+    },
+
+    "operationemblitz": {
+        "name": "Operation Emblitz",
+        "level": "Diamond",
+        "description": "Use the supply drop powerup 2000 times.",
+        "image": "operationemblitz.png"
+    },
+
+    "misinput": {
+        "name": "IT WAS A MISINPUT!",
+        "level": "Gold",
+        "description": "Accidentally drop supplies in enemy territories 20 times.",
+        "image": "misinput.png"
+    },
+
     //total medal count badges
     "25medals": {
         "name": "Private",
@@ -166,7 +246,7 @@ const badges = {
         "image": "50wins.png"
     },
 
-    "10000totaltroops": {
+    "4500medals": {
         "name": "RadioactiveBox",
         "level": "Uranium",
         "description": "Reach 4500 Emblitz medals. Named after the #1 Emblitz player when the leaderboard first came out (RadioactiveBox).",
