@@ -28,9 +28,14 @@ function loadProfile(info) {
     document.getElementById("up-rate").innerText = ((info.wins/(info.wins + info.losses)) * 100).toFixed(2);
 
     let userbadges = JSON.parse(info.badges);
-    let userbadgenames = Object.keys(userbadges);
+    let userbadgenames = null;
 
-    document.getElementById("u-badge-count").innerText = userbadgenames.length;
+    if(userbadges) {
+        userbadgenames = Object.keys(userbadges);
+        document.getElementById("u-badge-count").innerText = userbadgenames.length;
+    } else {
+        document.getElementById("u-badge-count").innerText = "0";
+    }
 
     for(let i=0; i < 6; i++) {
         let currentBadgeType;

@@ -160,7 +160,7 @@ function registerUser(username, email, password) {
             createPublicKey().then(function(publickey) {
                 let hashedpassword = passwordHash.generate(password);
                 app.db.query(`INSERT INTO users (token, wins, losses, medals, badges, pfp, tournamentprogress, verified, timecreated, username, email, password, publickey, playercolor, playersettings, metadata, xp)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`, [token, 0, 0, 0, {"betatester": {"awarded": Date.now()}}, null, null, false, Date.now(), username, email, hashedpassword, publickey, "red", null, {"type": "user"}, 0], function (err, result) {
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`, [token, 0, 0, 0, {}, null, null, false, Date.now(), username, email, hashedpassword, publickey, "red", null, {"type": "user"}, 0], function (err, result) {
                     genJWT(publickey).then(function(jwttoken) {
                         resolve([token, jwttoken, publickey]);
                     });
