@@ -915,7 +915,11 @@ function getUserInfo() {
         response.json().then(function(result) {
             if(document.getElementById("ms_medals")) {
                 document.getElementById("ms_medals").innerText = result.medals;
-                document.getElementById("ms_badges").innerText = Object.keys(JSON.parse(result.badges)).length;
+                if(result.badges) {
+                    document.getElementById("ms_badges").innerText = Object.keys(JSON.parse(result.badges)).length;
+                } else {
+                    document.getElementById("ms_badges").innerText = "0";
+                }
             }
         });
     });
