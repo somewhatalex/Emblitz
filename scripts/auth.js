@@ -12,7 +12,7 @@ function randomnumber(min, max) {
 
 function initDB() {
     return new Promise((resolve, reject) => {
-        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins INT, losses INT, medals INT, badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000), metadata VARCHAR(10000), xp INT)", function (err, result) {
+        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins INT, losses INT, medals INT, badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000), metadata VARCHAR(10000), xp INT, playerstats VARCHAR(10000))", function (err, result) {
             if (err) console.log(err);
             console.log("User data table initiated");
             app.db.query("CREATE TABLE IF NOT EXISTS devinfo (title VARCHAR(255), image VARCHAR(1000), content VARCHAR(10000), submittedtime VARCHAR(255), timestamp VARCHAR(255), id VARCHAR(255))", function (err, result) {

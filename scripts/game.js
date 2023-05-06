@@ -10,6 +10,7 @@ var gameLobbyTimerHandlers = {};
 var gameDeployTimers = {};
 const allmaps = require("./mapconfig.js");
 const configs = require("../configs.json");
+const player_stats = require("./player_stats.js");
 
 function randomnumber(min, max) {
     min = Math.ceil(min);
@@ -472,6 +473,9 @@ function game() {
                 //then move troops to the ghost territory
                 this.attackTerritory(roomid, playerid, start, planeterritory, amount);
 
+                //TODO - get the actual # of troops rather than percent
+                //player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "airliftedtroops", troopcount)
+
                 setTimeout(function() {
                     if(games.get(roomid)) {
                         if(games.get(roomid).playerstate.find(item => item.id === playerid)) {
@@ -576,6 +580,7 @@ function game() {
                 }, configs.gameSettings.powerupSettings.nuke.cooldown);
 
                 self.emit("powerup_nuke", [roomid, target]);
+                player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "nukesused", 1)
                 
                 //splash damage from nuke calculations
                 //import the data of the centers of each territory in the map
