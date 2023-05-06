@@ -96,6 +96,7 @@ const badges = {
     },
 
     //total troop count badges
+    /* Deprecated as of now
     "200totaltroops": {
         "name": "Village Chief",
         "level": "Bronze",
@@ -130,6 +131,7 @@ const badges = {
         "description": "Have an maximum of 10000 troops in one game.",
         "image": "50wins.png"
     },
+    */
 
     //challenges
     "expertplayer": {
@@ -154,18 +156,25 @@ const badges = {
     },
 
     //powerup mastery badges
-    "newbiepilot": {
+    "airlift747": {
         "name": "Newbie Pilot",
         "level": "Bronze",
         "description": "Airlift a total of 747 troops.",
-        "image": "newbiepilot.png"
+        "image": "airlift747.png"
     },
 
-    "veteranpilot": {
+    "airlift15000": {
         "name": "Veteran Pilot",
         "level": "Diamond",
         "description": "Airlift a total of 15000 troops.",
-        "image": "veteranpilot.png"
+        "image": "airlift15000.png"
+    },
+
+    "airlift50000": {
+        "name": "The Sky Is Falling",
+        "level": "Ruby",
+        "description": "Airlift a total of 50000 troops.",
+        "image": "airlift50000.png"
     },
 
     "pyromaniac": {
@@ -251,6 +260,49 @@ const badges = {
         "level": "Uranium",
         "description": "Reach 4500 Emblitz medals. Named after the #1 Emblitz player when the leaderboard first came out (RadioactiveBox).",
         "image": "4500medals.png"
+    },
+
+    //total territory count badges
+    "40territories": {
+        "name": "The Neighbor",
+        "level": "Bronze",
+        "description": "Invade a total of 40 territories.",
+        "image": "50territories.png"
+    },
+
+    "100territories": {
+        "name": "Conqueror",
+        "level": "Silver",
+        "description": "Invade a total of 100 territories.",
+        "image": "100territories.png"
+    },
+
+    "500territories": {
+        "name": "Warlord",
+        "level": "Gold",
+        "description": "Invade a total of 500 territories.",
+        "image": "500territories.png"
+    },
+
+    "1200territories": {
+        "name": "Dominator",
+        "level": "Diamond",
+        "description": "Invade a total of 1200 territories.",
+        "image": "1200territories.png"
+    },
+
+    "2000territories": {
+        "name": "Chieftain",
+        "level": "Ruby",
+        "description": "Invade a total of 2000 territories.",
+        "image": "2000territories.png"
+    },
+
+    "6000territories": {
+        "name": "Emperor",
+        "level": "Uranium",
+        "description": "Invade a total of 6000 territories.",
+        "image": "6000territories.png"
     }
 }
 

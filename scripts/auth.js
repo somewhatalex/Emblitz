@@ -87,10 +87,10 @@ function userLogin(username, password) {
 function checkUserConflicts(username, email) {
     return new Promise((resolve, reject) => {
         let conflicts = [];
-        app.db.query(`SELECT * FROM users WHERE username=$1`, [username], function (err, result) {
+        app.db.query(`SELECT * FROM users WHERE LOWER(username)=LOWER($1)`, [username], function (err, result) {
             if(result.rows.length != 0) {
                 conflicts.push("u3")
-                app.db.query(`SELECT * FROM users WHERE email=$1`, [email], function (err, result) {
+                app.db.query(`SELECT * FROM users WHERE LOWER(email)=LOWER($1)`, [email], function (err, result) {
                     if(result.rows.length != 0) {
                         conflicts.push("e3");
                         resolve(conflicts);
@@ -99,7 +99,7 @@ function checkUserConflicts(username, email) {
                     }
                 });
             } else {
-                app.db.query(`SELECT * FROM users WHERE email=$1`, [email], function (err, result) {
+                app.db.query(`SELECT * FROM users WHERE LOWER(email)=LOWER($1)`, [email], function (err, result) {
                     if(result.rows.length != 0) {
                         conflicts.push("e3");
                         resolve(conflicts);

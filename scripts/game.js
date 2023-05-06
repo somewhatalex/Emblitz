@@ -318,6 +318,7 @@ function game() {
                     if(games.get(roomid).mapstate[target].troopcount < 0) {
                         games.get(roomid).mapstate[target].player = playerid;
                         games.get(roomid).mapstate[target].troopcount = Math.abs(targetProxyTroops);
+                        player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "totalterritories", 1)
                     }
 
                     //if territory has 0 troops, it becomes neutral
