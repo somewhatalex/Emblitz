@@ -425,7 +425,7 @@ function game() {
 
                 self.emit("powerup_initsupplydrop", [roomid, start, target, id]);
 
-                // the plane travels 72px a second, so to get the traveltime you'll have to divide the total distance in pixels by 120
+                // the plane travels 72px a second, so to get the traveltime you'll have to divide the total distance in pixels by 72
                 
                 let traveltime = ((distance-50)/72)*1000;
 
@@ -444,6 +444,12 @@ function game() {
                         let index = games.get(roomid).suppliedterritories.length;
                         let suppliedterritoriesArr = games.get(roomid).suppliedterritories;
                         suppliedterritoriesArr.push(target);
+                        player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "supplydropsused", 1);
+
+                        //for misinput achievement
+                        if(games.get(roomid).mapstate[target].player !== playerid) {
+                            player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "supplydropmisinput", 1);
+                        }
                         setTimeout(function() {
                             // Remove territory supply once it wears off
                             if (index > -1) { // only splice array when item is found
@@ -454,7 +460,7 @@ function game() {
                 }, traveltime);
             }
         } catch(e) {
-            //console.log(e);
+            console.log(e);
         }
     }
 
@@ -468,14 +474,14 @@ function game() {
             if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == true && (games.get(roomid).mapstate[start].troopcount * (amount / 100)) > 0) {
                 games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = false;
                 
+                //DONE - gets the actual # of troops rather than percent
+                player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "airliftedtroops", Math.round((games.get(roomid).mapstate[start].troopcount-1)*amount*0.01))
+
                 //create a "ghost territory" to serve as the plane
                 let planeterritory = "plane-" + id + "-" + playerid;
                 games.get(roomid).mapstate[planeterritory] = ({"territory": planeterritory, "player": playerid, "troopcount": 0});
                 //then move troops to the ghost territory
                 this.attackTerritory(roomid, playerid, start, planeterritory, amount);
-
-                //TODO - get the actual # of troops rather than percent
-                //player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "airliftedtroops", troopcount)
 
                 setTimeout(function() {
                     if(games.get(roomid)) {
