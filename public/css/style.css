@@ -1644,7 +1644,7 @@ input { /*override default styles*/
     pointer-events: none;
 }
 
-.powerups-parachute {
+.powerups-parachute, .powerups-supplycrate {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;

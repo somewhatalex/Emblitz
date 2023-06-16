@@ -10,6 +10,7 @@ var gameLobbyTimerHandlers = {};
 var gameDeployTimers = {};
 const allmaps = require("./mapconfig.js");
 const configs = require("../configs.json");
+const player_stats = require("./player_stats.js");
 
 function randomnumber(min, max) {
     min = Math.ceil(min);
@@ -317,6 +318,7 @@ function game() {
                     if(games.get(roomid).mapstate[target].troopcount < 0) {
                         games.get(roomid).mapstate[target].player = playerid;
                         games.get(roomid).mapstate[target].troopcount = Math.abs(targetProxyTroops);
+                        player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "totalterritories", 1)
                     }
 
                     //if territory has 0 troops, it becomes neutral
@@ -423,7 +425,7 @@ function game() {
 
                 self.emit("powerup_initsupplydrop", [roomid, start, target, id]);
 
-                // the plane travels 72px a second, so to get the traveltime you'll have to divide the total distance in pixels by 120
+                // the plane travels 72px a second, so to get the traveltime you'll have to divide the total distance in pixels by 72
                 
                 let traveltime = ((distance-50)/72)*1000;
 
@@ -442,6 +444,12 @@ function game() {
                         let index = games.get(roomid).suppliedterritories.length;
                         let suppliedterritoriesArr = games.get(roomid).suppliedterritories;
                         suppliedterritoriesArr.push(target);
+                        player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "supplydropsused", 1);
+
+                        //for misinput achievement
+                        if(games.get(roomid).mapstate[target].player !== playerid) {
+                            player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "supplydropmisinput", 1);
+                        }
                         setTimeout(function() {
                             // Remove territory supply once it wears off
                             if (index > -1) { // only splice array when item is found
@@ -452,7 +460,7 @@ function game() {
                 }, traveltime);
             }
         } catch(e) {
-            //console.log(e);
+            console.log(e);
         }
     }
 
@@ -466,6 +474,9 @@ function game() {
             if(games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift == true && (games.get(roomid).mapstate[start].troopcount * (amount / 100)) > 0) {
                 games.get(roomid).playerstate.find(item => item.id === playerid).powerups_status.airlift = false;
                 
+                //DONE - gets the actual # of troops rather than percent
+                player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "airliftedtroops", Math.round((games.get(roomid).mapstate[start].troopcount-1)*amount*0.01))
+
                 //create a "ghost territory" to serve as the plane
                 let planeterritory = "plane-" + id + "-" + playerid;
                 games.get(roomid).mapstate[planeterritory] = ({"territory": planeterritory, "player": playerid, "troopcount": 0});
@@ -576,6 +587,7 @@ function game() {
                 }, configs.gameSettings.powerupSettings.nuke.cooldown);
 
                 self.emit("powerup_nuke", [roomid, target]);
+                player_stats.updatePlayerStat(idToPubkey(roomid, playerid), "nukesused", 1)
                 
                 //splash damage from nuke calculations
                 //import the data of the centers of each territory in the map
