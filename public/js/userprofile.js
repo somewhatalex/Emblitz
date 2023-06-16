@@ -4,6 +4,7 @@ window.addEventListener("load", function() {
     fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "badgedata"})}).then(response => {
         response.json().then(function(badgeresult) {
             badges = badgeresult;
+            document.getElementById("u-total-count").innerText = Object.keys(badges).length;
             fetch("/api", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "getuserprofile", username: username})}).then(response => {
                 response.json().then(function(result) {
                     loadProfile(result);
