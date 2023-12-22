@@ -19,6 +19,14 @@ function getDeviceSettings() {
         for(let i=0; i<checkboxes.length; i++) {
             checkboxes[i].checked = deviceSettings[checkboxes[i].id];
         }
+
+        let sliders = document.getElementsByClassName("DSslider");
+        for(let i=0; i<sliders.length; i++) {
+            sliders[i].value = deviceSettings[sliders[i].id];
+        }
+
+        //update slider values
+        updateAudioSlider();
     }
 }
 
@@ -78,6 +86,12 @@ function submitUserSettings() {
     for(let i=0; i<checkboxes.length; i++) {
         deviceSettings[checkboxes[i].id] = checkboxes[i].checked;
     }
+
+    let sliders = document.getElementsByClassName("DSslider");
+    for(let i=0; i<sliders.length; i++) {
+        deviceSettings[sliders[i].id] = sliders[i].value;
+    }
+
     localStorage.setItem("devicesettings", JSON.stringify(deviceSettings));
 }
 
@@ -106,6 +120,11 @@ function editPlayerColor(color) {
     });
 };
 
+function updateAudioSlider() {
+    let sliderValue = document.getElementById("audio-volume").value;
+    document.getElementById("audiodisplay").innerText = sliderValue + "%";
+}
+
 window.addEventListener("beforeunload", function (e) {
     let unsavedchanges = false;
 
@@ -116,6 +135,11 @@ window.addEventListener("beforeunload", function (e) {
     let checkboxes = document.getElementsByClassName("DSvalue");
     for(let i=0; i<checkboxes.length; i++) {
         deviceSettings[checkboxes[i].id] = checkboxes[i].checked;
+    }
+
+    let sliders = document.getElementsByClassName("DSslider");
+    for(let i=0; i<sliders.length; i++) {
+        deviceSettings[sliders[i].id] = sliders[i].value;
     }
 
     if(localStorage.getItem("devicesettings") !== JSON.stringify(deviceSettings)) unsavedchanges = true;

@@ -3,9 +3,13 @@ console.log("AudioManager loaded.");
 class audioManager {
     constructor() {
         this.tracks = new Map();
-        //zach made everything too loud lol
-        //can't blame him too much though, the sound effects are very nice
-        this.defaultVolume = 0.35;
+        //zach made sound fx too loud so default is 0.35. Can be edited through user settings
+        let volumeAdjust = 1;
+        if(localStorage.getItem("devicesettings")) {
+            let deviceSettings = JSON.parse(localStorage.getItem("devicesettings"));
+            volumeAdjust = deviceSettings["audio-volume"] / 100;
+        }
+        this.defaultVolume = 0.35 * volumeAdjust;
     }
 
     play(url, stopAll = false, fadeOut = false, loop = false) {
