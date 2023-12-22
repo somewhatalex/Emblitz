@@ -64,18 +64,25 @@
                 <DIV CLASS="s-divider" STYLE="margin-top: 5px; margin-bottom: 10px;"></DIV>
                 <DIV CLASS="s-area-info">Device settings save to this device only and don't sync between devices.</DIV>
                 <DIV CLASS="s-ds-setting">
-                    <LABEL CLASS="settingstoggle">
+                    <LABEL CLASS="settingstoggle switch">
                         <INPUT TYPE="checkbox" CLASS="DSvalue" ID="low-graphics">
                         <SPAN CLASS="slider"></SPAN>
                     </LABEL>
                     Low graphics mode
                 </DIV>
                 <DIV CLASS="s-ds-setting">
-                    <LABEL CLASS="settingstoggle">
+                    <LABEL CLASS="settingstoggle switch">
                         <INPUT TYPE="checkbox" CLASS="DSvalue" ID="no-highlighting">
                         <SPAN CLASS="slider"></SPAN>
                     </LABEL>
                     No map highlighting <SPAN STYLE="font-size: 14px">(also helps with performance)</SPAN>
+                </DIV>
+                <DIV CLASS="s-ds-setting">
+                    <DIV STYLE="margin-bottom: 8px;">Sound Effects Volume</DIV>
+                    <LABEL CLASS="settingstoggle">
+                        <INPUT ID="audio-volume" TYPE="range" MIN="0" MAX="200" CLASS="DSslider" STEP="10" ONINPUT="updateAudioSlider()">
+                    </LABEL>
+                    <SPAN ID="audiodisplay" STYLE="padding-bottom: 10px; font-weight:bold; vertical-align: middle;">100%</SPAN>
                 </DIV>
             </DIV>
 
