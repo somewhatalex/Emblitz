@@ -70,7 +70,7 @@ function getUserInfoNoReject(token) {
 
 function userLogin(username, password) {
     return new Promise((resolve, reject) => {
-        app.db.query(`SELECT * FROM users WHERE username=$1`, [username], function (err, result) {
+        app.db.query(`SELECT * FROM users WHERE lower(username)=$1`, [username.toLowerCase()], function (err, result) {
             if(result.rows.length != 0) {
                 if(passwordHash.verify(password, result.rows[0].password)) {
                     resolve([result.rows[0]]);
