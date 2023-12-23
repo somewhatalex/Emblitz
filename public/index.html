@@ -118,14 +118,14 @@
                             </TABLE>
                         </DIV>
                         <DIV CLASS="h_button_options">
-                            <BUTTON CLASS="joinbutton jb_green" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, false)">Play</BUTTON>
-                            <BUTTON CLASS="joinbutton jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
+                            <BUTTON CLASS="joinbutton pushdown jb_green" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, false)">Play</BUTTON>
+                            <BUTTON CLASS="joinbutton pushdown jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
                             <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
                                 <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game. If not, use the "Play" button to play a random match.</DIV>
-                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect('r-' + document.getElementById('room_id').value.toLowerCase(), null, false)">Connect</BUTTON>
+                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton pushdown jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect('r-' + document.getElementById('room_id').value.toLowerCase(), null, false)">Connect</BUTTON>
                             </DIV>
                             <BR><BR>
-                            <BUTTON CLASS="joinbutton jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
+                            <BUTTON CLASS="joinbutton pushdown jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
                             <BR>
                         </DIV>
 
@@ -217,8 +217,8 @@
                 <DIV CLASS="invitecode">Room join code: <SPAN ID="invitecode">-----</SPAN></DIV>
                 <DIV CLASS="timercode">Auto starts in: <SPAN ID="timeramount">-----</SPAN> seconds</DIV>
                 <DIV CLASS="privateroomdisplay" ID="proomdisplay" STYLE="display: none"><I CLASS="fa fa-lock"></I> This room is a private room. Users can only join using the room join code.</DIV>
-                <BUTTON ID="startvote" CLASS="joinbutton jb_green" STYLE="margin-top: 10px;">Ready</BUTTON>
-                <BUTTON ONCLICK="exitLobby()" CLASS="joinbutton jb_gray" STYLE="margin-top: 10px; padding-left: 5px; padding-right: 5px">Back to Main Menu</BUTTON>
+                <BUTTON ID="startvote" CLASS="joinbutton pushdown jb_green" STYLE="margin-top: 10px;">Ready</BUTTON>
+                <BUTTON ONCLICK="exitLobby()" CLASS="joinbutton pushdown jb_gray" STYLE="margin-top: 10px; padding-left: 5px; padding-right: 5px">Back to Main Menu</BUTTON>
             </DIV>
 
             <%- adslot_3 %>

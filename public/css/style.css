@@ -398,9 +398,20 @@ input { /*override default styles*/
     padding-bottom: 10px;
     border: none;
     cursor: pointer;
-    transition: 0.4s;
+    transition: background-color 0.4s;
     border-radius: 10px;
     margin: 5px;
+    position: relative;
+}
+
+.pushdown {
+    position: relative;
+    transition: background-color 0.4s !important;
+}
+
+.pushdown:hover {
+    top: 4px;
+    box-shadow: none;
 }
 
 .joinroomtext {
@@ -411,6 +422,7 @@ input { /*override default styles*/
 .jb_green {
     background-color: var(--green);
     color: var(--light);
+    box-shadow: 0px 4px 0px 0px var(--green-darker);
 }
 
 .jb_green:hover {
@@ -420,6 +432,7 @@ input { /*override default styles*/
 .jb_gray {
     background-color: var(--light-darker);
     color: var(--night);
+    box-shadow: 0px 4px 0px 0px var(--medium);
 }
 
 .jb_gray:hover {
@@ -1859,7 +1872,8 @@ input { /*override default styles*/
     font-size: 17px;
     padding: 10px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: background-color 0.3s;
+    position: relative;
 }
 
 .news-readmore {
@@ -1891,8 +1905,8 @@ input { /*override default styles*/
     cursor: pointer;
     z-index: 1999999;
     transition: 0.3s;
-    -webkit-box-shadow: 0px 0px 15px 3px #000000; 
-    box-shadow: 0px 0px 15px 3px #000000;
+    -webkit-box-shadow: 0px 0px 15px 3px #000000 !important; 
+    box-shadow: 0px 0px 15px 3px #000000 !important;
 }
 
 #gn-exit {

@@ -43,10 +43,10 @@
                         document.getElementById("mainarea").innerHTML = `
                             <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
                             <DIV CLASS="lg_resulttext">Please check your email for a verification email. Note that it will expire in 10 minutes, and any unverified accounts will be deleted in an hour. Try checking your spam and promotions tabs if you don't see the email. Still don't see it? Press the button below to resend the email.</DIV>
-                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register jb_gray" ID="i-resendemail" ONCLICK="resendemail()">Resend Verification Email</BUTTON>
+                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register pushdown jb_gray" ID="i-resendemail" ONCLICK="resendemail()">Resend Verification Email</BUTTON>
                             <DIV CLASS="lg_resulttext" ID="lg_resendstatus" STYLE="display: none; margin-top: 10px"></DIV>
                             <DIV CLASS="lg_resulttext">Once you verified your email, click here to go to Emblitz.</DIV>
-                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register jb_green" ONCLICK="window.location='http://emblitz.com'">To Emblitz!</BUTTON>
+                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register pushdown jb_green" ONCLICK="window.location='http://emblitz.com'">To Emblitz!</BUTTON>
                             `
                         document.getElementById("mainarea").style.opacity = "1";
                     }, 500);
@@ -76,10 +76,10 @@
                             <DIV CLASS="lg_container_title"><I CLASS="fa fa-check"></I> Confirm Password <SPAN CLASS="lb_form_error" ID="error-passwordconfirm"></SPAN></DIV>
                             <INPUT CLASS="lg_input" ID="i-password-confirm" NAME="password" TYPE="password" PLACEHOLDER="Retype password here..." MAXLENGTH="30">
                             <DIV CLASS="lg_divider"></DIV>
-                            <INPUT CLASS="lg_submit jb_green" ID="i-submit" TYPE="Submit" ONCLICK="submitRegister()" VALUE="Register">
+                            <INPUT CLASS="lg_submit pushdown jb_green" ID="i-submit" TYPE="Submit" ONCLICK="submitRegister()" VALUE="Register">
                         </FORM>
                         <DIV CLASS="lg_register_text">Already have an account?</DIV>
-                        <BUTTON CLASS="lg_register jb_gray" ID="backtologin" ONCLICK="loginwindow()">Login</BUTTON>
+                        <BUTTON CLASS="lg_register pushdown jb_gray" ID="backtologin" ONCLICK="loginwindow()">Login</BUTTON>
                         `
                     document.getElementById("mainarea").style.opacity = "1";
                 }, 500);
@@ -99,10 +99,10 @@
                             <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password <SPAN CLASS="lb_form_error" ID="error-login-password"></SPAN></DIV>
                             <INPUT CLASS="lg_input" NAME="password" TYPE="password" ID="login-password" PLACEHOLDER="Password...">
                             <DIV CLASS="lg_divider"></DIV>
-                            <INPUT CLASS="lg_submit jb_green" TYPE="Submit" VALUE="Login" ID="i-loginbtn" ONCLICK="login()">
+                            <INPUT CLASS="lg_submit pushdown jb_green" TYPE="Submit" VALUE="Login" ID="i-loginbtn" ONCLICK="login()">
                         </FORM>
                         <DIV CLASS="lg_register_text">Don't have an account?</DIV>
-                        <BUTTON CLASS="lg_register jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
+                        <BUTTON CLASS="lg_register pushdown jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
                         `
                     document.getElementById("mainarea").style.opacity = "1";
                 }, 500);
@@ -123,10 +123,10 @@
                     <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password <SPAN CLASS="lb_form_error" ID="error-login-password"></SPAN></DIV>
                     <INPUT CLASS="lg_input" NAME="password" TYPE="password" ID="login-password" PLACEHOLDER="Password...">
                     <DIV CLASS="lg_divider"></DIV>
-                    <INPUT CLASS="lg_submit jb_green" TYPE="Submit" VALUE="Login" ID="i-loginbtn" ONCLICK="login()">
+                    <INPUT CLASS="lg_submit pushdown jb_green" TYPE="Submit" VALUE="Login" ID="i-loginbtn" ONCLICK="login()">
                 </FORM>
                 <DIV CLASS="lg_register_text">Don't have an account?</DIV>
-                <BUTTON CLASS="lg_register jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
+                <BUTTON CLASS="lg_register pushdown jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
             </DIV>
         </DIV>
     </BODY>
