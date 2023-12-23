@@ -246,7 +246,7 @@ app.all("/", (req, res) => {
     let profileoutput = `
     <DIV CLASS="po-container">
         <DIV CLASS="po-description">Login or register to set a username, earn medals, see stats, and more! Only takes about 30 seconds!</DIV>
-        <BUTTON CLASS="joinbutton jb_green" ONCLICK="window.location.href='./login?action=register'" STYLE="font-size: 18px; min-width: 150px; margin-top: 10px;">Register</BUTTON><BUTTON ONCLICK="window.location.href='./login'" STYLE="font-size: 18px; min-width: 150px; margin-top: 10px;" CLASS="joinbutton jb_gray">Login</BUTTON>
+        <BUTTON CLASS="joinbutton pushdown jb_green" ONCLICK="window.location.href='./login?action=register'" STYLE="font-size: 18px; min-width: 150px; margin-top: 10px;">Register</BUTTON><BUTTON ONCLICK="window.location.href='./login'" STYLE="font-size: 18px; min-width: 150px; margin-top: 10px;" CLASS="joinbutton pushdown jb_gray">Login</BUTTON>
     </DIV>
     `
 
@@ -529,14 +529,14 @@ app.get("/verify", (req, res) => {
     jwt.verify(gettoken, authsecret, function(err, decoded) {
         //invalid token
         if(err || decoded.iss != "dr. defario's grandson samuel") {
-            outputresult = `Oops... an error occured. Your link might've expired or broke; try getting another verification email. Sorry about that.  <A CLASS="lg_register jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`
+            outputresult = `Oops... an error occured. Your link might've expired or broke; try getting another verification email. Sorry about that.  <A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`
             res.render("verify", {
                 result: outputresult
             });
         } else {
             pool.query(`SELECT * FROM users WHERE publickey=$1 AND email=$2 AND verified=$3`, [decoded.data[0].publickey, decoded.data[0].email, false], function(err, result) {
                 if(err || result.rows.length == 0) {
-                    outputresult = `Oops... an error occured. Your link might've expired, been used, or broke; try getting another verification email. Sorry about that. <A CLASS="lg_register jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`;
+                    outputresult = `Oops... an error occured. Your link might've expired, been used, or broke; try getting another verification email. Sorry about that. <A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`;
                     res.render("verify", {
                         result: outputresult
                     });
@@ -545,7 +545,7 @@ app.get("/verify", (req, res) => {
                     pool.query(`UPDATE users SET verified=$1 WHERE publickey=$2 AND email=$3`, [true, decoded.data[0].publickey, decoded.data[0].email], function(err, result) {
                         auth.awardBadge(decoded.data[0].publickey, "verifiedaccount");
                         
-                        let outputresult = `Thanks for verifying your account! You can now login through the login page using your username and password. Enjoy the game!<DIV STYLE="display: block; margin-top: 20px;">Your username: <B>${getusername}</B></DIV><A CLASS="lg_register jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://emblitz.com">To Emblitz!</A>`;
+                        let outputresult = `Thanks for verifying your account! You can now login through the login page using your username and password. Enjoy the game!<DIV STYLE="display: block; margin-top: 20px;">Your username: <B>${getusername}</B></DIV><A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://emblitz.com">To Emblitz!</A>`;
                         res.render("verify", {
                             result: outputresult
                         });

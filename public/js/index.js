@@ -226,7 +226,7 @@ function loadPosts(refresh) {
                 </DIV>`
             }
 
-            trtoappend += `<BUTTON CLASS="gn-loadmore jb_gray" ONCLICK="loadPosts()">Load more news</BUTTON>`;
+            trtoappend += `<BUTTON CLASS="gn-loadmore pushdown jb_gray" ONCLICK="loadPosts()">Load more news</BUTTON>`;
             postarea.innerHTML += trtoappend;
             p_startindex = p_startindex + 6;
         });
