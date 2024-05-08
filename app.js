@@ -81,7 +81,7 @@ var dbcredentials = null;
 if(process.env.PRODUCTION === "yes") {
     dbcredentials = {
         connectionString: process.env.DATABASE_URL,
-        ssl: { rejectUnauthorized: true }
+        ssl: { rejectUnauthorized: false }
     };
     console.log("Database set to production mode");
 } else {
