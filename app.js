@@ -76,7 +76,6 @@ const badWordsFilter = new badwords();
 const game = new gamehandler();
 const gameevents = gamehandler.gameevents;
 
-/*
 //database
 var dbcredentials = null;
 if(process.env.PRODUCTION === "yes") {
@@ -95,15 +94,6 @@ if(process.env.PRODUCTION === "yes") {
     };
     console.log("Database set to development mode");
 }
-*/
-
-const dbcredentials = {
-    host: process.env.DATABASE_URL,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-    port: process.env.DATABASE_PORT,
-    database: process.env.DATABASE_NAME
-};
 
 const pool = new Pool(dbcredentials);
 pool.connect(function(err) {
