@@ -527,6 +527,7 @@ app.get("/verify", (req, res) => {
     let gettoken = req.query.token;
     let outputresult = ``;
     jwt.verify(gettoken, authsecret, function(err, decoded) {
+	console.log(err);
         //invalid token
         if(err || decoded.iss != "dr. defario's grandson samuel") {
             outputresult = `Oops... an error occured. Your link might've expired or broke; try getting another verification email. Sorry about that.  <A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`
