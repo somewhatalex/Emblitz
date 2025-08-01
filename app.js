@@ -561,7 +561,7 @@ app.post("/verify", (req, res) => {
     res.json({"error": "please use GET"});
 });
 
-//id = roomid
+// id = roomid
 function getroommap(id) {
     for(let i=0; i<rooms.length; i++) {
         if(rooms[i].id === id) {
@@ -584,6 +584,7 @@ app.post("/auth2", (req, res) => {
         let wordtofilter = req.body.username.replace(/_/g, "");
         let containsbadwords = badWordsFilter.isProfane(wordtofilter);
         
+        // Check for username validity
         if(req.body.username.length < 2) {
             errors.push("u1");
         } else if(req.body.username.length > 12) {
@@ -593,15 +594,27 @@ app.post("/auth2", (req, res) => {
         } else if(containsbadwords) {
             errors.push("u5");
         }
+
+        // Check for email validity
         if(!req.body.email) {
             errors.push("e1");
         } else if(!emailformatted) {
             errors.push("e2");
         }
+
+        // Check for password validity
         if(!req.body.password) {
             errors.push("p1")
         } else if(req.body.password.length < 8 || req.body.password.length > 30) {
             errors.push("p2");
+        }
+
+        // Break if there are any errors
+        // Probably don't need this before also
+        // Wanted to prevent incorrectly formatted strings from going through to SQL query
+        if(errors.length > 0) {
+            res.json({"errors": errors});
+            return;
         }
 
         auth.checkUserConflicts(req.body.username, req.body.email).then(function(conflicts) {
@@ -663,8 +676,63 @@ app.post("/auth2", (req, res) => {
         } else {
             res.json({"error": "lookup_2"})
         }
-    } else if(req.body.action === "resetpassword") {
-        
+    } else if (req.body.action === "requestPasswordReset") {
+        let errors = [];
+        let emailformatted = req.body.email.match(
+            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+        let usernameformatted = req.body.username.match(
+            /^[a-zA-Z0-9_]+$/
+        );
+
+        // Check for username validity
+        if(req.body.username.length < 2) {
+            errors.push("u1");
+        } else if(req.body.username.length > 12) {
+            errors.push("u2")
+        } else if(!usernameformatted) {
+            errors.push("u4");
+        }
+
+        // Check for email validity
+        if(!req.body.email) {
+            errors.push("e1");
+        } else if(!emailformatted) {
+            errors.push("e2");
+        }
+
+        // Break if there are any errors
+        // Probably don't need this before also
+        // Wanted to prevent incorrectly formatted strings from going through to SQL query
+        if(errors.length > 0) {
+            res.json({"errors": errors});
+            return;
+        }
+
+        // TODO: Verify username and email address
+        // TODO: If valid, send password reset email
+    } else if (req.body.action === "requestUsername") {
+        let errors = [];
+        let emailformatted = req.body.email.match(
+            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+
+        // Check for email validity
+        if(!req.body.email) {
+            errors.push("e1");
+        } else if(!emailformatted) {
+            errors.push("e2");
+        }
+
+        // Break if there are any errors
+        // Probably don't need this before also
+        // Wanted to prevent incorrectly formatted strings from going through to SQL query
+        if(errors.length > 0) {
+            res.json({"errors": errors});
+            return;
+        }
+
+        // TODO: Send an email of the account username which corresponds to this email
     }
 })
 

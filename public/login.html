@@ -50,6 +50,12 @@
                             `
                         document.getElementById("mainarea").style.opacity = "1";
                     }, 500);
+                } else if (action === "passwordResetRequest") {
+                    // Has the user enter their username and email address to veryify who is resetting their password
+                    passwordResetRequestWindow();
+                } else if (action === "usernameRequest") {
+                    // The user can request an email reminding them of their email address
+                    usernameRequestWindow();
                 }
             });
 
@@ -103,6 +109,45 @@
                         </FORM>
                         <DIV CLASS="lg_register_text">Don't have an account?</DIV>
                         <BUTTON CLASS="lg_register pushdown jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
+                        `
+                    document.getElementById("mainarea").style.opacity = "1";
+                }, 500);
+            }
+
+            function passwordResetRequestWindow() {
+                document.getElementById("mainarea").style.opacity = "0";
+                setTimeout(function() {
+                    document.getElementById("mainarea").innerHTML = `
+                        <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                        <FORM CLASS="lg_container" ID="form-register" ONSUBMIT="return false" METHOD="POST">
+                            <DIV CLASS="lg_headertext"><B>Reset your password</B> by entering your username and email address linked to your account. Then follow the instructions provided via email to reset your Emblitz account password.</DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-envelope"></I> Email <SPAN CLASS="lb_form_error" ID="error-email"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-email" NAME="email" MAXLENGTH="1500" TYPE="email" PLACEHOLDER="Email...">
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username <SPAN CLASS="lb_form_error" ID="error-username"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-username" NAME="username" TYPE="name" MAXLENGTH="12" PLACEHOLDER="Username...">
+                            <DIV CLASS="lg_divider"></DIV>
+                            <INPUT CLASS="lg_submit pushdown jb_green" ID="i-submit" TYPE="Submit" ONCLICK="requestPasswordReset()" VALUE="Request Password Reset">
+                        </FORM>
+                        <DIV CLASS="lg_register_text">Remember your password?</DIV>
+                        <BUTTON CLASS="lg_register pushdown jb_gray" ID="backtologin" ONCLICK="loginwindow()">Login</BUTTON>
+                        `
+                    document.getElementById("mainarea").style.opacity = "1";
+                }, 500);
+            }
+
+            function usernameRequestWindow() {
+                document.getElementById("mainarea").style.opacity = "0";
+                setTimeout(function() {
+                    document.getElementById("mainarea").innerHTML = `
+                        <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                        <FORM CLASS="lg_container" ID="form-register" ONSUBMIT="return false" METHOD="POST">
+                            <DIV CLASS="lg_headertext"><B>Request your username</B> via email by entering the email linked to your Emblitz account below. You can also change your username via the settings page once you are logged in.</DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-envelope"></I> Email <SPAN CLASS="lb_form_error" ID="error-email"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-email" NAME="email" MAXLENGTH="1500" TYPE="email" PLACEHOLDER="Email...">
+                            <INPUT CLASS="lg_submit pushdown jb_green" ID="i-submit" TYPE="Submit" ONCLICK="requestUsername()" VALUE="Request Username">
+                        </FORM>
+                        <DIV CLASS="lg_register_text">Remember your username?</DIV>
+                        <BUTTON CLASS="lg_register pushdown jb_gray" ID="backtologin" ONCLICK="loginwindow()">Login</BUTTON>
                         `
                     document.getElementById("mainarea").style.opacity = "1";
                 }, 500);

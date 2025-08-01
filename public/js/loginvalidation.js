@@ -32,12 +32,10 @@ function checkPass(pass) {
     }
 }
 
-function submitRegister() {
-    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
-        document.getElementsByClassName("lb_form_error")[i].style.display = "none";
-    }
+function clientCheckEmailErrors() {
+    let errors = false;
 
-    var errors = false;
+    // Check for email errors
 
     if(!document.getElementById("i-email").value) {
         document.getElementById("error-email").style.display = "inline";
@@ -49,15 +47,20 @@ function submitRegister() {
         /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 
-    let usernameformatted = document.getElementById("i-username").value.match(
-        /^[a-zA-Z0-9_]+$/
-    )
-
     if(!emailformatted && document.getElementById("i-email").value) {
         document.getElementById("error-email").style.display = "inline";
         document.getElementById("error-email").innerText = "please enter a valid email";
         errors = true;
     }
+
+    return errors;
+}
+
+function clientCheckUsernameErrors() {
+    let errors = false;
+    let usernameformatted = document.getElementById("i-username").value.match(
+        /^[a-zA-Z0-9_]+$/
+    )
 
     if(!usernameformatted) {
         document.getElementById("error-username").style.display = "inline";
@@ -76,6 +79,12 @@ function submitRegister() {
         document.getElementById("error-username").innerText = "username is required";
         errors = true;
     }
+
+    return errors;
+}
+
+function clientCheckPasswordErrors() {
+    let errors = false;
 
     if(document.getElementById("i-password").value !== document.getElementById("i-password-confirm").value) {
         document.getElementById("error-password").style.display = "inline";
@@ -115,6 +124,22 @@ function submitRegister() {
         errors = true;
     }
 
+    return errors;
+}
+
+function submitRegister() {
+    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+        document.getElementsByClassName("lb_form_error")[i].style.display = "none";
+    }
+
+    let errors = false;
+
+    // Client side error checks for input boxes
+    errors = clientCheckEmailErrors();
+    errors = clientCheckUsernameErrors();
+    errors = clientCheckPasswordErrors();
+
+    // No client side errors
     if(!errors) {
         document.getElementById("i-submit").value = "Please wait...";
         document.getElementById("i-submit").style.cursor = "no-drop";
@@ -123,7 +148,7 @@ function submitRegister() {
         document.getElementById("backtologin").style.cursor = "no-drop";
         fetch("/auth2", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "registeruser", email: document.getElementById("i-email").value, username: document.getElementById("i-username").value, password: document.getElementById("i-password").value})}).then(response => {
             response.json().then(function(text) {
-                if(text.errors) {
+                if (text.errors) {
                     document.getElementById("i-submit").removeAttribute("disabled");
                     document.getElementById("backtologin").removeAttribute("disabled");
                     document.getElementById("i-submit").style.cursor = "pointer";
@@ -134,7 +159,8 @@ function submitRegister() {
                         document.getElementsByClassName("lb_form_error")[i].style.display = "none";
                     }
 
-                    //declared errors by server
+                    // Check if the server sent any error messages
+
                     if(text.errors.includes("u5")) {
                         document.getElementById("error-username").style.display = "inline";
                         document.getElementById("error-username").innerText = "don't use profanity in your username";
@@ -188,7 +214,7 @@ function submitRegister() {
                         document.getElementById("error-password").innerText = "password must meet requirements";
                         errors = true;
                     }
-                } else if(text.error == 429) {
+                } else if (text.error == 429) {
                     document.getElementById("i-submit").removeAttribute("disabled");
                     document.getElementById("backtologin").removeAttribute("disabled");
                     document.getElementById("i-submit").style.cursor = "pointer";
@@ -196,6 +222,7 @@ function submitRegister() {
                     document.getElementById("i-submit").value = "Register";
                     alert("You're trying to make an account too quickly! Please try again in 5 minutes.");
                 } else {
+                    // No errors from client or server
                     document.getElementById("mainarea").style.opacity = "0";
                     setTimeout(function() {
                         document.getElementById("mainarea").innerHTML = `
@@ -212,6 +239,39 @@ function submitRegister() {
             })
         });
     }
+}
+
+function requestPasswordReset() {
+    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+        document.getElementsByClassName("lb_form_error")[i].style.display = "none";
+    }
+
+    let errors = false;
+
+    // Client side error checks for email and username input boxes
+    errors = clientCheckEmailErrors();
+    errors = clientCheckUsernameErrors();
+
+    // TODO: Handle the way this system interacts with the server
+    if (!errors) {
+        fetch("/auth2", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "requestPasswordReset", email: document.getElementById("i-email").value, username: document.getElementById("i-username").value})}).then(response => {
+            response.json().then(function(text) {
+                //
+            })
+    }
+}
+
+function requestUsername() {
+    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+        document.getElementsByClassName("lb_form_error")[i].style.display = "none";
+    }
+
+    let errors = false;
+
+    // Client side error checks for email input box
+    errors = clientCheckEmailErrors();
+
+    // TODO: Handle the way this system interacts with the server
 }
 
 function resendemail() {
