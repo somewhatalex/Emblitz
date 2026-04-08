@@ -534,31 +534,75 @@ app.get("/verify", (req, res) => {
             res.render("verify", {
                 result: outputresult
             });
-        } else {
-            pool.query(`SELECT * FROM users WHERE publickey=$1 AND email=$2 AND verified=$3`, [decoded.data[0].publickey, decoded.data[0].email, false], function(err, result) {
-                if(err || result.rows.length == 0) {
-                    outputresult = `Oops... an error occured. Your link might've expired, been used, or broke; try getting another verification email. Sorry about that. <A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`;
+
+            return;
+        }
+
+        pool.query(`SELECT * FROM users WHERE publickey=$1 AND email=$2 AND verified=$3`, [decoded.data[0].publickey, decoded.data[0].email, false], function(err, result) {
+            // Ensure a database entry matches the requested link metadata
+            if(err || result.rows.length == 0) {
+                outputresult = `Oops... an error occured. Your link might've expired, been used, or broke; try getting another verification email. Sorry about that. <A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`;
+                res.render("verify", {
+                    result: outputresult
+                });
+            } else {
+                let getusername = result.rows[0].username;
+
+                //
+                pool.query(`UPDATE users SET verified=$1 WHERE publickey=$2 AND email=$3`, [true, decoded.data[0].publickey, decoded.data[0].email], function(err, result) {
+                    auth.awardBadge(decoded.data[0].publickey, "verifiedaccount");
+                    
+                    let outputresult = `Thanks for verifying your account! You can now login through the login page using your username and password. Enjoy the game!<DIV STYLE="display: block; margin-top: 20px;">Your username: <B>${getusername}</B></DIV><A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://emblitz.com">To Emblitz!</A>`;
                     res.render("verify", {
                         result: outputresult
                     });
-                } else {
-                    let getusername = result.rows[0].username;
-                    pool.query(`UPDATE users SET verified=$1 WHERE publickey=$2 AND email=$3`, [true, decoded.data[0].publickey, decoded.data[0].email], function(err, result) {
-                        auth.awardBadge(decoded.data[0].publickey, "verifiedaccount");
-                        
-                        let outputresult = `Thanks for verifying your account! You can now login through the login page using your username and password. Enjoy the game!<DIV STYLE="display: block; margin-top: 20px;">Your username: <B>${getusername}</B></DIV><A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://emblitz.com">To Emblitz!</A>`;
-                        res.render("verify", {
-                            result: outputresult
-                        });
-                    });
-                }
-            });
-        }
+                });
+            }
+        });
     });
 });
 
 app.post("/verify", (req, res) => {
     res.json({"error": "please use GET"});
+});
+
+app.get("/resetPassword", (req, res) => {
+    let gettoken = req.query.token;
+    let outputresult = ``;
+
+    // Verify the corresponding token
+    jwt.verify(gettoken, authsecret, function(err, decoded) {
+	console.log(err);
+        //invalid token
+        if(err || decoded.iss != "dr. defario's grandson samuel") {
+            outputresult = `Oops... an error occured. Your link might've expired or broke; try getting another verification email. Sorry about that.  <A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`
+            res.render("verify", {
+                result: outputresult
+            });
+
+            return;
+        }
+
+        pool.query(`SELECT * FROM users WHERE publickey=$1 AND email=$2 AND verified=$3`, [decoded.data[0].publickey, decoded.data[0].email, false], function(err, result) {
+            // Ensure a database entry matches the requested link metadata
+            if(err || result.rows.length == 0) {
+                outputresult = `Oops... an error occured. Your link might've expired, been used, or broke; try getting another verification email. Sorry about that. <A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://www.emblitz.com">Back to Emblitz</A>`;
+                res.render("verify", {
+                    result: outputresult
+                });
+            } else {
+                let getusername = result.rows[0].username;
+
+                //
+                pool.query(`UPDATE users SET verified=$1 WHERE publickey=$2 AND email=$3`, [true, decoded.data[0].publickey, decoded.data[0].email], function(err, result) {
+                    let outputresult = `Your password has successfully been reset! You can now login through the login page using your username and new password. Enjoy the game!<DIV STYLE="display: block; margin-top: 20px;">Your username: <B>${getusername}</B></DIV><A CLASS="lg_register pushdown jb_green" STYLE="display: block; margin: auto; margin-top: 30px; text-decoration: none" HREF="https://emblitz.com">To Emblitz!</A>`;
+                    res.render("verify", {
+                        result: outputresult
+                    });
+                });
+            }
+        });
+    });
 });
 
 // id = roomid
@@ -709,31 +753,84 @@ app.post("/auth2", (req, res) => {
             return;
         }
 
-        // TODO: Verify username and email address
+        // Verify username and email address match
+        auth.verifyUsernameEmailMatch(req.body.username, req.body.email).then(function(conflict) {
+            // Throw username errors
+            // Invalid emails are left ambiguous to prevent brute force guessing
+            if (conflict === "u3") {
+                errors.push(conflict);
+                res.json({"errors": errors});
+                return;
+            } else if (conflict.length > 0) {
+                res.json({"errors": errors});
+                return;
+            }
+        });
+
         // TODO: If valid, send password reset email
+        auth.createPasswordResetToken(req.body.username, req.body.email).then(function(pubKey) {
+            //
+        });
     } else if (req.body.action === "requestUsername") {
         let errors = [];
         let emailformatted = req.body.email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         );
 
-        // Check for email validity
-        if(!req.body.email) {
+        if (!req.body.email) {
             errors.push("e1");
-        } else if(!emailformatted) {
+        } else if (!emailformatted) {
             errors.push("e2");
         }
 
-        // Break if there are any errors
-        // Probably don't need this before also
-        // Wanted to prevent incorrectly formatted strings from going through to SQL query
-        if(errors.length > 0) {
-            res.json({"errors": errors});
+        if (errors.length > 0) {
+            res.json({ errors: errors });
             return;
         }
 
-        // TODO: Send an email of the account username which corresponds to this email
+        auth.getEmailUsername(req.body.email)
+            .then(username => {
+                if (username !== null) {
+                    var mail = {
+                        from: "'Emblitz Team' <emblitz@emblitz.com>",
+                        to: req.body.email,
+                        subject: "Emblitz Username Reminder!",
+                        html: `
+                            <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                                <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; padding: 20px;">
+                                    <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                                    <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;">
+                                        <DIV STYLE="display: block; margin-bottom: 5px;">Hello,</DIV>
+                                        This is a reminder of your Emblitz username:
+                                        <BR><BR>
+                                        <B>${username}</B>
+                                        <BR><BR>
+                                        No further action is required.
+                                        <BR><BR>
+                                        Thanks,<BR>-The Emblitz Team
+                                        <DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV>
+                                    </DIV>
+                                </DIV>
+                            </BODY>
+                        `
+                    };
+
+                    mailTransport.sendMail(mail);
+                    dev_emails++;
+                }
+
+                // Always ambiguous to the client
+                res.json({ ok: true });
+            })
+            .catch(err => {
+                console.error(err);
+                res.status(500).json({ error: "server_1" });
+            });
+
+        return;
     }
+
+    res.json({"ok": true});
 })
 
 app.post("/authapi", (req, res) => {

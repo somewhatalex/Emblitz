@@ -12,13 +12,19 @@ function randomnumber(min, max) {
 
 function initDB() {
     return new Promise((resolve, reject) => {
-        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins INT, losses INT, medals INT, badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000), metadata VARCHAR(10000), xp INT, playerstats VARCHAR(10000))", function (err, result) {
+        app.db.query("CREATE TABLE IF NOT EXISTS users (token VARCHAR(255), wins INT, losses INT, medals INT, badges VARCHAR(15000), pfp VARCHAR(10000), tournamentprogress VARCHAR(1000), verified VARCHAR(5), timecreated VARCHAR(255), username VARCHAR(255), email VARCHAR(1500), password VARCHAR(1500), publickey VARCHAR(255), playercolor VARCHAR(100), playersettings VARCHAR(10000), metadata VARCHAR(10000), xp INT, playerstats VARCHAR(10000));", function (err, result) {
             if (err) console.log(err);
             console.log("User data table initiated");
-            app.db.query("CREATE TABLE IF NOT EXISTS devinfo (title VARCHAR(255), image VARCHAR(1000), content VARCHAR(10000), submittedtime VARCHAR(255), timestamp VARCHAR(255), id VARCHAR(255))", function (err, result) {
+
+            app.db.query("CREATE TABLE IF NOT EXISTS devinfo (title VARCHAR(255), image VARCHAR(1000), content VARCHAR(10000), submittedtime VARCHAR(255), timestamp VARCHAR(255), id VARCHAR(255));", function (err, result) {
                 if (err) console.log(err);
                 console.log("Dev log data table initiated");
-                resolve("ok");
+
+                app.db.query("CREATE TABLE IF NOT EXISTS password_reset_tickets (publickey VARCHAR(255), tokenhash VARCHAR(255), VARCHAR(255));", function (err, result){
+                    console.log("Password reset tickets table initiated")
+
+                    resolve("ok");
+                })
             });
         });
     });
@@ -109,6 +115,133 @@ function checkUserConflicts(username, email) {
                 });
             }
         });
+    });
+}
+
+// Ensure that the given username matches the given email
+function verifyUsernameEmailMatch(username, email) {
+    email = String(email).toLowerCase();
+
+    return new Promise((resolve, reject) => {
+        app.db.query(
+            `SELECT email FROM users WHERE LOWER(username)=LOWER($1)`,
+            [username],
+            function (err, result) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                if (!result || result.rows.length === 0) {
+                    resolve("u3"); // username does not exist
+                    return;
+                }
+
+                if (String(result.rows[0].email).toLowerCase() !== email) {
+                    resolve("e3"); // email does not match username
+                    return;
+                }
+
+                resolve(""); // no issue
+            }
+        );
+    });
+}
+
+function getPublicKeyFromUsernameEmail(username, email) {
+    return new Promise((resolve, reject) => {
+        app.db.query(
+            `SELECT publickey
+             FROM users
+             WHERE LOWER(username)=LOWER($1)
+             AND LOWER(email)=LOWER($2)`,
+            [username, email],
+            function (err, result) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                if (!result || result.rows.length === 0) {
+                    resolve(null);
+                    return;
+                }
+
+                resolve(result.rows[0].publickey);
+            }
+        );
+    });
+}
+
+function getEmailUsername(email) {
+    email = String(email).toLowerCase();
+
+    return new Promise((resolve, reject) => {
+        app.db.query(
+            `SELECT username FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
+            [email],
+            function (err, result) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                if (result.rows.length === 0) {
+                    resolve(null); // No account with that email
+                    return;
+                }
+
+                resolve(result.rows[0].username); // Return the username
+            }
+        );
+    });
+}
+
+function resetPassword(token, newPassword) {
+    let newPasswordHash = "";
+
+    return new Promise((resolve, reject) => {
+        app.db.query(`SELECT * FROM users WHERE token=$1`, [token], function (err, result) {
+            if(result.rows.length > 0) {
+                newPasswordHash = passwordHash.generate(newPassword);
+            }
+        });
+
+        resolve(newPasswordHash);
+    });
+}
+
+function createPasswordResetToken(username, email) {
+    return new Promise((resolve, reject) => {
+        getPublicKeyFromUsernameEmail(username, email)
+            .then(function(pubKey) {
+                if (pubKey === null) {
+                    resolve(null);
+                    return;
+                }
+
+                const rawToken = crypto.randomBytes(32).toString("hex");
+                const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+                const expiresAt = String(Date.now() + (10 * 60 * 1000)); // 10 minutes from now
+
+                app.db.query(
+                    `INSERT INTO password_reset_tickets (publickey, tokenhash, timeexpires)
+                     VALUES ($1, $2, $3)`,
+                    [pubKey, tokenHash, expiresAt],
+                    function(err, result) {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+
+                        // Return the raw token so the caller can email it
+                        resolve(rawToken);
+                    }
+                );
+            })
+            .catch(function(err) {
+                reject(err);
+            });
     });
 }
 
@@ -372,6 +505,9 @@ module.exports = {
     fetchAnnouncements: fetchAnnouncements,
     registerUser: registerUser,
     checkUserConflicts: checkUserConflicts,
+    verifyUsernameEmailMatch: verifyUsernameEmailMatch,
+    getEmailUsername: getEmailUsername,
+    createPasswordResetToken: createPasswordResetToken,
     verifyUUID: verifyUUID,
     initDB: initDB,
     userLogin: userLogin,
@@ -382,5 +518,5 @@ module.exports = {
     editPlayerGameStats: editPlayerGameStats,
     runSQLQuery: runSQLQuery,
     changePlayerColor: changePlayerColor,
-    fetchLeaderboard, fetchLeaderboard
+    fetchLeaderboard: fetchLeaderboard
 };

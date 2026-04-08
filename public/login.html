@@ -54,7 +54,7 @@
                     // Has the user enter their username and email address to veryify who is resetting their password
                     passwordResetRequestWindow();
                 } else if (action === "usernameRequest") {
-                    // The user can request an email reminding them of their email address
+                    // The user can request an email reminding them of their username
                     usernameRequestWindow();
                 }
             });
@@ -109,6 +109,10 @@
                         </FORM>
                         <DIV CLASS="lg_register_text">Don't have an account?</DIV>
                         <BUTTON CLASS="lg_register pushdown jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
+                        <DIV>
+                            <A href="./login?action=usernameRequest" class="lg_resetlink">Forgot username?</A>
+                            <A href="./login?action=passwordResetRequest" class="lg_resetlink">Forgot password?</A>
+                        </DIV>
                         `
                     document.getElementById("mainarea").style.opacity = "1";
                 }, 500);
@@ -172,6 +176,10 @@
                 </FORM>
                 <DIV CLASS="lg_register_text">Don't have an account?</DIV>
                 <BUTTON CLASS="lg_register pushdown jb_gray" ID="i-registerbtn" ONCLICK="registerwindow()">Register</BUTTON>
+                <DIV>
+                    <A href="#" ONCLICK="usernameRequestWindow()" CLASS="lg_resetlink">Forgot username?</A>
+                    <A href="#" ONCLICK="passwordResetRequestWindow()" CLASS="lg_resetlink">Forgot password?</A>
+                </DIV>
             </DIV>
         </DIV>
     </BODY>

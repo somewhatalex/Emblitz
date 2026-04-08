@@ -254,15 +254,26 @@ function requestPasswordReset() {
 
     // TODO: Handle the way this system interacts with the server
     if (!errors) {
-        fetch("/auth2", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({action: "requestPasswordReset", email: document.getElementById("i-email").value, username: document.getElementById("i-username").value})}).then(response => {
-            response.json().then(function(text) {
-                //
+        fetch("/auth2", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+            action: "requestPasswordReset",
+            email: document.getElementById("i-email").value,
+            username: document.getElementById("i-username").value
             })
+        }).then(response => {
+            response.json().then(function(text) {
+                if (text.errors) {
+                    //
+                }
+            });
+        });
     }
 }
 
 function requestUsername() {
-    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+    for (let i = 0; i < document.getElementsByClassName("lb_form_error").length; i++) {
         document.getElementsByClassName("lb_form_error")[i].style.display = "none";
     }
 
@@ -271,7 +282,77 @@ function requestUsername() {
     // Client side error checks for email input box
     errors = clientCheckEmailErrors();
 
-    // TODO: Handle the way this system interacts with the server
+    if (!errors) {
+        document.getElementById("i-submit").value = "Please wait...";
+        document.getElementById("i-submit").style.cursor = "no-drop";
+        document.getElementById("i-submit").setAttribute("disabled", "disabled");
+        document.getElementById("backtologin").setAttribute("disabled", "disabled");
+        document.getElementById("backtologin").style.cursor = "no-drop";
+
+        fetch("/auth2", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                action: "requestUsername",
+                email: document.getElementById("i-email").value
+            })
+        }).then(response => {
+            response.json().then(function(text) {
+                if (text.errors) {
+                    document.getElementById("i-submit").removeAttribute("disabled");
+                    document.getElementById("backtologin").removeAttribute("disabled");
+                    document.getElementById("i-submit").style.cursor = "pointer";
+                    document.getElementById("backtologin").style.cursor = "pointer";
+                    document.getElementById("i-submit").value = "Request Username";
+
+                    for (let i = 0; i < document.getElementsByClassName("lb_form_error").length; i++) {
+                        document.getElementsByClassName("lb_form_error")[i].style.display = "none";
+                    }
+
+                    if (text.errors.includes("e1")) {
+                        document.getElementById("error-email").style.display = "inline";
+                        document.getElementById("error-email").innerText = "email is required";
+                    } else if (text.errors.includes("e2")) {
+                        document.getElementById("error-email").style.display = "inline";
+                        document.getElementById("error-email").innerText = "please enter a valid email";
+                    }
+                } else if (text.error == 429) {
+                    document.getElementById("i-submit").removeAttribute("disabled");
+                    document.getElementById("backtologin").removeAttribute("disabled");
+                    document.getElementById("i-submit").style.cursor = "pointer";
+                    document.getElementById("backtologin").style.cursor = "pointer";
+                    document.getElementById("i-submit").value = "Request Username";
+                    alert("You're trying too quickly. Please try again in 5 minutes.");
+                } else {
+                    // Generic success message to avoid revealing whether the email exists
+                    document.getElementById("mainarea").style.opacity = "0";
+                    setTimeout(function() {
+                        document.getElementById("mainarea").innerHTML = `
+                            <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                            <DIV CLASS="lg_resulttext">
+                                If an Emblitz account exists for that email address, a username reminder has been sent.
+                                Please check your inbox, spam, and promotions tabs.
+                            </DIV>
+                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register jb_green" ONCLICK="window.location='http://emblitz.com'">
+                                To Emblitz!
+                            </BUTTON>
+                        `;
+                        document.getElementById("mainarea").style.opacity = "1";
+                    }, 500);
+                }
+            });
+        }).catch(function(err) {
+            console.error(err);
+
+            document.getElementById("i-submit").removeAttribute("disabled");
+            document.getElementById("backtologin").removeAttribute("disabled");
+            document.getElementById("i-submit").style.cursor = "pointer";
+            document.getElementById("backtologin").style.cursor = "pointer";
+            document.getElementById("i-submit").value = "Request Username";
+
+            alert("Something went wrong. Please try again.");
+        });
+    }
 }
 
 function resendemail() {

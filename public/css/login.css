@@ -98,6 +98,19 @@
     margin-top: 5px;
 }
 
+.lg_resetlink {
+    display: block;
+    position: relative;
+    text-align: center;
+    justify-content: center;
+    margin: 10px;
+    margin-left: 94px;
+    margin-top: 20px;
+    color: var(--light);
+    font-size: 18px;
+    text-align: left;
+}
+
 .lg_headertext {
     max-width: 350px;
     width: calc(80% - 65px);
