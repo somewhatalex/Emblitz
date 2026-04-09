@@ -20,7 +20,7 @@ function initDB() {
                 if (err) console.log(err);
                 console.log("Dev log data table initiated");
 
-                app.db.query("CREATE TABLE IF NOT EXISTS password_reset_tickets (publickey VARCHAR(255), tokenhash VARCHAR(255), VARCHAR(255));", function (err, result){
+                app.db.query("CREATE TABLE IF NOT EXISTS password_reset_tickets (publickey VARCHAR(255) NOT NULL, tokenhash VARCHAR(127) NOT NULL UNIQUE, timeexpires BIGINT NOT NULL);", function (err, result){
                     console.log("Password reset tickets table initiated")
 
                     resolve("ok");
@@ -197,7 +197,7 @@ function getEmailUsername(email) {
     });
 }
 
-function resetPassword(token, newPassword) {
+/*function resetPassword(token, newPassword) {
     let newPasswordHash = "";
 
     return new Promise((resolve, reject) => {
@@ -209,40 +209,102 @@ function resetPassword(token, newPassword) {
 
         resolve(newPasswordHash);
     });
+}*/
+
+// Create the token itself for the reset token entry
+// Also avoids duplicate token hashes
+function createPasswordResetRawToken() {
+    return new Promise((resolve, reject) => {
+        const tryGenerate = function() {
+            const rawToken = crypto.randomBytes(32).toString("hex");
+            const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+            app.db.query(
+                `SELECT 1 FROM password_reset_tickets WHERE tokenhash=$1 LIMIT 1`,
+                [tokenHash],
+                function(err, result) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    if (result.rows.length === 0) {
+                        resolve(rawToken);
+                    } else {
+                        // Duplicates are extremely unlikely, but it is best to be 100% certain there are no duplicates
+                        tryGenerate();
+                    }
+                }
+            );
+        };
+
+        tryGenerate();
+    });
 }
 
-function createPasswordResetToken(username, email) {
-    return new Promise((resolve, reject) => {
-        getPublicKeyFromUsernameEmail(username, email)
-            .then(function(pubKey) {
-                if (pubKey === null) {
-                    resolve(null);
-                    return;
-                }
+async function createPasswordResetToken(username, email) {
+    email = String(email).toLowerCase();
 
-                const rawToken = crypto.randomBytes(32).toString("hex");
-                const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
-                const expiresAt = String(Date.now() + (10 * 60 * 1000)); // 10 minutes from now
+    const pubKey = await getPublicKeyFromUsernameEmail(username, email);
+    if (!pubKey) return null;
 
-                app.db.query(
-                    `INSERT INTO password_reset_tickets (publickey, tokenhash, timeexpires)
-                     VALUES ($1, $2, $3)`,
-                    [pubKey, tokenHash, expiresAt],
-                    function(err, result) {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
+    const rawToken = await createPasswordResetRawToken();
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const expiresAt = Date.now() + (10 * 60 * 1000);
 
-                        // Return the raw token so the caller can email it
-                        resolve(rawToken);
-                    }
-                );
-            })
-            .catch(function(err) {
-                reject(err);
-            });
-    });
+    // Add the password reset token to the database
+    await app.db.query(
+        `INSERT INTO password_reset_tickets (publickey, tokenhash, timeexpires)
+         VALUES ($1, $2, $3)`,
+        [pubKey, tokenHash, expiresAt]
+    );
+
+    return rawToken;
+}
+
+async function isPasswordResetTokenValid(rawToken) {
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    const result = await app.db.query(
+        `SELECT publickey
+         FROM password_reset_tickets
+         WHERE tokenhash=$1 AND timeexpires>$2
+         LIMIT 1`,
+        [tokenHash, Date.now()]
+    );
+
+    return result.rows.length > 0;
+}
+
+async function finishPasswordReset(rawToken, newPassword) {
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const newPasswordHash = passwordHash.generate(newPassword);
+    const newLoginToken = await createUUID();
+
+    const result = await app.db.query(
+        `
+        WITH consumed_ticket AS (
+            DELETE FROM password_reset_tickets
+            WHERE tokenhash = $1
+              AND timeexpires > $2
+            RETURNING publickey
+        ),
+        updated_user AS (
+            UPDATE users u
+            SET password = $3,
+                token = $4
+            FROM consumed_ticket ct
+            WHERE u.publickey = ct.publickey
+            RETURNING u.publickey
+        )
+        SELECT EXISTS (
+            SELECT 1 FROM updated_user
+        ) AS success;
+        `,
+        [tokenHash, Date.now(), newPasswordHash, newLoginToken]
+    );
+
+    return result.rows[0].success;
 }
 
 function createUUID() {
@@ -349,6 +411,19 @@ function deleteUnusedAccounts() {
         console.log(`Deleted unverified accounts`);
     }).catch(function(error) {
         console.log("Error deleting accounts: " + error);
+    });
+}
+
+function deleteExpiredTickets() {
+    let currenttime = Date.now();
+
+    app.db.query(
+        `DELETE FROM password_reset_tickets WHERE timeexpires<$1`,
+        [currenttime]
+    ).then(function(result) {
+        console.log(`Deleted expired tickets`);
+    }).catch(function(error) {
+        console.log("Error deleting tickets: " + error);
     });
 }
 
@@ -508,12 +583,15 @@ module.exports = {
     verifyUsernameEmailMatch: verifyUsernameEmailMatch,
     getEmailUsername: getEmailUsername,
     createPasswordResetToken: createPasswordResetToken,
+    isPasswordResetTokenValid: isPasswordResetTokenValid,
+    finishPasswordReset: finishPasswordReset,
     verifyUUID: verifyUUID,
     initDB: initDB,
     userLogin: userLogin,
     getUserInfoNoReject: getUserInfoNoReject,
     getPublicUserInfo: getPublicUserInfo,
     deleteUnusedAccounts: deleteUnusedAccounts,
+    deleteExpiredTickets: deleteExpiredTickets,
     awardBadge: awardBadge,
     editPlayerGameStats: editPlayerGameStats,
     runSQLQuery: runSQLQuery,

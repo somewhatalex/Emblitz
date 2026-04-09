@@ -110,6 +110,7 @@ pool.connect(function(err) {
         if(configs.accountManagement.forceEmailVerification) {
             setInterval(function() {
                 auth.deleteUnusedAccounts();
+                auth.deleteExpiredTickets();
             }, configs.accountManagement.deleteUnusedAccountsInterval);
         }
     });
@@ -453,6 +454,32 @@ app.get("/login", (req, res) => {
     }
 });
 
+app.get("/resetPassword", async function(req, res) {
+    const rawToken = String(req.query.token || "");
+
+    try {
+        const valid = await auth.isPasswordResetTokenValid(rawToken);
+
+        if (!valid) {
+            res.render("verify", {
+                result: `Oops... this password reset link is invalid or expired.
+                <A CLASS="lg_register pushdown jb_green" STYLE="display:block; margin:auto; margin-top:30px; text-decoration:none" HREF="./login?action=passwordResetRequest">Request another reset link</A>`
+            });
+            return;
+        }
+
+        res.render("resetPassword", {
+            resetToken: rawToken
+        });
+    } catch (err) {
+        console.error(err);
+        res.render("verify", {
+            result: `Oops... an error occurred.
+            <A CLASS="lg_register pushdown jb_green" STYLE="display:block; margin:auto; margin-top:30px; text-decoration:none" HREF="./login?action=passwordResetRequest">Try again</A>`
+        });
+    }
+});
+
 app.get("/tutorial", (req, res) => {
     res.render("tutorial")
 });
@@ -566,7 +593,7 @@ app.post("/verify", (req, res) => {
     res.json({"error": "please use GET"});
 });
 
-app.get("/resetPassword", (req, res) => {
+/*app.get("/resetPassword", (req, res) => {
     let gettoken = req.query.token;
     let outputresult = ``;
 
@@ -603,7 +630,7 @@ app.get("/resetPassword", (req, res) => {
             }
         });
     });
-});
+});*/
 
 // id = roomid
 function getroommap(id) {
@@ -615,7 +642,7 @@ function getroommap(id) {
     return false;
 }
 
-app.post("/auth2", (req, res) => {
+app.post("/auth2", async (req, res) => {
     if(req.body.action === "registeruser") {
         let errors = [];
         let emailformatted = req.body.email.match(
@@ -721,56 +748,100 @@ app.post("/auth2", (req, res) => {
             res.json({"error": "lookup_2"})
         }
     } else if (req.body.action === "requestPasswordReset") {
-        let errors = [];
-        let emailformatted = req.body.email.match(
+        const errors = [];
+        const email = String(req.body.email || "");
+        const username = String(req.body.username || "");
+        const emailformatted = email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         );
-        let usernameformatted = req.body.username.match(
-            /^[a-zA-Z0-9_]+$/
-        );
+        const usernameformatted = username.match(/^[a-zA-Z0-9_]+$/);
 
-        // Check for username validity
-        if(req.body.username.length < 2) {
-            errors.push("u1");
-        } else if(req.body.username.length > 12) {
-            errors.push("u2")
-        } else if(!usernameformatted) {
-            errors.push("u4");
-        }
+        if (!email) errors.push("e1");
+        else if (!emailformatted) errors.push("e2");
 
-        // Check for email validity
-        if(!req.body.email) {
-            errors.push("e1");
-        } else if(!emailformatted) {
-            errors.push("e2");
-        }
+        if (!username) errors.push("u1");
+        else if (username.length < 2 || username.length > 12 || !usernameformatted) errors.push("u4");
 
-        // Break if there are any errors
-        // Probably don't need this before also
-        // Wanted to prevent incorrectly formatted strings from going through to SQL query
-        if(errors.length > 0) {
-            res.json({"errors": errors});
+        if (errors.length > 0) {
+            res.json({ errors });
             return;
         }
 
-        // Verify username and email address match
-        auth.verifyUsernameEmailMatch(req.body.username, req.body.email).then(function(conflict) {
-            // Throw username errors
-            // Invalid emails are left ambiguous to prevent brute force guessing
-            if (conflict === "u3") {
-                errors.push(conflict);
-                res.json({"errors": errors});
-                return;
-            } else if (conflict.length > 0) {
-                res.json({"errors": errors});
-                return;
-            }
+        // Always respond ambiguously
+        res.json({ ok: true });
+
+        auth.createPasswordResetToken(username, email)
+        .then(token => {
+            if (!token) return;
+
+            const resetLink = `https://www.emblitz.com/resetPassword?token=${encodeURIComponent(token)}`;
+
+            const mail = {
+                from: "'Emblitz Team' <emblitz@emblitz.com>",
+                to: email,
+                subject: "Reset your Emblitz password",
+                html: `
+                <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                    <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; padding: 20px;">
+                        <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                        <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;">
+                            <DIV STYLE="display: block; margin-bottom: 5px;">Hello,</DIV>
+                            We received a request to reset your Emblitz password.
+                            <BR><BR>
+                            This link expires in 10 minutes:
+                            <A HREF="${resetLink}" TARGET="_blank"
+                            STYLE="display:block; margin-top:30px; margin-bottom:30px; border:none; border-radius:10px; font-size:18px; padding:10px; width:180px; text-align:center; text-decoration:none; color:#ffffff; background:#00b00f;">
+                            Reset Password
+                            </A>
+                            If you didn't request this, you can ignore this email.
+                            <BR><BR>
+                            Thanks,<BR>-The Emblitz Team
+                            <DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV>
+                        </DIV>
+                    </DIV>
+                </BODY>`
+            };
+
+            mailTransport.sendMail(mail);
+            dev_emails++;
+        })
+        .catch(err => {
+            console.error(err);
         });
 
-        // TODO: If valid, send password reset email
-        auth.createPasswordResetToken(req.body.username, req.body.email).then(function(pubKey) {
-            //
-        });
+        return;
+    } else if (req.body.action === "finishPasswordReset") {
+        const token = String(req.body.token || "");
+        const password = String(req.body.password || "");
+        const errors = [];
+
+        // Check for password validity
+        if (password.length < 1) {
+            errors.push("p1");
+        } else if (password.length < 8 || password.length > 30) {
+            errors.push("p2");
+        }
+
+        if (errors.length > 0) {
+            res.json({ errors });
+            return;
+        }
+
+        try {
+            const ok = await auth.finishPasswordReset(token, password);
+
+            if (!ok) {
+                res.json({ error: "invalid_or_expired" });
+                return;
+            }
+
+            res.json({ ok: true });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "server_1" });
+        }
+
+        return;
     } else if (req.body.action === "requestUsername") {
         let errors = [];
         let emailformatted = req.body.email.match(

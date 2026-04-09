@@ -1,4 +1,4 @@
-function checkPass(pass) {
+function checkPass(pass, confirmPass) {
     if(pass.length >=8 && pass.length <= 30) {
         document.getElementById("pswd_char").style.color = "rgb(59, 255, 108)";
         document.getElementById("pswd_char").innerHTML = `<I CLASS="fa fa-check"></I>`;
@@ -29,6 +29,14 @@ function checkPass(pass) {
     } else {
         document.getElementById("pswd_number").style.color = "rgb(255, 59, 59)";
         document.getElementById("pswd_number").innerHTML = `<I CLASS="fa fa-times"></I>`;
+    }
+
+    if (pass == confirmPass) {
+        document.getElementById("pswd_match").style.color = "rgb(59, 255, 108)";
+        document.getElementById("pswd_match").innerHTML = `<I CLASS="fa fa-check"></I>`;
+    } else {
+        document.getElementById("pswd_match").style.color = "rgb(255, 59, 59)";
+        document.getElementById("pswd_match").innerHTML = `<I CLASS="fa fa-times"></I>`;
     }
 }
 
@@ -265,7 +273,54 @@ function requestPasswordReset() {
         }).then(response => {
             response.json().then(function(text) {
                 if (text.errors) {
-                    //
+                    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+                        document.getElementsByClassName("lb_form_error")[i].style.display = "none";
+                    }
+
+                    // Check if the server sent any error messages
+                    if(text.errors.includes("u5")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "don't use profanity in your username";
+                        errors = true;
+                    }
+
+                    if(text.errors.includes("u4")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "only letters, numbers, and underscores allowed";
+                        errors = true;
+                    }
+
+                    if(text.errors.includes("u1")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "must be at least 2 characters long";
+                        errors = true;
+                    } else if(text.errors.includes("u2")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "must be less than 12 characters long";
+                        errors = true;
+                    }
+
+                    if(text.errors.includes("u3")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "another user already has this username";
+                        errors = true;
+                    }
+
+                    if(text.errors.includes("e1")) {
+                        document.getElementById("error-email").style.display = "inline";
+                        document.getElementById("error-email").innerText = "email is required";
+                        errors = true;
+                    } else if(text.errors.includes("e2")) {
+                        document.getElementById("error-username").style.display = "inline";
+                        document.getElementById("error-username").innerText = "please enter a valid email";
+                        errors = true;
+                    }
+
+                    if(text.errors.includes("e3")) {
+                        document.getElementById("error-email").style.display = "inline";
+                        document.getElementById("error-email").innerText = "this email is already taken";
+                        errors = true;
+                    }
                 }
             });
         });
@@ -464,3 +519,12 @@ function login() {
         document.getElementById("i-loginbtn").value = "Login";
     }
 }
+
+setInterval(() => {
+    let passwordField = document.getElementById('i-password');
+    let passwordConfirmField = document.getElementById('i-password-confirm');
+
+    if (passwordField != null && passwordConfirmField != null) {
+        checkPass(passwordField.value, passwordConfirmField.value);
+    }
+}, 200);

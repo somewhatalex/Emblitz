@@ -71,16 +71,17 @@
                             <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username <SPAN CLASS="lb_form_error" ID="error-username"></SPAN></DIV>
                             <INPUT CLASS="lg_input" ID="i-username" NAME="username" TYPE="name" MAXLENGTH="12" PLACEHOLDER="Username...">
                             <DIV CLASS="lg_container_title"><I CLASS="fa fa-lock"></I> Password <SPAN CLASS="lb_form_error" ID="error-password"></SPAN></DIV>
-                            <INPUT CLASS="lg_input" ID="i-password" NAME="password" TYPE="password" PLACEHOLDER="Password..." MAXLENGTH="30" ONKEYUP="checkPass(this.value)">
+                            <INPUT CLASS="lg_input" ID="i-password" NAME="password" TYPE="password" PLACEHOLDER="Password..." MAXLENGTH="30" ONKEYUP="checkPass(this.value, document.getElementById('i-password-confirm').value)">
                             <DIV CLASS="lb_password_check">
                                 Password must contain:
                                 <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_char"><I CLASS="fa fa-times"></I></SPAN> 8-30 characters</DIV>
                                 <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_upper"><I CLASS="fa fa-times"></I></SPAN> at least 1 uppercase letter</DIV>
                                 <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_lower"><I CLASS="fa fa-times"></I></SPAN> at least 1 lowercase letter</DIV>
                                 <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_number"><I CLASS="fa fa-times"></I></SPAN> at least 1 number</DIV>
+                                <DIV CLASS="lbpc_row"><SPAN CLASS="pswd_check" ID="pswd_match"><I CLASS="fa fa-times"></I></SPAN> confirmation password matches</DIV>
                             </DIV>
                             <DIV CLASS="lg_container_title"><I CLASS="fa fa-check"></I> Confirm Password <SPAN CLASS="lb_form_error" ID="error-passwordconfirm"></SPAN></DIV>
-                            <INPUT CLASS="lg_input" ID="i-password-confirm" NAME="password" TYPE="password" PLACEHOLDER="Retype password here..." MAXLENGTH="30">
+                            <INPUT CLASS="lg_input" ID="i-password-confirm" NAME="password" TYPE="password" PLACEHOLDER="Retype password here..." MAXLENGTH="30" ONKEYUP="checkPass(this.value, document.getElementById('i-password').value)">
                             <DIV CLASS="lg_divider"></DIV>
                             <INPUT CLASS="lg_submit pushdown jb_green" ID="i-submit" TYPE="Submit" ONCLICK="submitRegister()" VALUE="Register">
                         </FORM>
@@ -119,6 +120,27 @@
             }
 
             function passwordResetRequestWindow() {
+                document.getElementById("mainarea").style.opacity = "0";
+                setTimeout(function() {
+                    document.getElementById("mainarea").innerHTML = `
+                        <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                        <FORM CLASS="lg_container" ID="form-register" ONSUBMIT="return false" METHOD="POST">
+                            <DIV CLASS="lg_headertext"><B>Reset your password</B> by entering your username and email address linked to your account. Then follow the instructions provided via email to reset your Emblitz account password.</DIV>
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-envelope"></I> Email <SPAN CLASS="lb_form_error" ID="error-email"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-email" NAME="email" MAXLENGTH="1500" TYPE="email" PLACEHOLDER="Email...">
+                            <DIV CLASS="lg_container_title"><I CLASS="fa fa-user"></I> Username <SPAN CLASS="lb_form_error" ID="error-username"></SPAN></DIV>
+                            <INPUT CLASS="lg_input" ID="i-username" NAME="username" TYPE="name" MAXLENGTH="12" PLACEHOLDER="Username...">
+                            <DIV CLASS="lg_divider"></DIV>
+                            <INPUT CLASS="lg_submit pushdown jb_green" ID="i-submit" TYPE="Submit" ONCLICK="requestPasswordReset()" VALUE="Request Password Reset">
+                        </FORM>
+                        <DIV CLASS="lg_register_text">Remember your password?</DIV>
+                        <BUTTON CLASS="lg_register pushdown jb_gray" ID="backtologin" ONCLICK="loginwindow()">Login</BUTTON>
+                        `
+                    document.getElementById("mainarea").style.opacity = "1";
+                }, 500);
+            }
+
+            function passwordResetWindow() {
                 document.getElementById("mainarea").style.opacity = "0";
                 setTimeout(function() {
                     document.getElementById("mainarea").innerHTML = `
