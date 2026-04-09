@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<HTML LANG="en">
-    <HEAD>
+<html lang="en">
+    <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <LINK REL="stylesheet" HREF="./css/style.css">
-        <LINK REL="stylesheet" HREF="./css/leaderboard.css">
+        <link rel="stylesheet" href="./css/style.css">
+        <link rel="stylesheet" href="./css/leaderboard.css">
         <link rel="canonical" href="https://www.emblitz.com">
 
         <meta name="title" content="Emblitz | Multiplayer Strategy Game">
@@ -33,101 +33,101 @@
         <link rel="icon" href="./images/icon.png">
 
         <!-- configs | put in front of js files -->
-        <SCRIPT>
+        <script>
             const hostname = "<%= host_name %>";
             const prod = "<%= prod %>";
             const timeoutDuration = <%= timeoutDuration %>;
-        </SCRIPT>
+        </script>
 
-        <SCRIPT TYPE="text/javascript" SRC="./js/index.js"></SCRIPT>
-        <SCRIPT TYPE="text/javascript" SRC="./js/tutorialslide.js"></SCRIPT>
-        <SCRIPT TYPE="text/javascript" SRC="./js/mapdefs.js"></SCRIPT>
-        <SCRIPT TYPE="text/javascript" SRC="../js/xpLevelCalc.js"></SCRIPT>
-        <SCRIPT TYPE="text/javascript" SRC="../js/loadingScreen.js"></SCRIPT>
-        <SCRIPT TYPE="text/javascript" SRC="../js/powerups.js"></SCRIPT>
-        <SCRIPT TYPE="text/javascript" SRC="../js/audiomanager.js"></SCRIPT>
+        <script type="text/javascript" src="./js/index.js"></script>
+        <script type="text/javascript" src="./js/tutorialslide.js"></script>
+        <script type="text/javascript" src="./js/mapdefs.js"></script>
+        <script type="text/javascript" src="../js/xpLevelCalc.js"></script>
+        <script type="text/javascript" src="../js/loadingScreen.js"></script>
+        <script type="text/javascript" src="../js/powerups.js"></script>
+        <script type="text/javascript" src="../js/audiomanager.js"></script>
 
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2859288291436441"
         onerror="detectAdBlock()"></script>
 
-        <TITLE>Emblitz | Multiplayer Strategy Game</TITLE>
-    </HEAD>
-    <BODY>
-        <DIV ID="notifications">
+        <title>Emblitz | Multiplayer Strategy Game</title>
+    </head>
+    <body>
+        <div id="notifications">
             <!-- notifications display here -->
-        </DIV>
+        </div>
 
-        <DIV CLASS="loadingscreen" ID="loadingscreen">
-        </DIV>
+        <div class="loadingscreen" id="loadingscreen">
+        </div>
 
-        <DIV CLASS="lobbyscreen" ID="lobbyscreen">
-            <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
-            <DIV CLASS="tutorial-tooltip" ID="t-tooltip">Hello! Would you like a quick tutorial of the game? You can also access it through the "game tutorial" button on this page.<A HREF="./tutorial" ONCLICK="hidetutorialtt()" STYLE="font-size: 20px" TARGET="_blank" CLASS="tooltip-link">Sure!</A><BUTTON ONCLICK="hidetutorialtt();" CLASS="tooltip-link-second">No thanks</BUTTON></DIV>
+        <div class="lobbyscreen" id="lobbyscreen">
+            <div class="homebackgroundcontainer"><div class="homebackground"></div></div>
+            <div class="tutorial-tooltip" id="t-tooltip">Hello! Would you like a quick tutorial of the game? You can also access it through the "game tutorial" button on this page.<a href="./tutorial" onclick="hidetutorialtt()" style="font-size: 20px" target="_blank" class="tooltip-link">Sure!</a><button onclick="hidetutorialtt();" class="tooltip-link-second">No thanks</button></div>
 
-            <DIV CLASS="socials">
-                <DIV CLASS="socials-bg"></DIV>
-                <DIV CLASS="socials-discord">
-                    <DIV CLASS="socials-header">Join our Discord!</DIV>
-                    <A HREF="https://discord.gg/SVcahqGxQD" TARGET="_blank" REL="nofollow"><IMG SRC="./images/discord.png" CLASS="socials-icon"></A>
-                </DIV>
-                <DIV CLASS="socials-instagram">
-                    <DIV CLASS="socials-header">Game news on Instagram</DIV>
-                    <A HREF="https://www.instagram.com/alex.z.404" TARGET="_blank" REL="nofollow"><IMG SRC="./images/instagram.png" CLASS="socials-icon"></A>
-                </DIV>
-            </DIV>
-            <DIV CLASS="homeguicontainer">
-                <DIV CLASS="homemenu">
-                    <DIV CLASS="homemenu-bg"></DIV>
-                    <DIV CLASS="homelogo"><IMG CLASS="mainlogoimg" SRC="./images/logo.png"></DIV>
-                    <DIV CLASS="join_input" ID="join_input">
+            <div class="socials">
+                <div class="socials-bg"></div>
+                <div class="socials-discord">
+                    <div class="socials-header">Join our Discord!</div>
+                    <a href="https://discord.gg/SVcahqGxQD" target="_blank" rel="nofollow"><img src="./images/discord.png" class="socials-icon"></a>
+                </div>
+                <div class="socials-instagram">
+                    <div class="socials-header">Game news on Instagram</div>
+                    <a href="https://www.instagram.com/alex.z.404" target="_blank" rel="nofollow"><img src="./images/instagram.png" class="socials-icon"></a>
+                </div>
+            </div>
+            <div class="homeguicontainer">
+                <div class="homemenu">
+                    <div class="homemenu-bg"></div>
+                    <div class="homelogo"><img class="mainlogoimg" src="./images/logo.png"></div>
+                    <div class="join_input" id="join_input">
                         <%- profile_output %>
-                        <DIV CLASS="mapselect">
-                            <DIV CLASS="mapselecttitle">Current map selection:</DIV>
-                            <TABLE CLASS="mapnav">
-                                <TBODY>
-                                    <TR>
-                                        <TD>
-                                            <BUTTON CLASS="mapnavbutton" ID="mapleft" ONCLICK="changeMapSelect('left')"><I CLASS="fa fa-chevron-left"></I></BUTTON>
-                                        </TD>
-                                        <TD>
+                        <div class="mapselect">
+                            <div class="mapselecttitle">Current map selection:</div>
+                            <table class="mapnav">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <button class="mapnavbutton" id="mapleft" onclick="changeMapSelect('left')"><i class="fa fa-chevron-left"></i></button>
+                                        </td>
+                                        <td>
                                             <!-- map selection card -->
-                                            <DIV CLASS="selectedmapcontainer">
-                                                <TABLE CLASS="selectedmap">
-                                                    <TBODY>
-                                                        <TR>
-                                                            <TD>
-                                                                <DIV CLASS="s-image"><IMG ID="s-image" SRC="./images/randompreview.JPG"></DIV>
-                                                            </TD>
-                                                            <TD>
-                                                                <DIV CLASS="s-text">
-                                                                    <DIV CLASS="s-title" ID="s-title">Random Map</DIV>
-                                                                    <DIV ID="s-maxplayers" STYLE="font-size: 13px; display: none"></DIV>
-                                                                    <DIV CLASS="s-description" ID="s-description">You'll join a game with a random map. It could be anything, so be prepared!</DIV>
-                                                                </DIV>
-                                                            </TD>
-                                                        </TR>
-                                                    </TBODY>
-                                                </TABLE>
-                                            </DIV>
-                                        </TD>
-                                        <TD>
-                                            <BUTTON CLASS="mapnavbutton" ID="mapright" ONCLICK="changeMapSelect('right')"><I CLASS="fa fa-chevron-right"></I></BUTTON>
-                                        </TD>
-                                    </TR>
-                                </TBODY>
-                            </TABLE>
-                        </DIV>
-                        <DIV CLASS="h_button_options">
-                            <BUTTON CLASS="joinbutton pushdown jb_green" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, false)">Play</BUTTON>
-                            <BUTTON CLASS="joinbutton pushdown jb_gray" ID="joinprivate" ONCLICK="showJoinRoom()">Join Game</BUTTON>
-                            <DIV CLASS="joinroom_area" ID="joinroom_area" STYLE="display: none;">
-                                <DIV CLASS="joinroomtext">Got an invite code? Enter it here to join the game. If not, use the "Play" button to play a random match.</DIV>
-                                <INPUT CLASS="room_input" ID="room_id" MAXLENGTH="6" PLACEHOLDER="123abc"><BUTTON CLASS="joinbutton pushdown jb_green" ID="joingame" style="padding: 7px !important; margin-left: 5px" ONCLICK="gameConnect('r-' + document.getElementById('room_id').value.toLowerCase(), null, false)">Connect</BUTTON>
-                            </DIV>
-                            <BR><BR>
-                            <BUTTON CLASS="joinbutton pushdown jb_gray joinprivateroom" ID="joingame" ONCLICK="gameConnect(null, mapselectedvalue, true)" STYLE="width: 250px;">Create Private Room</BUTTON>
-                            <BR>
-                        </DIV>
+                                            <div class="selectedmapcontainer">
+                                                <table class="selectedmap">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="s-image"><img id="s-image" src="./images/randompreview.JPG"></div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="s-text">
+                                                                    <div class="s-title" id="s-title">Random Map</div>
+                                                                    <div id="s-maxplayers" style="font-size: 13px; display: none"></div>
+                                                                    <div class="s-description" id="s-description">You'll join a game with a random map. It could be anything, so be prepared!</div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="mapnavbutton" id="mapright" onclick="changeMapSelect('right')"><i class="fa fa-chevron-right"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="h_button_options">
+                            <button class="joinbutton pushdown jb_green" id="joingame" onclick="gameConnect(null, mapselectedvalue, false)">Play</button>
+                            <button class="joinbutton pushdown jb_gray" id="joinprivate" onclick="showJoinRoom()">Join Game</button>
+                            <div class="joinroom_area" id="joinroom_area" style="display: none;">
+                                <div class="joinroomtext">Got an invite code? Enter it here to join the game. If not, use the "Play" button to play a random match.</div>
+                                <input class="room_input" id="room_id" maxlength="6" placeholder="123abc"><button class="joinbutton pushdown jb_green" id="joingame" style="padding: 7px !important; margin-left: 5px" onclick="gameConnect('r-' + document.getElementById('room_id').value.toLowerCase(), null, false)">Connect</button>
+                            </div>
+                            <br><br>
+                            <button class="joinbutton pushdown jb_gray joinprivateroom" id="joingame" onclick="gameConnect(null, mapselectedvalue, true)" style="width: 250px;">Create Private Room</button>
+                            <br>
+                        </div>
 
                         <style>
                             @media (max-width: 550px) {
@@ -143,196 +143,196 @@
                         <%- adslot_1 %>
 
                         <!-- leaderboard -->
-                        <DIV CLASS="lb-divider"></DIV>
+                        <div class="lb-divider"></div>
                         
-                        <H3 CLASS="lb-header">Global Leaderboard</H3>
-                        <DIV CLASS="lb-scroll-container">
-                            <DIV CLASS="lb-tcontainer">
-                                <TABLE CLASS="lb-table">
-                                    <THEAD>
-                                        <TR>
-                                            <TH>#</TH>
-                                            <TH>Username</TH>
-                                            <TH>Medals</TH>
-                                            <TH>Wins</TH>
-                                            <TH>Win Rate</TH>
-                                        </TR>
-                                    </THEAD>
-                                    <TBODY ID="lb-tablebody">
+                        <h3 class="lb-header">Global Leaderboard</h3>
+                        <div class="lb-scroll-container">
+                            <div class="lb-tcontainer">
+                                <table class="lb-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Username</th>
+                                            <th>Medals</th>
+                                            <th>Wins</th>
+                                            <th>Win Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lb-tablebody">
                                         <!-- fill leaderboard with loadLeaderboard() -->
-                                    </TBODY>
-                                </TABLE>
-                            </DIV>
-                        </DIV>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
-                        <DIV CLASS="lb-footnote">Want to join the global leaderboard? <A HREF="./login?action=register" TARGET="_blank">Make an account</A> if you haven't already and start battling to earn medals!</DIV>
+                        <div class="lb-footnote">Want to join the global leaderboard? <a href="./login?action=register" target="_blank">Make an account</a> if you haven't already and start battling to earn medals!</div>
 
                         <%- adslot_2 %>
 
-                        <DIV CLASS="lb-divider"></DIV>
+                        <div class="lb-divider"></div>
 
-                        <A HREF="./tutorial" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Game Tutorial</A> | <A HREF="./privacy" TARGET="_blank" CLASS="ltp-link" STYLE="font-size: 20px">Privacy Policy</A><BR><BR>
+                        <a href="./tutorial" target="_blank" class="ltp-link" style="font-size: 20px">Game Tutorial</a> | <a href="./privacy" target="_blank" class="ltp-link" style="font-size: 20px">Privacy Policy</a><br><br>
                         <!-- discord -->
-                        <DIV CLASS="mobile-socials">
-                            <DIV CLASS="socials-header">Join our Discord!</DIV>
-                            <A HREF="https://discord.gg/SVcahqGxQD" TARGET="_blank" REL="nofollow"><IMG SRC="./images/discord.png" CLASS="socials-icon"></A><BR><BR>
-                        </DIV>
+                        <div class="mobile-socials">
+                            <div class="socials-header">Join our Discord!</div>
+                            <a href="https://discord.gg/SVcahqGxQD" target="_blank" rel="nofollow"><img src="./images/discord.png" class="socials-icon"></a><br><br>
+                        </div>
                         <!-- instagram -->
-                        <DIV CLASS="mobile-socials">
-                            <DIV CLASS="socials-header">Game news on Instagram</DIV>
-                            <A HREF="https://www.instagram.com/alex.z.404" TARGET="_blank" REL="nofollow"><IMG SRC="./images/instagram.png" CLASS="socials-icon"></A><BR><BR>
-                        </DIV>
-                    </DIV>
-                </DIV>
-                <DIV CLASS="gamenews" ID="gamenews-container">
-                    <DIV CLASS="gamenews-bg"></DIV>
-                    <DIV CLASS="gn-header"><I CLASS="fa fa-newspaper-o"></I> Latest Game News <BUTTON ID="gn-exit" ONCLICK="hidegamenews()"><I CLASS="fa fa-close"></I></BUTTON></DIV>
-                    <DIV CLASS="gn-body" ID="gn-body">Loading...
-                    </DIV>
-                </DIV>
-            </DIV>
-            <BUTTON ID="shownewsbutton" ONCLICK='document.getElementById("gamenews-container").style.setProperty("display", "inline-block", "important"); this.style.setProperty("display", "none", "important"); document.getElementsByClassName("homeguicontainer")[0].style.setProperty("position", "fixed");' CLASS="shownewsbutton jb_gray"><I CLASS="fa fa-newspaper-o"></I> Latest News</BUTTON>
-            <DIV CLASS="gameversion">
-                <DIV>&copy Emblitz</DIV>
+                        <div class="mobile-socials">
+                            <div class="socials-header">Game news on Instagram</div>
+                            <a href="https://www.instagram.com/alex.z.404" target="_blank" rel="nofollow"><img src="./images/instagram.png" class="socials-icon"></a><br><br>
+                        </div>
+                    </div>
+                </div>
+                <div class="gamenews" id="gamenews-container">
+                    <div class="gamenews-bg"></div>
+                    <div class="gn-header"><i class="fa fa-newspaper-o"></i> Latest Game News <button id="gn-exit" onclick="hidegamenews()"><i class="fa fa-close"></i></button></div>
+                    <div class="gn-body" id="gn-body">Loading...
+                    </div>
+                </div>
+            </div>
+            <button id="shownewsbutton" onclick='document.getElementById("gamenews-container").style.setProperty("display", "inline-block", "important"); this.style.setProperty("display", "none", "important"); document.getElementsByClassName("homeguicontainer")[0].style.setProperty("position", "fixed");' class="shownewsbutton jb_gray"><i class="fa fa-newspaper-o"></i> Latest News</button>
+            <div class="gameversion">
+                <div>&copy Emblitz</div>
                 <%= gameversion %>
-            </DIV>
-            <DIV CLASS="gn-reader">
-                <DIV CLASS="gn-reader-bg"></DIV>
-                <DIV CLASS="gn-reader-area">
-                    <BUTTON CLASS="gn-reader-exit" ONCLICK="hidenewsreader()"><I CLASS="fa fa-close"></I></BUTTON>
-                    <DIV CLASS="gn-inner">
-                        <DIV ID="gn-title">loading...</DIV>
-                        <DIV ID="gn-date">loading...</DIV>
-                        <DIV ID="gn-content">loading...</DIV>
-                    </DIV>
-                </DIV>
-            </DIV>
-        </DIV>
-        <DIV CLASS="gamelobby" ID="gamelobby">
-            <DIV CLASS="globby_container">
-                <DIV ID="mapname" CLASS="lobby_mapname">---</DIV>
-                <DIV CLASS="lobbyptable" ID="lobbyptable">
+            </div>
+            <div class="gn-reader">
+                <div class="gn-reader-bg"></div>
+                <div class="gn-reader-area">
+                    <button class="gn-reader-exit" onclick="hidenewsreader()"><i class="fa fa-close"></i></button>
+                    <div class="gn-inner">
+                        <div id="gn-title">loading...</div>
+                        <div id="gn-date">loading...</div>
+                        <div id="gn-content">loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="gamelobby" id="gamelobby">
+            <div class="globby_container">
+                <div id="mapname" class="lobby_mapname">---</div>
+                <div class="lobbyptable" id="lobbyptable">
 
-                </DIV>
-                <DIV CLASS="invitecode">Room join code: <SPAN ID="invitecode">-----</SPAN></DIV>
-                <DIV CLASS="timercode">Auto starts in: <SPAN ID="timeramount">-----</SPAN> seconds</DIV>
-                <DIV CLASS="privateroomdisplay" ID="proomdisplay" STYLE="display: none"><I CLASS="fa fa-lock"></I> This room is a private room. Users can only join using the room join code.</DIV>
-                <BUTTON ID="startvote" CLASS="joinbutton pushdown jb_green" STYLE="margin-top: 10px;">Ready</BUTTON>
-                <BUTTON ONCLICK="exitLobby()" CLASS="joinbutton pushdown jb_gray" STYLE="margin-top: 10px; padding-left: 5px; padding-right: 5px">Back to Main Menu</BUTTON>
-            </DIV>
+                </div>
+                <div class="invitecode">Room join code: <span id="invitecode">-----</span></div>
+                <div class="timercode">Auto starts in: <span id="timeramount">-----</span> seconds</div>
+                <div class="privateroomdisplay" id="proomdisplay" style="display: none"><i class="fa fa-lock"></i> This room is a private room. Users can only join using the room join code.</div>
+                <button id="startvote" class="joinbutton pushdown jb_green" style="margin-top: 10px;">Ready</button>
+                <button onclick="exitLobby()" class="joinbutton pushdown jb_gray" style="margin-top: 10px; padding-left: 5px; padding-right: 5px">Back to Main Menu</button>
+            </div>
 
             <%- adslot_3 %>
-        </DIV>
-        <DIV CLASS="gamescreen" ID="gamescreen">
-            <DIV ID="player_gui">
-                <DIV CLASS="leaderboard">
-                    <DIV CLASS="lb_table" ID="leaderboard">
-                        <DIV CLASS="leaderboard_bg"></DIV> <!-- transparent background to bypass goofy ahh transparency css -->
-                        <DIV CLASS="lb_header">Players</DIV>
-                        <DIV ID="players_container">
+        </div>
+        <div class="gamescreen" id="gamescreen">
+            <div id="player_gui">
+                <div class="leaderboard">
+                    <div class="lb_table" id="leaderboard">
+                        <div class="leaderboard_bg"></div> <!-- transparent background to bypass goofy ahh transparency css -->
+                        <div class="lb_header">Players</div>
+                        <div id="players_container">
                             <!-- player leaderboard goes here -->
-                        </DIV>                       
-                    </DIV>
-                </DIV>
-                <DIV CLASS="troopscontrol">
-                    <DIV CLASS="troopscontrolbg"></DIV>
-                    <DIV CLASS="t_avatar-frame" ID="t-avatar-frame"></DIV>
-                    <DIV CLASS="tc-control-info" STYLE="margin-top: -80px; margin-left: 60px;">
-                        <INPUT TYPE="range" MIN="1" MAX="100" VALUE="75" CLASS="troopslider" ID="troopslider">
-                        <BR>
-                        <DIV CLASS="controlitem" ID="trooppercentage">75%</DIV><DIV CLASS="controlitem" ID="sendamount">--</DIV>
-                    </DIV>
-                </DIV>
-                <DIV CLASS="infobar-main" ID="infobar">
-                    <DIV CLASS="infobar-bg"></DIV>
-                    <DIV CLASS="ibmain-text" ID="statustext"><B>Deploy Phase:</B> Select a starting point</DIV>
-                    <DIV CLASS="timer-bg"><DIV CLASS="timer-line" ID="eventstimer"></DIV></DIV>
-                </DIV>
-                <DIV CLASS="troopcounterinfo">
-                    <DIV CLASS="troopcounter-bg"></DIV>
-                    <DIV CLASS="troopcounter"><IMG CLASS="troopcounterimage" SRC="./images/troopgaincounter.png"><DIV CLASS="troopcountertext"><SPAN ID="troopseconds">10</SPAN> seconds</DIV></DIV>
-                    <DIV CLASS="timer-bg"><DIV CLASS="timer-line" ID="troopstimer"></DIV></DIV>
-                </DIV>
-                <DIV CLASS="statsbar">
-                    <DIV CLASS="statsbar-bg" ID="statsbar-bg"></DIV>
-                    <DIV CLASS="statsbar-inner">
-                        <DIV CLASS="s-title">Your Stats</DIV>
-                        <DIV CLASS="s-troops"><I CLASS="fa fa-male"></I> <SPAN ID="s-troops">0</SPAN> Troops</DIV>
-                        <DIV CLASS="s-territories"><I CLASS="fa fa-map-marker"></I> <SPAN ID="s-territories">0</SPAN>/<SPAN ID="s-totalterritories">0</SPAN> Territories</DIV>
-                        <DIV CLASS="s-territories-label">Territories captured:</DIV>
-                        <DIV CLASS="s-territories-bar" ID="s-tb-container">
-                            <DIV ID="territoryprogress" CLASS="s-territories-bar-inner"></DIV>
-                        </DIV>
-                    </DIV>
-                </DIV>
-                <DIV CLASS="leavegame">
-                    <BUTTON CLASS="leavegamebutton" ID="leavegamebutton" ONCLICK="toggleqcvisibility()"><I CLASS="fa fa-caret-square-o-left"></I></BUTTON>
-                    <DIV CLASS="quitconfirm" ID="quitconfirm" STYLE="display: none;">
-                        <DIV CLASS="quitconfirm-bg"></DIV>
-                        <DIV CLASS="qc-inner">
-                            <DIV CLASS="qc-title">Leave Game?</DIV>
-                            <DIV CLASS="qc-message">Are you sure you want to leave the game? You cannot rejoin and will be defeated!</DIV>
-                            <BUTTON CLASS="qc-button end-gray" STYLE="margin-right: 8px;" ONCLICK="leavegame()">Yes</BUTTON><BUTTON CLASS="qc-button end-red" ONCLICK='document.getElementById("quitconfirm").style.display = "none"'>Cancel</BUTTON>
-                        </DIV>
-                    </DIV>
-                </DIV>
-                <DIV CLASS="togglelb" ID="togglelb" ONCLICK="togglelb()">
-                    <DIV CLASS="togglelb-bg"></DIV>
-                    <DIV ID="togglelb-inner"><I CLASS="fa fa-angle-double-left"></I></DIV>
-                </DIV>
-                <DIV CLASS="spectatingbar" ID="spectatingbar">
-                    <DIV CLASS="spectatingbar-bg"></DIV>
-                    <DIV CLASS="spec-inner">
-                        <DIV CLASS="spec-title"><I CLASS="fa fa-eye"></I> Spectating game</DIV>
-                        <BUTTON CLASS="qc-button end-red spec-leave" ONCLICK="leavegame()">Exit</BUTTON>
-                    </DIV>
-                </DIV>
+                        </div>                       
+                    </div>
+                </div>
+                <div class="troopscontrol">
+                    <div class="troopscontrolbg"></div>
+                    <div class="t_avatar-frame" id="t-avatar-frame"></div>
+                    <div class="tc-control-info" style="margin-top: -80px; margin-left: 60px;">
+                        <input type="range" min="1" max="100" value="75" class="troopslider" id="troopslider">
+                        <br>
+                        <div class="controlitem" id="trooppercentage">75%</div><div class="controlitem" id="sendamount">--</div>
+                    </div>
+                </div>
+                <div class="infobar-main" id="infobar">
+                    <div class="infobar-bg"></div>
+                    <div class="ibmain-text" id="statustext"><b>Deploy Phase:</b> Select a starting point</div>
+                    <div class="timer-bg"><div class="timer-line" id="eventstimer"></div></div>
+                </div>
+                <div class="troopcounterinfo">
+                    <div class="troopcounter-bg"></div>
+                    <div class="troopcounter"><img class="troopcounterimage" src="./images/troopgaincounter.png"><div class="troopcountertext"><span id="troopseconds">10</span> seconds</div></div>
+                    <div class="timer-bg"><div class="timer-line" id="troopstimer"></div></div>
+                </div>
+                <div class="statsbar">
+                    <div class="statsbar-bg" id="statsbar-bg"></div>
+                    <div class="statsbar-inner">
+                        <div class="s-title">Your Stats</div>
+                        <div class="s-troops"><i class="fa fa-male"></i> <span id="s-troops">0</span> Troops</div>
+                        <div class="s-territories"><i class="fa fa-map-marker"></i> <span id="s-territories">0</span>/<span id="s-totalterritories">0</span> Territories</div>
+                        <div class="s-territories-label">Territories captured:</div>
+                        <div class="s-territories-bar" id="s-tb-container">
+                            <div id="territoryprogress" class="s-territories-bar-inner"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="leavegame">
+                    <button class="leavegamebutton" id="leavegamebutton" onclick="toggleqcvisibility()"><i class="fa fa-caret-square-o-left"></i></button>
+                    <div class="quitconfirm" id="quitconfirm" style="display: none;">
+                        <div class="quitconfirm-bg"></div>
+                        <div class="qc-inner">
+                            <div class="qc-title">Leave Game?</div>
+                            <div class="qc-message">Are you sure you want to leave the game? You cannot rejoin and will be defeated!</div>
+                            <button class="qc-button end-gray" style="margin-right: 8px;" onclick="leavegame()">Yes</button><button class="qc-button end-red" onclick='document.getElementById("quitconfirm").style.display = "none"'>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="togglelb" id="togglelb" onclick="togglelb()">
+                    <div class="togglelb-bg"></div>
+                    <div id="togglelb-inner"><i class="fa fa-angle-double-left"></i></div>
+                </div>
+                <div class="spectatingbar" id="spectatingbar">
+                    <div class="spectatingbar-bg"></div>
+                    <div class="spec-inner">
+                        <div class="spec-title"><i class="fa fa-eye"></i> Spectating game</div>
+                        <button class="qc-button end-red spec-leave" onclick="leavegame()">Exit</button>
+                    </div>
+                </div>
                 <!-- powerups bar -->
-                <DIV CLASS="powerupbar">
-                    <DIV CLASS="powerup-label">Powerups</DIV>
+                <div class="powerupbar">
+                    <div class="powerup-label">Powerups</div>
                     <!-- nuke -->
-                    <BUTTON CLASS="powerup-btn" ID="nuke-powerup" TITLE="Nuke" ONCLICK="nuke()">
-                        <DIV CLASS="powerup-nooverflow">
-                            <DIV CLASS="powerup-btn-bg"></DIV>
-                            <DIV CLASS="powerup-recharge"></DIV>
-                            <IMG SRC="./images/assets/nukeicon.svg">
-                        </DIV>
-                        <DIV CLASS="powerup-notify" ID="nuke-notify-icon"></DIV>
-                    </BUTTON>
+                    <button class="powerup-btn" id="nuke-powerup" title="Nuke" onclick="nuke()">
+                        <div class="powerup-nooverflow">
+                            <div class="powerup-btn-bg"></div>
+                            <div class="powerup-recharge"></div>
+                            <img src="./images/assets/nukeicon.svg">
+                        </div>
+                        <div class="powerup-notify" id="nuke-notify-icon"></div>
+                    </button>
                     <!-- airlift -->
-                    <BUTTON CLASS="powerup-btn" ID="airlift-powerup" TITLE="Airlift" ONCLICK="airlift()">
-                        <DIV CLASS="powerup-nooverflow">
-                            <DIV CLASS="powerup-btn-bg"></DIV>
-                            <DIV CLASS="powerup-recharge"></DIV>
-                            <IMG SRC="./images/assets/airlifticon.svg">
-                        </DIV>
-                        <DIV CLASS="powerup-notify" ID="airlift-notify-icon"></DIV>
-                    </BUTTON>
+                    <button class="powerup-btn" id="airlift-powerup" title="Airlift" onclick="airlift()">
+                        <div class="powerup-nooverflow">
+                            <div class="powerup-btn-bg"></div>
+                            <div class="powerup-recharge"></div>
+                            <img src="./images/assets/airlifticon.svg">
+                        </div>
+                        <div class="powerup-notify" id="airlift-notify-icon"></div>
+                    </button>
                     <!-- supply drop -->
-                    <BUTTON CLASS="powerup-btn" ID="supplydrop-powerup" TITLE="Supply Drop" ONCLICK="supplydrop()">
-                        <DIV CLASS="powerup-nooverflow">
-                            <DIV CLASS="powerup-btn-bg"></DIV>
-                            <DIV CLASS="powerup-recharge"></DIV>
-                            <IMG SRC="./images/assets/supplybuttonicon.svg">
-                        </DIV>
-                        <DIV CLASS="powerup-notify" ID="supplydrop-notify-icon"></DIV>
-                    </BUTTON>
-                </DIV>
-                <DIV CLASS="endscreen" ID="endscreen">
-                    <DIV CLASS="endscreen-bg"></DIV>
-                    <DIV CLASS="endscreen-inner">
-                        <DIV CLASS="e-header" ID="e-header">You were defeated</DIV>
-                        <DIV CLASS="e-medal-change" ID="e-medal-change">
-                            <IMG CLASS="e-medal-icon" SRC="./images/medal.png"> <SPAN ID="e-medals">+0 Medals</SPAN>
-                        </DIV>
-                        <DIV CLASS="e-stats"><SPAN ID="e-intro">You lost all your territories and were defeated!</SPAN> You had a max of <SPAN ID="e-troops">0</SPAN> troops and controlled a max of <SPAN ID="e-territories">0</SPAN> territories at your peak. You placed <SPAN ID="e-place">6th</SPAN> playing the <SPAN ID="e-map"></SPAN> map. <SPAN ID="e-ending">Better luck next time!</SPAN></DIV>
-                        <BUTTON ONCLICK="share()" CLASS="endbutton end-blue"><I CLASS="fa fa-share-square-o"></I> Share</BUTTON><BUTTON CLASS="endbutton end-green" ONCLICK="spectategame()"><I CLASS="fa fa-eye"></I> Spectate</BUTTON><BUTTON CLASS="endbutton end-red" ONCLICK="leavegame()"><I CLASS="fa fa-chevron-circle-left"></I> Leave Game</BUTTON>
-                    </DIV>
-                </DIV>
-            </DIV>
-            <DIV CLASS="mapcontainer" STYLE="transform: scale(1)" ID="mapcontainer">
-                <DIV ID="map" STYLE="transform: translate(0px, 0px);"><DIV ID="svg-map-bg" class="svg-map-bg"><DIV ID="mapl2"></DIV><DIV ID="mapl1"></DIV><DIV ID="maploading"><DIV STYLE="font-size: 22px; font-weight: bold; color: #ffffff">Loading...</DIV></DIV></DIV></DIV>
-            </DIV>
-        </DIV>
-    </BODY>
-</HTML>
+                    <button class="powerup-btn" id="supplydrop-powerup" title="Supply Drop" onclick="supplydrop()">
+                        <div class="powerup-nooverflow">
+                            <div class="powerup-btn-bg"></div>
+                            <div class="powerup-recharge"></div>
+                            <img src="./images/assets/supplybuttonicon.svg">
+                        </div>
+                        <div class="powerup-notify" id="supplydrop-notify-icon"></div>
+                    </button>
+                </div>
+                <div class="endscreen" id="endscreen">
+                    <div class="endscreen-bg"></div>
+                    <div class="endscreen-inner">
+                        <div class="e-header" id="e-header">You were defeated</div>
+                        <div class="e-medal-change" id="e-medal-change">
+                            <img class="e-medal-icon" src="./images/medal.png"> <span id="e-medals">+0 Medals</span>
+                        </div>
+                        <div class="e-stats"><span id="e-intro">You lost all your territories and were defeated!</span> You had a max of <span id="e-troops">0</span> troops and controlled a max of <span id="e-territories">0</span> territories at your peak. You placed <span id="e-place">6th</span> playing the <span id="e-map"></span> map. <span id="e-ending">Better luck next time!</span></div>
+                        <button onclick="share()" class="endbutton end-blue"><i class="fa fa-share-square-o"></i> Share</button><button class="endbutton end-green" onclick="spectategame()"><i class="fa fa-eye"></i> Spectate</button><button class="endbutton end-red" onclick="leavegame()"><i class="fa fa-chevron-circle-left"></i> Leave Game</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mapcontainer" style="transform: scale(1)" id="mapcontainer">
+                <div id="map" style="transform: translate(0px, 0px);"><div id="svg-map-bg" class="svg-map-bg"><div id="mapl2"></div><div id="mapl1"></div><div id="maploading"><div style="font-size: 22px; font-weight: bold; color: #ffffff">Loading...</div></div></div></div>
+            </div>
+        </div>
+    </body>
+</html>
