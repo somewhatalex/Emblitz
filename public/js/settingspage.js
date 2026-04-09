@@ -161,10 +161,22 @@ function promptLogout() {
     }, 50);
 }
 
+function promptAccountDeletion() {
+    document.getElementById("delete-account-confirm").style.display = "block";
+    setTimeout(function() {
+        document.getElementById("delete-account-confirm").style.opacity = 1;
+    }, 50);
+}
+
 window.onclick = function(event) {
     if (event.target === document.getElementById("logout-confirm") || event.target === document.getElementById("lc-exit") || event.target === document.getElementById("cancellogout")) {
         document.getElementById("logout-confirm").style.display = "none";
         document.getElementById("logout-confirm").style.opacity = 0;
+    }
+
+    if (event.target === document.getElementById("delete-account-confirm") || event.target === document.getElementById("dac-exit") || event.target === document.getElementById("cancelDeletionRequest")) {
+        document.getElementById("delete-account-confirm").style.display = "none";
+        document.getElementById("delete-account-confirm").style.opacity = 0;
     }
 }
 

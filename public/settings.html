@@ -45,7 +45,8 @@
             </DIV>
             <DIV CLASS="s-divider" STYLE="margin-bottom: 15px;"></DIV>
                 <BUTTON CLASS="s-option-top jb_gray" ONCLICK="window.location.href='./user/<%= playername %>'"><I CLASS="fa fa-user"></I> My Profile</BUTTON>
-                <BUTTON CLASS="s-option-top s-warning" ONCLICK="promptLogout()"><I CLASS="fa fa-sign-out"></I> Log Out</BUTTON>
+                <BUTTON CLASS="s-option-top s-yellow" ONCLICK="promptLogout()"><I CLASS="fa fa-sign-out"></I> Log Out</BUTTON>
+                <!-- <BUTTON CLASS="s-option-top s-warning" ONCLICK="promptAccountDeletion()"><I CLASS="fa fa-times"></I> Delete Account</BUTTON> -->
             <DIV CLASS="s-divider" STYLE="margin-top: 15px;"></DIV>
             <DIV CLASS="s-colorselect">
                 <DIV CLASS="s-area-header">Player color:</DIV>
@@ -101,6 +102,18 @@
                     <DIV CLASS="lc-bottom">
                         <BUTTON CLASS="s-option-top jb_green" ID="cancellogout">No, cancel</BUTTON>
                         <BUTTON CLASS="s-option-top s-warning" ONCLICK="logoutUser()">Yes, logout</BUTTON>
+                    </DIV>
+                </DIV>
+            </DIV>
+
+            <DIV ID="delete-account-confirm">
+                <DIV ID="dac-content">
+                    <DIV CLASS="lc-top"><I ID="dac-exit" CLASS="fa fa-times"></I></DIV>
+                    <DIV CLASS="lc-middle">Are you sure you want to request an account deletion? If you press yes, you will need to confirm via the email which this account is set up with. From there, you will have 14 days to revert this decision before your account is gone forever (a long time)!</DIV>
+                    <DIV CLASS="s-divider" STYLE="border: 1px solid var(--night); margin-top: 15px; margin-bottom: 15px;"></DIV>
+                    <DIV CLASS="lc-bottom">
+                        <BUTTON CLASS="s-option-top jb_green" ID="cancelDeletionRequest">No, cancel</BUTTON>
+                        <BUTTON CLASS="s-option-top s-warning" ONCLICK="requestAccountDeletion()">Yes, request account deletion</BUTTON>
                     </DIV>
                 </DIV>
             </DIV>

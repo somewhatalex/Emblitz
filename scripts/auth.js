@@ -23,6 +23,12 @@ function initDB() {
                 app.db.query("CREATE TABLE IF NOT EXISTS password_reset_tickets (publickey VARCHAR(255) NOT NULL, tokenhash VARCHAR(127) NOT NULL UNIQUE, timeexpires BIGINT NOT NULL);", function (err, result){
                     console.log("Password reset tickets table initiated")
 
+                    /*app.db.query("CREATE TABLE IF NOT EXISTS account_deletion_tickets (publickey VARCHAR(255) NOT NULL, tokenhash VARCHAR(127) NOT NULL UNIQUE, deletiontime BIGINT NOT NULL);", function (err, result){
+                        console.log("Password reset tickets table initiated")
+
+                        resolve("ok");
+                    })*/
+
                     resolve("ok");
                 })
             });

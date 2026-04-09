@@ -183,6 +183,16 @@ body {
     font-size: 17px;
 }
 
+.s-yellow {
+    background: #e0e000;
+    color: var(--night);
+    margin-left: 10px;
+}
+
+.s-yellow:hover {
+    background: #baba00;
+}
+
 .s-warning {
     background: #e00d0d;
     color: var(--light);
@@ -232,6 +242,39 @@ body {
 }
 
 #lc-exit:hover {
+    color: var(--light-darker);
+}
+
+#delete-account-confirm {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: 1s;
+}
+
+#dac-content {
+    background-color: #e0e000;
+    margin: auto;
+    margin-top: calc(15% + 40px);
+    padding: 20px;
+    max-width: 800px;
+    width: 90%;
+    color: var(--night);
+    font-size: 18px;
+}
+
+#dac-exit {
+    cursor: pointer;
+}
+
+#dac-exit:hover {
     color: var(--light-darker);
 }
 
