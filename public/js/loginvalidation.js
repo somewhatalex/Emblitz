@@ -250,79 +250,105 @@ function submitRegister() {
 }
 
 function requestPasswordReset() {
-    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+    for (let i = 0; i < document.getElementsByClassName("lb_form_error").length; i++) {
         document.getElementsByClassName("lb_form_error")[i].style.display = "none";
     }
 
     let errors = false;
 
-    // Client side error checks for email and username input boxes
-    errors = clientCheckEmailErrors();
-    errors = clientCheckUsernameErrors();
+    // Combine client-side validation instead of overwriting the previous result
+    errors = clientCheckEmailErrors() || errors;
+    errors = clientCheckUsernameErrors() || errors;
 
-    // TODO: Handle the way this system interacts with the server
     if (!errors) {
+        document.getElementById("i-submit").value = "Please wait...";
+        document.getElementById("i-submit").style.cursor = "no-drop";
+        document.getElementById("i-submit").setAttribute("disabled", "disabled");
+        document.getElementById("backtologin").setAttribute("disabled", "disabled");
+        document.getElementById("backtologin").style.cursor = "no-drop";
+
         fetch("/auth2", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-            action: "requestPasswordReset",
-            email: document.getElementById("i-email").value,
-            username: document.getElementById("i-username").value
+                action: "requestPasswordReset",
+                email: document.getElementById("i-email").value,
+                username: document.getElementById("i-username").value
             })
         }).then(response => {
             response.json().then(function(text) {
                 if (text.errors) {
-                    for(let i=0; i<document.getElementsByClassName("lb_form_error").length; i++) {
+                    document.getElementById("i-submit").removeAttribute("disabled");
+                    document.getElementById("backtologin").removeAttribute("disabled");
+                    document.getElementById("i-submit").style.cursor = "pointer";
+                    document.getElementById("backtologin").style.cursor = "pointer";
+                    document.getElementById("i-submit").value = "Request Password Reset";
+
+                    for (let i = 0; i < document.getElementsByClassName("lb_form_error").length; i++) {
                         document.getElementsByClassName("lb_form_error")[i].style.display = "none";
                     }
 
-                    // Check if the server sent any error messages
-                    if(text.errors.includes("u5")) {
-                        document.getElementById("error-username").style.display = "inline";
-                        document.getElementById("error-username").innerText = "don't use profanity in your username";
-                        errors = true;
-                    }
-
-                    if(text.errors.includes("u4")) {
+                    if (text.errors.includes("u4")) {
                         document.getElementById("error-username").style.display = "inline";
                         document.getElementById("error-username").innerText = "only letters, numbers, and underscores allowed";
-                        errors = true;
                     }
 
-                    if(text.errors.includes("u1")) {
+                    if (text.errors.includes("u1")) {
                         document.getElementById("error-username").style.display = "inline";
                         document.getElementById("error-username").innerText = "must be at least 2 characters long";
-                        errors = true;
-                    } else if(text.errors.includes("u2")) {
+                    } else if (text.errors.includes("u2")) {
                         document.getElementById("error-username").style.display = "inline";
                         document.getElementById("error-username").innerText = "must be less than 12 characters long";
-                        errors = true;
                     }
 
-                    if(text.errors.includes("u3")) {
-                        document.getElementById("error-username").style.display = "inline";
-                        document.getElementById("error-username").innerText = "another user already has this username";
-                        errors = true;
-                    }
-
-                    if(text.errors.includes("e1")) {
+                    if (text.errors.includes("e1")) {
                         document.getElementById("error-email").style.display = "inline";
                         document.getElementById("error-email").innerText = "email is required";
-                        errors = true;
-                    } else if(text.errors.includes("e2")) {
-                        document.getElementById("error-username").style.display = "inline";
-                        document.getElementById("error-username").innerText = "please enter a valid email";
-                        errors = true;
+                    } else if (text.errors.includes("e2")) {
+                        document.getElementById("error-email").style.display = "inline";
+                        document.getElementById("error-email").innerText = "please enter a valid email";
                     }
 
-                    if(text.errors.includes("e3")) {
-                        document.getElementById("error-email").style.display = "inline";
-                        document.getElementById("error-email").innerText = "this email is already taken";
-                        errors = true;
-                    }
+                    return;
+                } else if (response.status === 429 || text.error == 429) {
+                    document.getElementById("i-submit").removeAttribute("disabled");
+                    document.getElementById("backtologin").removeAttribute("disabled");
+                    document.getElementById("i-submit").style.cursor = "pointer";
+                    document.getElementById("backtologin").style.cursor = "pointer";
+                    document.getElementById("i-submit").value = "Request Password Reset";
+                    alert("You're sending password reset requests too quickly! Please try again in 5 minutes.");
+                    return;
+                } else {
+                    // Generic success message, even if the account doesn't exist
+                    document.getElementById("mainarea").style.opacity = "0";
+                    setTimeout(function() {
+                        document.getElementById("mainarea").innerHTML = `
+                            <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                            <DIV CLASS="lg_resulttext">
+                                If an Emblitz account exists for that username and email address, a password reset email has been sent.
+                                Please check your inbox, spam, and promotions tabs.
+                            </DIV>
+                            <DIV CLASS="lg_resulttext">
+                                The reset link will expire in 10 minutes.
+                            </DIV>
+                            <BUTTON STYLE="margin-top: 20px;" CLASS="lg_register jb_green" ONCLICK="window.location='https://www.emblitz.com/login'">
+                                Back to Login
+                            </BUTTON>
+                        `;
+                        document.getElementById("mainarea").style.opacity = "1";
+                    }, 500);
                 }
             });
+        }).catch(function(err) {
+            console.error(err);
+
+            document.getElementById("i-submit").removeAttribute("disabled");
+            document.getElementById("backtologin").removeAttribute("disabled");
+            document.getElementById("i-submit").style.cursor = "pointer";
+            document.getElementById("backtologin").style.cursor = "pointer";
+            document.getElementById("i-submit").value = "Request Password Reset";
+
+            alert("Something went wrong. Please try again.");
         });
     }
 }
