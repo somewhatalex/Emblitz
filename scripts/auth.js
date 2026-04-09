@@ -24,7 +24,7 @@ function initDB() {
                     console.log("Password reset tickets table initiated")
 
                     /*app.db.query("CREATE TABLE IF NOT EXISTS account_deletion_tickets (publickey VARCHAR(255) NOT NULL, tokenhash VARCHAR(127) NOT NULL UNIQUE, deletiontime BIGINT NOT NULL);", function (err, result){
-                        console.log("Password reset tickets table initiated")
+                        console.log("Account deletion tickets table initiated")
 
                         resolve("ok");
                     })*/
@@ -203,20 +203,6 @@ function getEmailUsername(email) {
     });
 }
 
-/*function resetPassword(token, newPassword) {
-    let newPasswordHash = "";
-
-    return new Promise((resolve, reject) => {
-        app.db.query(`SELECT * FROM users WHERE token=$1`, [token], function (err, result) {
-            if(result.rows.length > 0) {
-                newPasswordHash = passwordHash.generate(newPassword);
-            }
-        });
-
-        resolve(newPasswordHash);
-    });
-}*/
-
 // Create the token itself for the reset token entry
 // Also avoids duplicate token hashes
 function createPasswordResetRawToken() {
@@ -288,6 +274,9 @@ async function finishPasswordReset(rawToken, newPassword) {
     const newLoginToken = await createUUID();
     const now = Date.now();
 
+    // Conumes the reset ticket
+    // Updates the user password hash to the new password
+    // Delete all other tickets which apply to this user once the password reset has succeeded
     const result = await app.db.query(
         `
         WITH consumed_ticket AS (
@@ -303,6 +292,11 @@ async function finishPasswordReset(rawToken, newPassword) {
             WHERE u.publickey = ct.publickey
               AND ct.timeexpires > $4
             RETURNING u.publickey
+        ),
+        deleted_other_tickets AS (
+            DELETE FROM password_reset_tickets
+            WHERE publickey IN (SELECT publickey FROM updated_user)
+            RETURNING publickey
         )
         SELECT EXISTS (
             SELECT 1 FROM updated_user
