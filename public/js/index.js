@@ -31,6 +31,10 @@ var boostedterritories = [];
 var mapHighlights = true;
 var websocketAlive = Date.now();
 var pingInterval;
+var mapAdjacency = {};
+var currentMapZoom = 1;
+var currentMapTranslateX = 0;
+var currentMapTranslateY = 0;
 
 //mobile detection
 window.onload = function() {
@@ -119,6 +123,7 @@ function resetAll() {
 
     mapdict = "";
     mapmoves = "";
+    mapAdjacency = {};
     possibleMoves = [];
 
     inGame = false;
@@ -153,6 +158,9 @@ function resetAll() {
 
     previoustouch = null;
     previousmobilezoom = null;
+    currentMapZoom = 1;
+    currentMapTranslateX = 0;
+    currentMapTranslateY = 0;
 
     p_startindex = 0;
 
@@ -236,7 +244,10 @@ function loadPosts(refresh) {
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
     var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
-    var zoomlevel = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+    var zoomlevel = currentMapZoom;
+    if(!zoomlevel) {
+        zoomlevel = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
+    }
     return {
         left: rect.left/zoomlevel - boundingmap.left/zoomlevel,
         top: rect.top/zoomlevel - boundingmap.top/zoomlevel,
@@ -263,46 +274,62 @@ function getColor(element, darken) {
     }
 }
 
+function buildMapAdjacency(moves) {
+    let adjacency = {};
+    for(let i=0; i<moves.length; i++) {
+        let pair = moves[i].split(" ");
+        let territoryA = pair[0];
+        let territoryB = pair[1];
+
+        if(!adjacency[territoryA]) {
+            adjacency[territoryA] = [];
+        }
+        if(!adjacency[territoryB]) {
+            adjacency[territoryB] = [];
+        }
+
+        adjacency[territoryA].push(territoryB);
+        adjacency[territoryB].push(territoryA);
+    }
+    return adjacency;
+}
+
 function initializeMap() {
     let isDragging = false;
     var mapelements = document.getElementsByClassName("map-region");
+    let mapl2Element = document.getElementById("mapl2");
+    let territoryLabelsHTML = "";
     selectedRegion = "";
-    for(let i=0; i<mapelements.length; i++) {
-        mapelements[i].setAttribute("fill", getColor(mapelements[i], false));
-        mapelements[i].style.stroke = "#171717";
-        mapelements[i].style.strokeWidth = "2px";
-        mapelements[i].style.strokeLinejoin = "round";
-        mapelements[i].style.cursor = "pointer";
-        let labelpos = getOffset(mapelements[i]);
-        if(coordadjusts[mapelements[i].getAttribute("data-code")]) {
-            let adjustamount = coordadjusts[mapelements[i].getAttribute("data-code")];
-            document.getElementById("mapl2").innerHTML += `
-            <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35+adjustamount[1]}px; left: ${labelpos.left+25+adjustamount[0]}px">
-                <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
-                <DIV CLASS="t_name"><SPAN ID="t_boosts_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"></SPAN>${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
-                <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
-            </DIV>`
-        } else {
-            document.getElementById("mapl2").innerHTML += `
-            <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
-                <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
-                <DIV CLASS="t_name"><SPAN ID="t_boosts_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"></SPAN>${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
-                <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
-            </DIV>`
-        }
 
-        if(!mapHighlights) {
-            let highlightareas = document.getElementsByClassName("region-shadow-container");
-            for(let i=0; i< highlightareas.length; i++) {
-                highlightareas[i].classList.remove("region-shadow-container");
-            }
+    if(!mapHighlights) {
+        let highlightareas = document.getElementsByClassName("region-shadow-container");
+        for(let i=0; i< highlightareas.length; i++) {
+            highlightareas[i].classList.remove("region-shadow-container");
         }
+    }
+
+    for(let i=0; i<mapelements.length; i++) {
+        let mapElementRef = mapelements[i];
+        let territoryCode = mapElementRef.getAttribute("data-code");
+        let territoryCodeLower = territoryCode.toLowerCase().replace(/ /g, "");
+        mapElementRef.setAttribute("fill", getColor(mapElementRef, false));
+        mapElementRef.style.stroke = "#171717";
+        mapElementRef.style.strokeWidth = "2px";
+        mapElementRef.style.strokeLinejoin = "round";
+        mapElementRef.style.cursor = "pointer";
+
+        let labelpos = getOffset(mapElementRef);
+        let adjustamount = coordadjusts[territoryCode] || [0, 0];
+        territoryLabelsHTML += `
+            <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35+adjustamount[1]}px; left: ${labelpos.left+25+adjustamount[0]}px">
+                <DIV CLASS="t_troop_change" ID="t_troops_change_${territoryCodeLower}">+0</DIV>
+                <DIV CLASS="t_name"><SPAN ID="t_boosts_${territoryCodeLower}"></SPAN>${mapdict[territoryCode]}</DIV>
+                <DIV CLASS="t_troops" ID="t_origin_${territoryCodeLower}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
+            </DIV>`;
 
         //show outline
-        mapelements[i].addEventListener("mouseover", function(d) {
-            let countryCode = mapelements[i].getAttribute("data-code");
-            //console.log(countryCode);
-            mapelements[i].setAttribute("fill", getColor(mapelements[i], true));
+        mapElementRef.addEventListener("mouseover", function(d) {
+            mapElementRef.setAttribute("fill", getColor(mapElementRef, true));
             let area = d.currentTarget;
             if(selectedRegion != area) {
                 area.style.stroke = "#ffffff";
@@ -312,23 +339,23 @@ function initializeMap() {
         });
         //hide outline
 
-        mapelements[i].addEventListener("mouseleave", function(d) {
-            mapelements[i].setAttribute("fill", getColor(mapelements[i], false));
+        mapElementRef.addEventListener("mouseleave", function(d) {
+            mapElementRef.setAttribute("fill", getColor(mapElementRef, false));
             let area = d.currentTarget;
             if(selectedRegion != area && !possibleMoves.includes(area.getAttribute("data-code"))) {
-                mapelements[i].style.stroke = "#171717";
-                mapelements[i].style.strokeWidth = "2px";
-                mapelements[i].style.strokeLinejoin = "round";
+                mapElementRef.style.stroke = "#171717";
+                mapElementRef.style.strokeWidth = "2px";
+                mapElementRef.style.strokeLinejoin = "round";
             } else if(possibleMoves.includes(area.getAttribute("data-code") && selectedRegion)) {
-                mapelements[i].style.strokeWidth = "2px";
+                mapElementRef.style.strokeWidth = "2px";
             } else if(area != selectedRegion) {
-                mapelements[i].style.strokeWidth = "2px";
-                mapelements[i].style.strokeLinejoin = "round";
+                mapElementRef.style.strokeWidth = "2px";
+                mapElementRef.style.strokeLinejoin = "round";
             }
         });
 
         //when clicked...
-        mapelements[i].addEventListener("click", function(d) {
+        mapElementRef.addEventListener("click", function(d) {
             //isDragging --> is the mouse moving? handled by "mousemove" event listener
             if(isDragging == false) {
                 if(attackPhase === "deploy") {

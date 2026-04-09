@@ -688,15 +688,21 @@ input { /*override default styles*/
 .globby_container {
     margin: auto;
     width: 500px;
-    margin-top: 30px;
-    padding: 10px;
-    -webkit-box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.4); 
-    box-shadow: 0px 0px 15px 5px rgba(0,0,0,0.4);
+    margin-top: 0;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(160deg, rgba(27, 35, 50, 0.95) 0%, rgba(12, 16, 24, 0.95) 100%);
+    -webkit-box-shadow: 0px 18px 30px -12px rgba(0,0,0,0.8); 
+    box-shadow: 0px 18px 30px -12px rgba(0,0,0,0.8);
 }
 
 .gamelobby {
     display: none;
-    height: calc(100vh - 30px);
+    min-height: 100vh;
+    padding: 30px 0;
+    box-sizing: border-box;
+    background: radial-gradient(circle at 15% 5%, #2a3850 0%, #171f2d 42%, #0b1018 100%);
 }
 
 .lobby_mapname {
@@ -704,6 +710,31 @@ input { /*override default styles*/
     text-align: center;
     font-size: 18px;
     font-weight: bold;
+    color: #f4f7ff;
+}
+
+.gamelobby .invitecode,
+.gamelobby .timercode,
+.gamelobby .privateroomdisplay {
+    color: #dce4ef;
+}
+
+.gamelobby .privateroomdisplay {
+    border-radius: 10px;
+    margin-right: 8px;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.gamelobby .jb_gray {
+    background-color: #2d3949;
+    color: #f4f7ff;
+    box-shadow: 0px 4px 0px 0px #1a2432;
+}
+
+.gamelobby .jb_gray:hover {
+    background-color: #3a4759;
 }
 
 .glb_player {
