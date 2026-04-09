@@ -250,7 +250,7 @@ async function createPasswordResetToken(username, email) {
 
     const rawToken = await createPasswordResetRawToken();
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
-    const expiresAt = Date.now() + (10 * 60 * 1000);
+    const expiresAt = Date.now() + (10 * 60 * 1000); // Expires 10 minutes after creation time
 
     // Add the password reset token to the database
     await app.db.query(
@@ -280,31 +280,55 @@ async function finishPasswordReset(rawToken, newPassword) {
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
     const newPasswordHash = passwordHash.generate(newPassword);
     const newLoginToken = await createUUID();
+    const now = Date.now();
 
     const result = await app.db.query(
         `
         WITH consumed_ticket AS (
             DELETE FROM password_reset_tickets
             WHERE tokenhash = $1
-              AND timeexpires > $2
-            RETURNING publickey
+            RETURNING publickey, timeexpires
         ),
         updated_user AS (
             UPDATE users u
-            SET password = $3,
-                token = $4
+            SET password = $2,
+                token = $3
             FROM consumed_ticket ct
             WHERE u.publickey = ct.publickey
+              AND ct.timeexpires > $4
             RETURNING u.publickey
         )
         SELECT EXISTS (
             SELECT 1 FROM updated_user
         ) AS success;
         `,
-        [tokenHash, Date.now(), newPasswordHash, newLoginToken]
+        [tokenHash, newPasswordHash, newLoginToken, now]
     );
 
     return result.rows[0].success;
+}
+
+async function getPasswordResetTicketUserInfo(rawToken) {
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    const result = await app.db.query(
+        `SELECT u.username, u.email
+         FROM password_reset_tickets prt
+         INNER JOIN users u
+         ON prt.publickey = u.publickey
+         WHERE prt.tokenhash = $1
+         LIMIT 1`,
+        [tokenHash]
+    );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    return {
+        username: result.rows[0].username,
+        email: result.rows[0].email
+    };
 }
 
 function createUUID() {
@@ -585,6 +609,7 @@ module.exports = {
     createPasswordResetToken: createPasswordResetToken,
     isPasswordResetTokenValid: isPasswordResetTokenValid,
     finishPasswordReset: finishPasswordReset,
+    getPasswordResetTicketUserInfo: getPasswordResetTicketUserInfo,
     verifyUUID: verifyUUID,
     initDB: initDB,
     userLogin: userLogin,

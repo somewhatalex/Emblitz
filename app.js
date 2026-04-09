@@ -815,10 +815,15 @@ app.post("/auth2", async (req, res) => {
         const password = String(req.body.password || "");
         const errors = [];
 
-        // Check for password validity
         if (password.length < 1) {
             errors.push("p1");
-        } else if (password.length < 8 || password.length > 30) {
+        } else if (
+            password.length < 8 ||
+            password.length > 30 ||
+            !/[A-Z]/.test(password) ||
+            !/[a-z]/.test(password) ||
+            !/[0-9]/.test(password)
+        ) {
             errors.push("p2");
         }
 
@@ -828,6 +833,9 @@ app.post("/auth2", async (req, res) => {
         }
 
         try {
+            // Get email + username BEFORE the ticket is consumed and deleted
+            const resetUser = await auth.getPasswordResetTicketUserInfo(token);
+
             const ok = await auth.finishPasswordReset(token, password);
 
             if (!ok) {
@@ -836,6 +844,40 @@ app.post("/auth2", async (req, res) => {
             }
 
             res.json({ ok: true });
+
+            // Send confirmation email after success
+            if (resetUser !== null) {
+                const mail = {
+                    from: "'Emblitz Team' <emblitz@emblitz.com>",
+                    to: resetUser.email,
+                    subject: "Your Emblitz password was changed",
+                    html: `
+                    <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                        <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; padding: 20px;">
+                            <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                            <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;">
+                                <DIV STYLE="display: block; margin-bottom: 5px;">Hello <B>${resetUser.username ? `${resetUser.username}` : ""}<B>,</DIV>
+                                This email confirms that your Emblitz password was just changed.
+                                <BR><BR>
+                                If you made this change, no further action is required.
+                                <BR><BR>
+                                If you did <B>not</B> make this change, please request another password reset immediately and secure your email account.
+                                <BR><BR>
+                                Thanks,<BR>-The Emblitz Team
+                                <DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV>
+                            </DIV>
+                        </DIV>
+                    </BODY>`
+                };
+
+                mailTransport.sendMail(mail)
+                .then(function() {
+                    dev_emails++;
+                })
+                .catch(function(mailErr) {
+                    console.error("Password reset confirmation email failed:", mailErr);
+                });
+            }
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: "server_1" });
