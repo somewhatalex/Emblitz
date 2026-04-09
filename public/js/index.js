@@ -298,6 +298,7 @@ function initializeMap() {
     let isDragging = false;
     var isMouseDown = 0;
     var mapelements = document.getElementsByClassName("map-region");
+    let gameScreenElement = document.getElementById("gamescreen");
     let mapl2Element = document.getElementById("mapl2");
     let zoomElement = document.getElementById("mapcontainer");
     var mapElement = document.getElementById("map");
@@ -311,11 +312,10 @@ function initializeMap() {
     currentMapTranslateX = 0;
     currentMapTranslateY = 0;
 
-    if(!mapHighlights) {
-        let highlightareas = document.getElementsByClassName("region-shadow-container");
-        for(let i=0; i< highlightareas.length; i++) {
-            highlightareas[i].classList.remove("region-shadow-container");
-        }
+    if(mapHighlights) {
+        gameScreenElement.classList.remove("map-highlights-disabled");
+    } else {
+        gameScreenElement.classList.add("map-highlights-disabled");
     }
 
     for(let i=0; i<mapelements.length; i++) {

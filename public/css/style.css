@@ -308,30 +308,35 @@ input { /*override default styles*/
 }
 
 .region-shadow-container {
-    animation: boxshadowone 6s ease infinite;
+    animation: mapglowpulse 6s ease infinite;
     filter:
         drop-shadow(1px 0px 1px hsla(0, 0%, 90%, 1))
-        drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1))
+        drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1));
 }
 
-@keyframes boxshadowone {
+@keyframes mapglowpulse {
     0% {
         filter:
             drop-shadow(1px 0px 1px hsla(0, 0%, 90%, 1))
-            drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1))
+            drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1));
     }
 
     50% {
         filter:
             drop-shadow(1px 0px 4px hsla(0, 0%, 90%, 1))
-            drop-shadow(-1px 0px 4px hsla(0, 0%, 90%, 1))
+            drop-shadow(-1px 0px 4px hsla(0, 0%, 90%, 1));
     }
 
     100% {
         filter:
             drop-shadow(1px 0px 1px hsla(0, 0%, 90%, 1))
-            drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1))
+            drop-shadow(-1px 0px 1px hsla(0, 0%, 90%, 1));
     }
+}
+
+.gamescreen.map-highlights-disabled .region-shadow-container {
+    animation: none !important;
+    filter: none !important;
 }
 
 .wideadcontainer {
