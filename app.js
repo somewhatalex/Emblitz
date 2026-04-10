@@ -106,12 +106,15 @@ pool.connect(function(err) {
     auth.initDB().then(function() {
         console.log("Finished initializing database");
         console.log("--- Server launched, begin logging. ---")
+
+        setInterval(function() {
+                auth.processAccountDeletionTickets();
+                auth.deleteExpiredTickets();
+        }, configs.accountManagement.deleteUnusedAccountsInterval);
         
         if(configs.accountManagement.forceEmailVerification) {
             setInterval(function() {
-                auth.processAccountDeletionTickets();
                 auth.deleteUnusedAccounts();
-                auth.deleteExpiredTickets();
             }, configs.accountManagement.deleteUnusedAccountsInterval);
         }
     });

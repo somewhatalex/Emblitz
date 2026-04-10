@@ -406,7 +406,7 @@ async function activateAccountDeletionTicket(rawToken) {
 function processAccountDeletionTickets() {
     const now = Date.now();
 
-    app.db.query(
+    return app.db.query(
         `
         WITH expired_unactivated_tickets AS (
             DELETE FROM account_deletion_tickets
@@ -490,7 +490,7 @@ function createUUID() {
             let id = "";
 
             for (let i = 0; i < 50; i++) {
-                id += chars.charAt(crypto.randomInt(0, chars.length));
+                id += chars.charAt(crypto.randomInt(0, chars.length - 1));
             }
 
             app.db.query(
@@ -523,7 +523,7 @@ function createPublicKey() {
             let id = "";
 
             for (let i = 0; i < 50; i++) {
-                id += chars.charAt(crypto.randomInt(0, chars.length));
+                id += chars.charAt(crypto.randomInt(0, chars.length - 1));
             }
 
             app.db.query(
