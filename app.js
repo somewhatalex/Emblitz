@@ -109,7 +109,7 @@ pool.connect(function(err) {
         
         if(configs.accountManagement.forceEmailVerification) {
             setInterval(function() {
-                auth.deleteUnusedAccounts();
+                auth.processAccountDeletionTickets();
                 auth.deleteUnusedAccounts();
                 auth.deleteExpiredTickets();
             }, configs.accountManagement.deleteUnusedAccountsInterval);
