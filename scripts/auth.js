@@ -23,17 +23,19 @@ function initDB() {
                 app.db.query("CREATE TABLE IF NOT EXISTS password_reset_tickets (publickey VARCHAR(255) NOT NULL, tokenhash VARCHAR(127) NOT NULL UNIQUE, timeexpires BIGINT NOT NULL);", function (err, result){
                     console.log("Password reset tickets table initiated")
 
-                    app.db.query(`
-                    CREATE TABLE IF NOT EXISTS account_deletion_tickets (
-                        publickey VARCHAR(255) NOT NULL UNIQUE,
-                        activate_token_hash VARCHAR(127) NOT NULL UNIQUE,
-                        activate_expires_at BIGINT NOT NULL,
-                        delete_account_at BIGINT
-                    );`, function(err, result) {
-                        if (err) console.log(err);
-                        console.log("Account deletion tickets table initiated");
-                        resolve("ok");
-                    });
+                    app.db.query(
+                        `CREATE TABLE IF NOT EXISTS account_deletion_tickets (
+                            publickey VARCHAR(255) NOT NULL UNIQUE,
+                            activate_token_hash VARCHAR(127) NOT NULL UNIQUE,
+                            activate_expires_at BIGINT NOT NULL,
+                            delete_account_at BIGINT
+                        );`,
+                        function (err, result) {
+                            if (err) console.log(err);
+                            console.log("Account deletion tickets table initiated");
+                            resolve("ok");
+                        }
+                    );
 
                     //resolve("ok");
                 })
@@ -218,7 +220,7 @@ async function createPasswordResetRawToken() {
             const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
             app.db.query(
-                `SELECT 1 FROM account_deletion_tickets WHERE activate_token_hash=$1 LIMIT 1`,
+                `SELECT 1 FROM password_reset_tickets WHERE tokenhash=$1 LIMIT 1`,
                 [tokenHash],
                 function(err, result) {
                     if (err) {
@@ -229,7 +231,6 @@ async function createPasswordResetRawToken() {
                     if (result.rows.length === 0) {
                         resolve(rawToken);
                     } else {
-                        // Duplicates are extremely unlikely, but it is best to be 100% certain there are no duplicates
                         tryGenerate();
                     }
                 }
@@ -483,43 +484,67 @@ function createRawAccountDeletionToken() {
 
 function createUUID() {
     return new Promise((resolve, reject) => {
-        let id = "";
-        let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
-        for(let i=0; i<50; i++) {
-            id += chars.charAt(crypto.randomInt(0, chars.length-1));
-        }
+        const chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
 
-        //duplicate check once (odds it a 50 char string matching twice is negligible)
-        app.db.query(`SELECT * FROM users WHERE token=$1`, [id], function (err, result) {
-            if(result.rows.length == 0) {
-                resolve(id);
-            } else {
-                for(let i=0; i<50; i++) {
-                    id += chars.charAt(crypto.randomInt(0, chars.length-1));
-                }
+        const tryGenerate = function() {
+            let id = "";
+
+            for (let i = 0; i < 50; i++) {
+                id += chars.charAt(crypto.randomInt(0, chars.length));
             }
-        });
+
+            app.db.query(
+                `SELECT 1 FROM users WHERE token=$1 LIMIT 1`,
+                [id],
+                function(err, result) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    if (result.rows.length === 0) {
+                        resolve(id);
+                    } else {
+                        tryGenerate();
+                    }
+                }
+            );
+        };
+
+        tryGenerate();
     });
 }
 
 function createPublicKey() {
     return new Promise((resolve, reject) => {
-        let id = "";
-        let chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
-        for(let i=0; i<50; i++) {
-            id += chars.charAt(crypto.randomInt(0, chars.length-1));
-        }
+        const chars = "1234567890qwertyuiopasdfghjklzxcvbnm";
 
-        //duplicate check once (odds it a 50 char string matching twice is negligible)
-        app.db.query(`SELECT * FROM users WHERE publickey=$1`, [id], function (err, result) {
-            if(result.rows.length == 0) {
-                resolve(id);
-            } else {
-                for(let i=0; i<50; i++) {
-                    id += chars.charAt(crypto.randomInt(0, chars.length-1));
-                }
+        const tryGenerate = function() {
+            let id = "";
+
+            for (let i = 0; i < 50; i++) {
+                id += chars.charAt(crypto.randomInt(0, chars.length));
             }
-        });
+
+            app.db.query(
+                `SELECT 1 FROM users WHERE publickey=$1 LIMIT 1`,
+                [id],
+                function(err, result) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    if (result.rows.length === 0) {
+                        resolve(id);
+                    } else {
+                        tryGenerate();
+                    }
+                }
+            );
+        };
+
+        tryGenerate();
     });
 }
 

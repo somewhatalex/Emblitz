@@ -251,8 +251,6 @@ async function requestAccountDeletion() {
             } else {
                 alert("We sent an account deletion confirmation link to your account email address. It expires in 10 minutes.");
             }
-
-            window.location.href = "../";
         }
     } catch (err) {
         console.error(err);
