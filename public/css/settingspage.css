@@ -35,6 +35,14 @@ body {
     }
 }
 
+@media (max-width: 424px) {
+    .s-yellow {
+        margin-left: 0px !important;
+        margin-top: 10px;
+        display: block;
+    }
+}
+
 .s-main {
     max-width: 900px;
     margin: auto;
