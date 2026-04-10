@@ -189,3 +189,84 @@ function logoutUser() {
         window.location.href = "../";
     });
 }
+
+async function requestAccountDeletion() {
+    const deleteButton = document.getElementById("confirm-account-deletion-btn");
+
+    if (deleteButton) {
+        deleteButton.innerText = "Please wait...";
+        deleteButton.setAttribute("disabled", "disabled");
+        deleteButton.style.cursor = "no-drop";
+    }
+
+    try {
+        const response = await fetch("/auth2", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({
+                action: "requestAccountDeletion"
+            })
+        });
+
+        const text = await response.json();
+
+        if (response.status === 429 || text.error === 429) {
+            if (typeof notification === "function") {
+                notification("error", "Too many requests", "Please wait a few minutes before trying again.", 4);
+            } else {
+                alert("Please wait a few minutes before trying again.");
+            }
+            return;
+        }
+
+        if (text.error === "not_logged_in") {
+            if (typeof notification === "function") {
+                notification("error", "Not logged in", "You must be logged in to request account deletion.", 4);
+            } else {
+                alert("You must be logged in to request account deletion.");
+            }
+            return;
+        }
+
+        if (text.error === "server_1") {
+            if (typeof notification === "function") {
+                notification("error", "Server error", "Something went wrong. Please try again.", 4);
+            } else {
+                alert("Something went wrong. Please try again.");
+            }
+            return;
+        }
+
+        if (text.ok) {
+            if (typeof notification === "function") {
+                notification(
+                    "notify",
+                    "Check your email",
+                    "We sent an account deletion confirmation link to your account email address. It expires in 10 minutes.",
+                    6
+                );
+            } else {
+                alert("We sent an account deletion confirmation link to your account email address. It expires in 10 minutes.");
+            }
+
+            window.location.href = "../";
+        }
+    } catch (err) {
+        console.error(err);
+
+        if (typeof notification === "function") {
+            notification("error", "Network error", "Could not contact the server. Please try again.", 4);
+        } else {
+            alert("Could not contact the server. Please try again.");
+        }
+    } finally {
+        if (deleteButton) {
+            deleteButton.removeAttribute("disabled");
+            deleteButton.style.cursor = "pointer";
+            deleteButton.innerText = "Yes, request account deletion";
+        }
+    }
+}

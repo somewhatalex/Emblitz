@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<HTML>
+    <HEAD>
+        <TITLE>Verify Account</TITLE>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="language" content="en">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <LINK REL="stylesheet" HREF="./css/style.css">
+        <LINK REL="stylesheet" HREF="./css/login.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QNCVLQXQCJ"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-QNCVLQXQCJ');
+        </script>
+
+        <link rel="icon" href="./images/icon.png">
+    </HEAD>
+    <BODY>
+        <SCRIPT>
+            window.addEventListener("load", function() {
+                document.getElementById("mainarea").style.opacity = "1";
+            });
+        </SCRIPT>
+        <DIV CLASS="homebackgroundcontainer"><DIV CLASS="homebackground"></DIV></DIV>
+        <DIV CLASS="lg_content">
+            <DIV CLASS="lg_bg"></DIV>
+            <DIV ID="mainarea">
+                <DIV CLASS="homelogo"><IMG CLASS="lg_logo" SRC="./images/logo.png"></DIV>
+                <DIV CLASS="lg_resulttext"><%- result %></DIV>
+            </DIV>
+        </DIV>
+    </BODY>
+</HTML>

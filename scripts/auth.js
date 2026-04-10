@@ -23,13 +23,19 @@ function initDB() {
                 app.db.query("CREATE TABLE IF NOT EXISTS password_reset_tickets (publickey VARCHAR(255) NOT NULL, tokenhash VARCHAR(127) NOT NULL UNIQUE, timeexpires BIGINT NOT NULL);", function (err, result){
                     console.log("Password reset tickets table initiated")
 
-                    /*app.db.query("CREATE TABLE IF NOT EXISTS account_deletion_tickets (publickey VARCHAR(255) NOT NULL, tokenhash VARCHAR(127) NOT NULL UNIQUE, deletiontime BIGINT NOT NULL);", function (err, result){
-                        console.log("Account deletion tickets table initiated")
-
+                    app.db.query(`
+                    CREATE TABLE IF NOT EXISTS account_deletion_tickets (
+                        publickey VARCHAR(255) NOT NULL UNIQUE,
+                        activate_token_hash VARCHAR(127) NOT NULL UNIQUE,
+                        activate_expires_at BIGINT NOT NULL,
+                        delete_account_at BIGINT
+                    );`, function(err, result) {
+                        if (err) console.log(err);
+                        console.log("Account deletion tickets table initiated");
                         resolve("ok");
-                    })*/
+                    });
 
-                    resolve("ok");
+                    //resolve("ok");
                 })
             });
         });
@@ -205,14 +211,14 @@ function getEmailUsername(email) {
 
 // Create the token itself for the reset token entry
 // Also avoids duplicate token hashes
-function createPasswordResetRawToken() {
+async function createPasswordResetRawToken() {
     return new Promise((resolve, reject) => {
         const tryGenerate = function() {
             const rawToken = crypto.randomBytes(32).toString("hex");
             const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
             app.db.query(
-                `SELECT 1 FROM password_reset_tickets WHERE tokenhash=$1 LIMIT 1`,
+                `SELECT 1 FROM account_deletion_tickets WHERE activate_token_hash=$1 LIMIT 1`,
                 [tokenHash],
                 function(err, result) {
                     if (err) {
@@ -234,7 +240,7 @@ function createPasswordResetRawToken() {
     });
 }
 
-async function createPasswordResetToken(username, email) {
+async function createPasswordResetTicket(username, email) {
     email = String(email).toLowerCase();
 
     const pubKey = await getPublicKeyFromUsernameEmail(username, email);
@@ -254,7 +260,7 @@ async function createPasswordResetToken(username, email) {
     return rawToken;
 }
 
-async function isPasswordResetTokenValid(rawToken) {
+async function isPasswordResetTicketValid(rawToken) {
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
     const result = await app.db.query(
@@ -329,6 +335,145 @@ async function getPasswordResetTicketUserInfo(rawToken) {
         username: result.rows[0].username,
         email: result.rows[0].email
     };
+}
+
+async function createAccountDeletionTicket(publicKey) {
+    const rawToken = await createRawAccountDeletionToken();
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const expiresAt = Date.now() + (10 * 60 * 1000);
+
+    // One live account deletion ticket per account
+    await app.db.query(
+        `DELETE FROM account_deletion_tickets WHERE publickey = $1`,
+        [publicKey]
+    );
+
+    // Add the password reset token to the database
+    await app.db.query(
+        `INSERT INTO account_deletion_tickets (publickey, activate_token_hash, activate_expires_at, delete_account_at)
+         VALUES ($1, $2, $3, $4)`,
+        [publicKey, tokenHash, expiresAt, null]
+    );
+
+    return rawToken;
+}
+
+// Set an account deletion time, and also reset the user token as to sign them out of all devices
+async function activateAccountDeletionTicket(rawToken) {
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const newLoginToken = await createUUID();
+    const now = Date.now();
+    const deleteAt = now + (14 * 24 * 60 * 60 * 1000); // 14 days from now
+
+    const result = await app.db.query(
+        `
+        WITH activated_ticket AS (
+            UPDATE account_deletion_tickets
+            SET delete_account_at = $2
+            WHERE activate_token_hash = $1
+              AND activate_expires_at > $3
+              AND delete_account_at IS NULL
+            RETURNING publickey, delete_account_at
+        ),
+        updated_user AS (
+            UPDATE users u
+            SET token = $4
+            FROM activated_ticket at
+            WHERE u.publickey = at.publickey
+            RETURNING u.publickey, u.username, u.email
+        )
+        SELECT
+            uu.publickey,
+            uu.username,
+            uu.email,
+            at.delete_account_at
+        FROM updated_user uu
+        INNER JOIN activated_ticket at
+        ON uu.publickey = at.publickey
+        LIMIT 1;
+        `,
+        [tokenHash, deleteAt, now, newLoginToken]
+    );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    return result.rows[0];
+}
+
+function processAccountDeletionTickets() {
+    const now = Date.now();
+
+    app.db.query(
+        `
+        WITH expired_unactivated_tickets AS (
+            DELETE FROM account_deletion_tickets
+            WHERE delete_account_at IS NULL
+              AND activate_expires_at <= $1
+            RETURNING publickey
+        ),
+        due_tickets AS (
+            SELECT publickey
+            FROM account_deletion_tickets
+            WHERE delete_account_at IS NOT NULL
+              AND delete_account_at <= $1
+        ),
+        deleted_users AS (
+            DELETE FROM users
+            WHERE publickey IN (SELECT publickey FROM due_tickets)
+            RETURNING publickey
+        ),
+        deleted_due_tickets AS (
+            DELETE FROM account_deletion_tickets
+            WHERE publickey IN (SELECT publickey FROM due_tickets)
+            RETURNING publickey
+        )
+        SELECT 1;
+        `,
+        [now]
+    ).catch(function(error) {
+        console.log("Error deleting expired/due account deletion tickets: " + error);
+    });
+}
+
+// If account logged into, cancel pending account deletion
+async function cancelAccountDeletionTickets(publicKey) {
+    await app.db.query(
+        `DELETE FROM account_deletion_tickets WHERE publickey = $1`,
+        [publicKey]
+    );
+}
+
+function createRawAccountDeletionToken() {
+    return new Promise((resolve, reject) => {
+        const tryGenerate = function() {
+            const rawToken = crypto.randomBytes(32).toString("hex");
+            const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+            app.db.query(
+                `SELECT 1
+                 FROM account_deletion_tickets
+                 WHERE activate_token_hash = $1
+                 LIMIT 1`,
+                [tokenHash],
+                function(err, result) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    if (result.rows.length === 0) {
+                        resolve(rawToken);
+                    } else {
+                        tryGenerate();
+                    }
+                }
+            );
+        };
+
+        tryGenerate();
+    });
 }
 
 function createUUID() {
@@ -606,10 +751,14 @@ module.exports = {
     checkUserConflicts: checkUserConflicts,
     verifyUsernameEmailMatch: verifyUsernameEmailMatch,
     getEmailUsername: getEmailUsername,
-    createPasswordResetToken: createPasswordResetToken,
-    isPasswordResetTokenValid: isPasswordResetTokenValid,
+    createPasswordResetTicket: createPasswordResetTicket,
+    isPasswordResetTicketValid: isPasswordResetTicketValid,
     finishPasswordReset: finishPasswordReset,
     getPasswordResetTicketUserInfo: getPasswordResetTicketUserInfo,
+    createAccountDeletionTicket: createAccountDeletionTicket,
+    activateAccountDeletionTicket: activateAccountDeletionTicket,
+    processAccountDeletionTickets: processAccountDeletionTickets,
+    cancelAccountDeletionTickets: cancelAccountDeletionTickets,
     verifyUUID: verifyUUID,
     initDB: initDB,
     userLogin: userLogin,

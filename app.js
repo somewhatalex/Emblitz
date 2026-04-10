@@ -110,6 +110,7 @@ pool.connect(function(err) {
         if(configs.accountManagement.forceEmailVerification) {
             setInterval(function() {
                 auth.deleteUnusedAccounts();
+                auth.deleteUnusedAccounts();
                 auth.deleteExpiredTickets();
             }, configs.accountManagement.deleteUnusedAccountsInterval);
         }
@@ -458,7 +459,7 @@ app.get("/resetPassword", async function(req, res) {
     const rawToken = String(req.query.token || "");
 
     try {
-        const valid = await auth.isPasswordResetTokenValid(rawToken);
+        const valid = await auth.isPasswordResetTicketValid(rawToken);
 
         if (!valid) {
             res.render("verify", {
@@ -476,6 +477,67 @@ app.get("/resetPassword", async function(req, res) {
         res.render("verify", {
             result: `Oops... an error occurred.
             <A CLASS="lg_register pushdown jb_green" STYLE="display:block; margin:auto; margin-top:30px; text-decoration:none" HREF="./login?action=passwordResetRequest">Try again</A>`
+        });
+    }
+});
+
+app.get("/activateAccountDeletion", async function(req, res) {
+    const rawToken = String(req.query.token || "");
+
+    try {
+        const activationResult = await auth.activateAccountDeletionTicket(rawToken);
+
+        if (!activationResult) {
+            res.render("verify", {
+                result: `Oops... this account deletion link is invalid or expired.`
+            });
+            return;
+        }
+
+        const deleteDateText = new Date(Number(activationResult.delete_account_at)).toLocaleString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        });
+
+        const mail = {
+            from: "'Emblitz Team' <emblitz@emblitz.com>",
+            to: activationResult.email,
+            subject: "Your Emblitz account is scheduled for deletion",
+            html: `
+            <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; padding: 20px;">
+                    <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                    <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;">
+                        <DIV STYLE="display: block; margin-bottom: 5px;">Hello, ${activationResult.username},</DIV>
+                        Your Emblitz account deletion request has been confirmed.
+                        <BR><BR>
+                        Your account is currently scheduled to be deleted on:
+                        <BR><BR>
+                        <B>${deleteDateText}</B>
+                        <BR><BR>
+                        If you want to cancel this deletion request, simply log back into your account before that time.
+                        <BR><BR>
+                        Thanks,<BR>-The Emblitz Team
+                        <DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV>
+                    </DIV>
+                </DIV>
+            </BODY>`
+        };
+
+        mailTransport.sendMail(mail).catch(function(err) {
+            console.error("Account deletion confirmation email failed:", err);
+        });
+
+        res.render("verify", {
+            result: `Your account deletion request has been confirmed. Your account is now scheduled for deletion in 14 days unless you cancel it by logging back in.`
+        });
+    } catch (err) {
+        console.error(err);
+        res.render("verify", {
+            result: `Oops... an error occurred. Please try again.`
         });
     }
 });
@@ -770,7 +832,7 @@ app.post("/auth2", async (req, res) => {
         // Always respond ambiguously
         res.json({ ok: true });
 
-        auth.createPasswordResetToken(username, email)
+        auth.createPasswordResetTicket(username, email)
         .then(token => {
             if (!token) return;
 
@@ -941,6 +1003,64 @@ app.post("/auth2", async (req, res) => {
             });
 
         return;
+    } else if (req.body.action === "requestAccountDeletion") {
+        try {
+            const uuid = req.cookies.uuid;
+
+            if (!uuid || uuid.startsWith("guest-")) {
+                res.json({ error: "not_logged_in" });
+                return;
+            }
+
+            const user = await auth.getUserInfoNoReject(uuid);
+
+            if (!user || !user.publickey) {
+                res.json({ error: "not_logged_in" });
+                return;
+            }
+
+            const rawToken = await auth.createAccountDeletionTicket(user.publickey);
+
+            const activateLink = `https://www.emblitz.com/activateAccountDeletion?token=${encodeURIComponent(rawToken)}`;
+
+            const mail = {
+                from: "'Emblitz Team' <emblitz@emblitz.com>",
+                to: user.email,
+                subject: "Confirm your Emblitz account deletion request",
+                html: `
+                <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                    <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; padding: 20px;">
+                        <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                        <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;">
+                            <DIV STYLE="display: block; margin-bottom: 5px;">Hello, ${user.username},</DIV>
+                            We received a request to delete your Emblitz account.
+                            <BR><BR>
+                            To confirm this request, click the button below.
+                            This link expires in 10 minutes.
+                            <A HREF="${activateLink}" TARGET="_blank"
+                            STYLE="display:block; margin-top:30px; margin-bottom:30px; border:none; border-radius:10px; font-size:18px; padding:10px; width:220px; text-align:center; text-decoration:none; color:#ffffff; background:#c0392b;">
+                            Confirm Account Deletion
+                            </A>
+                            If you did <B>not</B> make this change, please request a password reset immediately and secure your email account.
+                            <BR><BR>
+                            Thanks,<BR>-The Emblitz Team
+                            <DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV>
+                        </DIV>
+                    </DIV>
+                </BODY>`
+            };
+
+            mailTransport.sendMail(mail).catch(function(err) {
+                console.error("Account deletion email failed:", err);
+            });
+
+            res.json({ ok: true });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: "server_1" });
+        }
+
+        return;
     }
 
     res.json({"ok": true});
@@ -982,9 +1102,16 @@ app.post("/authapi", (req, res) => {
             res.json({"result": result.rows});
         });
     } else if(req.body.action === "login") {
+        // Global cleanup of deleted accounts first
+        auth.processAccountDeletionTickets();
+
         if(req.body.username && req.body.password) {
             auth.userLogin(req.body.username, req.body.password).then(function(userdata) {
                 userdata = userdata[0];
+
+                // If login is valid, cancel any pending deletion for this account here
+                auth.cancelAccountDeletionTickets(userdata.publickey);
+                
                 res.cookie("publickey", userdata.publickey, { expires: new Date(Date.now() + (30*24*3600000))});
                 res.cookie("uuid", userdata.token, { expires: new Date(Date.now() + (30*24*3600000))});
                 res.json({
