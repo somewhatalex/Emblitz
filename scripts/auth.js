@@ -438,11 +438,16 @@ function processAccountDeletionTickets() {
 }
 
 // If account logged into, cancel pending account deletion
-async function cancelAccountDeletionTickets(publicKey) {
-    await app.db.query(
-        `DELETE FROM account_deletion_tickets WHERE publickey = $1`,
-        [publicKey]
+async function cancelAccountDeletionTickets(publickey) {
+    const result = await app.db.query(
+        `DELETE FROM account_deletion_tickets
+         WHERE publickey = $1
+           AND delete_account_at IS NOT NULL
+         RETURNING publickey`,
+        [publickey]
     );
+
+    return result.rows.length > 0;
 }
 
 function createRawAccountDeletionToken() {

@@ -1066,7 +1066,7 @@ app.post("/auth2", async (req, res) => {
     res.json({"ok": true});
 })
 
-app.post("/authapi", (req, res) => {
+app.post("/authapi", async (req, res) => {
     //admin functions
     if(req.body.action === "createpost") {
         if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
@@ -1102,43 +1102,78 @@ app.post("/authapi", (req, res) => {
             res.json({"result": result.rows});
         });
     } else if(req.body.action === "login") {
-        // Global cleanup of deleted accounts first
-        auth.processAccountDeletionTickets();
+        try {
+            // Global cleanup of deleted accounts first
+            await auth.processAccountDeletionTickets();
 
-        if(req.body.username && req.body.password) {
-            auth.userLogin(req.body.username, req.body.password).then(function(userdata) {
-                userdata = userdata[0];
+            if(req.body.username && req.body.password) {
+                auth.userLogin(req.body.username, req.body.password).then(async function(userdata) {
+                    userdata = userdata[0];
 
-                // If login is valid, cancel any pending deletion for this account here
-                auth.cancelAccountDeletionTickets(userdata.publickey);
-                
-                res.cookie("publickey", userdata.publickey, { expires: new Date(Date.now() + (30*24*3600000))});
-                res.cookie("uuid", userdata.token, { expires: new Date(Date.now() + (30*24*3600000))});
-                res.json({
-                    "username": userdata.username,
-                    "email": userdata.email,
-                    "wins": userdata.wins,
-                    "losses": userdata.losses,
-                    "medals": userdata.medals,
-                    "badges": userdata.badges,
-                    "pfp": userdata.pfp,
-                    "tournamentprogress": userdata.tournamentprogress,
-                    "verified": userdata.verified,
-                    "timecreated": userdata.timecreated,
-                    "playercolor": userdata.playercolor,
-                    "playersettings": userdata.playersettings,
-                    "metadata": userdata.metadata,
-                    "xp": userdata.xp
+                    // If login is valid, cancel any pending deletion for this account here
+                    const canceledDeletion = await auth.cancelAccountDeletionTickets(userdata.publickey);
+                    
+                    res.cookie("publickey", userdata.publickey, { expires: new Date(Date.now() + (30*24*3600000))});
+                    res.cookie("uuid", userdata.token, { expires: new Date(Date.now() + (30*24*3600000))});
+                    res.json({
+                        "username": userdata.username,
+                        "email": userdata.email,
+                        "wins": userdata.wins,
+                        "losses": userdata.losses,
+                        "medals": userdata.medals,
+                        "badges": userdata.badges,
+                        "pfp": userdata.pfp,
+                        "tournamentprogress": userdata.tournamentprogress,
+                        "verified": userdata.verified,
+                        "timecreated": userdata.timecreated,
+                        "playercolor": userdata.playercolor,
+                        "playersettings": userdata.playersettings,
+                        "metadata": userdata.metadata,
+                        "xp": userdata.xp
+                    });
+
+                    // Send an email telling the user that their account deletion request was canceled
+                    if (canceledDeletion) {
+                        const mail = {
+                            from: "'Emblitz Team' <emblitz@emblitz.com>",
+                            to: userdata.email,
+                            subject: "Your Emblitz account deletion request was canceled",
+                            html: `
+                            <BODY STYLE="background: #121212; padding-top: 45px; padding-bottom: 45px; width: 100%;">
+                                <DIV STYLE="width: calc(100% - 40px); max-width: 700px; margin: auto; background: #303030; padding: 20px;">
+                                    <IMG SRC="https://www.emblitz.com/images/logo.png" STYLE="width: 100%; max-width: 350px;">
+                                    <DIV STYLE="margin-top: 10px; color: #ffffff; font-size: 18px; font-family: sans-serif; margin-left: 8px;">
+                                        <DIV STYLE="display: block; margin-bottom: 5px;">Hello, ${userdata.username},</DIV>
+                                        Your Emblitz account deletion request has been canceled because you logged back into your account.
+                                        <BR><BR>
+                                        Your account is no longer scheduled for deletion.
+                                        <BR><BR>
+                                        If you did not intend to cancel the deletion request, you can request account deletion again from your account settings.
+                                        <BR><BR>
+                                        Thanks,<BR>-The Emblitz Team
+                                        <DIV STYLE="margin-top: 60px;">&copy; Emblitz</DIV>
+                                    </DIV>
+                                </DIV>
+                            </BODY>`
+                        };
+
+                        mailTransport.sendMail(mail).catch(function(err) {
+                            console.error("Account deletion cancellation email failed:", err);
+                        });
+                    }
+                }).catch(function(error) {
+                    res.json({"error": error});
                 });
-            }).catch(function(error) {
-                res.json({"error": error});
-            });
-        } else if(!req.body.username && req.body.password) {
-            res.json({"error": "missing username"});
-        } else if(!req.body.password && req.body.username) {
-            res.json({"error": "missing password"});
-        } else {
-            res.json({"error": "missing username and password"})
+            } else if(!req.body.username && req.body.password) {
+                res.json({"error": "missing username"});
+            } else if(!req.body.password && req.body.username) {
+                res.json({"error": "missing password"});
+            } else {
+                res.json({"error": "missing username and password"});
+            }
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({"error": "server_1"});
         }
     }
 });
