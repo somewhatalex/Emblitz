@@ -512,6 +512,10 @@ let florida = {
     ]
 };
 
+let hawaii = {
+
+}
+
 module.exports = {
-    miniworld, michigan, florida
+    miniworld, michigan, florida, hawaii
 }
