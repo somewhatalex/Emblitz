@@ -20,7 +20,7 @@ const mapDescriptions = [
     ["Micro World Map", "Battle for the entire globe! Oh wait... it got shrunken down a little. Who did it?", "./images/miniworldpreview.JPG", "miniworld", 3],
     ["Michigan", "Michigan's cities broke apart for some reason. Can you unite them before Ohio invades?", "./images/michiganpreview.JPG", "michigan", 6],
     ["Florida", "Florida man started a war again. Can you stop it before it gets out of hand?", "./images/floridapreview.JPG", "florida", 6],
-    ["Hawaii", "Have a restful vacation in Hawaii! Except, you have to lead an army and earn it for yourself first.", "./images/hawaiipreview.JPG", "hawaii", 6]
+    ["Hawaii", "Have a restful vacation in Hawaii! Except, you have to lead an army and earn it for yourself first.", "./images/hawaiipreview.png", "hawaii", 6]
 ]
 
 const colorData = {

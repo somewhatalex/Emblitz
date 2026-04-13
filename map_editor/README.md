@@ -39,3 +39,16 @@ Given an uploaded SVG/XML map, the tool can generate the exact files used by exi
 - The importer matches JSON territory codes against SVG shapes by existing `data-code` values.
 - Loading `mapdata/<mapname>/<mapname>.txt` now auto-attempts to import sibling `mapdict.json`, `coordadjust.json`, `moves.json`, and `metadata.json` from `mapdata/<mapname>/`.
 - A large transparent background rect (for example `fill: rgba(216, 216, 216, 0)`) is treated as an explicit map bounds reference for editor viewBox/bounds workflows.
+
+## Territory Centers Helper
+
+Use `map_editor/territory-centers-console.js` to export territory centers for `scripts/territory_centers.js`.
+
+### How To Use
+
+1. Open either a live game map (preferred) or `map_editor/index.html` with preview labels visible.
+2. Open DevTools console.
+3. Paste and run the script contents from `map_editor/territory-centers-console.js`.
+4. Copy the emitted `let <mapname> = { ... };` block into `scripts/territory_centers.js`.
+
+The script follows troop-label targeting flow and outputs values as `[y, x]`, matching server distance checks.
