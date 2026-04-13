@@ -2051,8 +2051,8 @@ input { /*override default styles*/
 
 .rotate-svg {
     animation: rotate-svg 5s linear infinite;
-    transform-box: fill-box;
-    transform-origin: center;
+    transform-box: fill-box !important;
+    transform-origin: center center !important;
 }
 
 @keyframes rotate-svg {

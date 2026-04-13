@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Emblitz Map Data Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+    <div class="bg-orb bg-orb-a"></div>
+    <div class="bg-orb bg-orb-b"></div>
+
+    <main class="layout">
+        <section class="workspace">
+            <aside class="sidebar card">
+                <section class="panel">
+                    <h2>1) Source Map</h2>
+                    <label class="file-input-wrap">
+                        <input id="xmlFileInput" type="file" accept=".svg,.xml,.txt" />
+                        <span>Choose SVG/XML File</span>
+                    </label>
+                    <p id="loadedFileName" class="muted">No file loaded.</p>
+                    <div class="stats-grid">
+                        <div>
+                            <span class="stat-label">Candidates</span>
+                            <strong id="candidateCount">0</strong>
+                        </div>
+                        <div>
+                            <span class="stat-label">Territories</span>
+                            <strong id="territoryCount">0</strong>
+                        </div>
+                        <div>
+                            <span class="stat-label">Moves</span>
+                            <strong id="moveCount">0</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>2) Metadata</h2>
+                    <div class="form-grid">
+                        <label>
+                            Folder Name
+                            <input id="folderNameInput" type="text" value="newmap" />
+                        </label>
+                        <label>
+                            Display Name
+                            <input id="mapDisplayNameInput" type="text" value="New Map" />
+                        </label>
+                    </div>
+                    <div class="bounds-grid">
+                        <label>
+                            Bounds X Max
+                            <input id="boundsXMax" type="number" value="600" />
+                        </label>
+                        <label>
+                            Bounds X Min
+                            <input id="boundsXMin" type="number" value="-600" />
+                        </label>
+                        <label>
+                            Bounds Y Max
+                            <input id="boundsYMax" type="number" value="400" />
+                        </label>
+                        <label>
+                            Bounds Y Min
+                            <input id="boundsYMin" type="number" value="-800" />
+                        </label>
+                    </div>
+                    <div class="bounds-grid">
+                        <label>
+                            ViewBox Center X
+                            <input id="viewBoxCenterXInput" type="number" step="0.001" />
+                        </label>
+                        <label>
+                            ViewBox Center Y
+                            <input id="viewBoxCenterYInput" type="number" step="0.001" />
+                        </label>
+                        <label>
+                            ViewBox Width
+                            <input id="viewBoxWidthInput" type="number" step="0.001" min="0.001" />
+                        </label>
+                        <label>
+                            ViewBox Height
+                            <input id="viewBoxHeightInput" type="number" step="0.001" min="0.001" />
+                        </label>
+                    </div>
+                    <div class="button-row">
+                        <button id="applyViewBoxBtn" class="btn ghost" type="button">Apply ViewBox Center/Size</button>
+                        <button id="syncViewBoxBtn" class="btn ghost" type="button">Read Current ViewBox</button>
+                        <button id="toggleViewBoxOverlayBtn" class="btn ghost" type="button" aria-pressed="false">Show ViewBox Outline</button>
+                        <button id="toggleCameraBoundsOverlayBtn" class="btn ghost" type="button" aria-pressed="false">Show Camera Bounds</button>
+                        <button id="guessBoundsBtn" class="btn ghost" type="button">Guess Bounds</button>
+                        <button id="fitViewBoxBtn" class="btn ghost" type="button">Fit viewBox To Territories</button>
+                        <button id="autoCenterOffsetsBtn" class="btn ghost" type="button">Auto-Center Label Offsets</button>
+                    </div>
+                    <p class="muted">Default in-game scale comes from SVG viewBox. Use Fit viewBox before exporting if a map looks too zoomed out.</p>
+                </section>
+
+                <section class="panel">
+                    <h2>2.5) Optional Import Existing Mapdata</h2>
+                    <label class="file-input-wrap">
+                        <input id="importJsonInput" type="file" accept=".json" multiple />
+                        <span>Choose Existing JSON Files</span>
+                    </label>
+                    <p class="muted">Supports mapdict.json, coordadjust.json, moves.json, metadata.json.</p>
+                    <p id="importStatus" class="muted">No import files selected.</p>
+                    <div class="button-row">
+                        <button id="applyImportBtn" class="btn soft" type="button">Apply Import</button>
+                        <button id="clearImportBtn" class="btn ghost" type="button">Clear Selection</button>
+                    </div>
+                </section>
+
+                <section class="panel legacy-sidebar-controls">
+                    <h2>3) Selection</h2>
+                    <p id="selectedInfo" class="muted">Click a shape in the map preview.</p>
+                    <div class="button-row">
+                        <button id="markTerritoryBtn" class="btn" type="button">Mark As Territory</button>
+                        <button id="unmarkTerritoryBtn" class="btn ghost" type="button">Unmark</button>
+                    </div>
+                    <div class="form-grid compact">
+                        <label>
+                            Code
+                            <input id="selectedCodeInput" type="text" placeholder="DE" />
+                        </label>
+                        <label>
+                            Name
+                            <input id="selectedNameInput" type="text" placeholder="Detroit" />
+                        </label>
+                        <label>
+                            Label Offset X
+                            <input id="selectedOffsetXInput" type="number" value="0" />
+                        </label>
+                        <label>
+                            Label Offset Y
+                            <input id="selectedOffsetYInput" type="number" value="0" />
+                        </label>
+                    </div>
+                    <button id="applySelectedBtn" class="btn soft" type="button">Apply Selection Fields</button>
+                </section>
+
+                <section class="panel legacy-sidebar-controls">
+                    <h2>4) Moves</h2>
+                    <div class="form-grid compact">
+                        <label>
+                            Territory A
+                            <select id="moveASelect"></select>
+                        </label>
+                        <label>
+                            Territory B
+                            <select id="moveBSelect"></select>
+                        </label>
+                    </div>
+                    <div class="button-row">
+                        <button id="addMoveBtn" class="btn" type="button">Add Move</button>
+                        <button id="removeMoveBtn" class="btn ghost" type="button">Remove Move</button>
+                    </div>
+                    <div class="form-grid compact">
+                        <label>
+                            Auto-Detect Threshold
+                            <input id="autolinkThresholdInput" type="number" value="8" min="0" step="0.5" />
+                        </label>
+                    </div>
+                    <button id="autoDetectMovesBtn" class="btn soft" type="button">Auto-Detect Nearby Territories</button>
+                    <ul id="edgeList" class="edge-list"></ul>
+                </section>
+
+                <section class="panel">
+                    <h2>5) Export</h2>
+                    <p id="validationStatus" class="muted">Load a map to begin.</p>
+                    <div class="button-row">
+                        <button id="generatePreviewBtn" class="btn" type="button">Generate Files</button>
+                        <button id="downloadFilesBtn" class="btn ghost" type="button">Download Individual Files</button>
+                        <button id="downloadZipBtn" class="btn accent" type="button">Download mapdata Zip</button>
+                    </div>
+                </section>
+            </aside>
+
+            <section class="main-pane">
+                <div class="card preview-card">
+                    <h2>Map Preview</h2>
+                    <div class="preview-toolbar">
+                        <p class="muted">Drag to pan. Use mouse wheel to zoom. Use Reset View to center.</p>
+                        <div class="preview-actions">
+                            <button id="toggleMovesGraphBtn" class="btn ghost" type="button" aria-pressed="false">Show Moves Graph</button>
+                            <button id="resetViewBtn" class="btn ghost" type="button">Reset View</button>
+                        </div>
+                    </div>
+                    <div id="svgPreview" class="svg-preview">
+                        <div id="previewPanZoomLayer" class="preview-panzoom-layer">
+                            <div id="previewSvgMount" class="preview-svg-mount"></div>
+                            <svg id="previewMovesSvg" class="preview-moves-svg" aria-hidden="true"></svg>
+                            <div id="previewLabelsLayer" class="preview-labels-layer"></div>
+                        </div>
+                        <div id="viewBoxOverlay" class="viewbox-overlay is-hidden" aria-hidden="true">
+                            <div id="viewBoxFrame" class="viewbox-frame" title="Drag to move viewBox; drag handles to resize.">
+                                <div class="viewbox-handle handle-nw" data-viewbox-handle="nw"></div>
+                                <div class="viewbox-handle handle-n" data-viewbox-handle="n"></div>
+                                <div class="viewbox-handle handle-ne" data-viewbox-handle="ne"></div>
+                                <div class="viewbox-handle handle-e" data-viewbox-handle="e"></div>
+                                <div class="viewbox-handle handle-se" data-viewbox-handle="se"></div>
+                                <div class="viewbox-handle handle-s" data-viewbox-handle="s"></div>
+                                <div class="viewbox-handle handle-sw" data-viewbox-handle="sw"></div>
+                                <div class="viewbox-handle handle-w" data-viewbox-handle="w"></div>
+                                <div class="viewbox-handle handle-move" data-viewbox-handle="move"></div>
+                            </div>
+                        </div>
+                        <div id="cameraBoundsOverlay" class="camera-bounds-overlay is-hidden" aria-hidden="true">
+                            <div id="cameraBoundsFrame" class="camera-bounds-frame" title="Drag to move camera bounds; drag handles to resize.">
+                                <div class="camera-bounds-handle handle-nw" data-camera-bounds-handle="nw"></div>
+                                <div class="camera-bounds-handle handle-n" data-camera-bounds-handle="n"></div>
+                                <div class="camera-bounds-handle handle-ne" data-camera-bounds-handle="ne"></div>
+                                <div class="camera-bounds-handle handle-e" data-camera-bounds-handle="e"></div>
+                                <div class="camera-bounds-handle handle-se" data-camera-bounds-handle="se"></div>
+                                <div class="camera-bounds-handle handle-s" data-camera-bounds-handle="s"></div>
+                                <div class="camera-bounds-handle handle-sw" data-camera-bounds-handle="sw"></div>
+                                <div class="camera-bounds-handle handle-w" data-camera-bounds-handle="w"></div>
+                                <div class="camera-bounds-handle handle-move" data-camera-bounds-handle="move"></div>
+                            </div>
+                        </div>
+                        <div id="territoryEditorMenu" class="territory-editor-menu is-hidden">
+                            <div class="territory-editor-header">
+                                <strong id="territoryMenuTitle">Selected Shape</strong>
+                                <button id="closeTerritoryMenuBtn" class="territory-editor-close" type="button" aria-label="Close territory editor">x</button>
+                            </div>
+                            <div class="territory-editor-grid">
+                                <label>
+                                    Territory Code (2 letters)
+                                    <input id="territoryMenuCodeInput" type="text" maxlength="2" placeholder="AA" />
+                                </label>
+                                <label>
+                                    Full Name
+                                    <input id="territoryMenuNameInput" type="text" placeholder="Territory Name" />
+                                </label>
+                                <label>
+                                    Troop Offset X
+                                    <input id="territoryMenuOffsetXInput" type="number" value="0" />
+                                </label>
+                                <label>
+                                    Troop Offset Y
+                                    <input id="territoryMenuOffsetYInput" type="number" value="0" />
+                                </label>
+                            </div>
+                            <div class="button-row territory-editor-actions">
+                                <button id="territoryMenuSaveBtn" class="btn" type="button">Mark Territory</button>
+                                <button id="territoryMenuUnmarkBtn" class="btn ghost" type="button">Unmark</button>
+                            </div>
+                            <div class="territory-editor-moves">
+                                <div class="territory-editor-moves-header">Moves To Other Territories</div>
+                                <div id="territoryMenuMovesList" class="territory-editor-moves-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card table-card">
+                    <h2>Territories</h2>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Element</th>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Offset X</th>
+                                    <th>Offset Y</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="territoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card output-card">
+                    <h2>Generated Output</h2>
+                    <div class="output-grid">
+                        <label>
+                            mapdict.json
+                            <textarea id="mapdictOutput" readonly></textarea>
+                        </label>
+                        <label>
+                            coordadjust.json
+                            <textarea id="coordadjustOutput" readonly></textarea>
+                        </label>
+                        <label>
+                            moves.json
+                            <textarea id="movesOutput" readonly></textarea>
+                        </label>
+                        <label>
+                            metadata.json
+                            <textarea id="metadataOutput" readonly></textarea>
+                        </label>
+                        <label class="wide">
+                            [foldername].txt (SVG/XML)
+                            <textarea id="maptxtOutput" readonly></textarea>
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
