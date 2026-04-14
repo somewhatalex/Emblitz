@@ -31,10 +31,6 @@ var boostedterritories = [];
 var mapHighlights = true;
 var websocketAlive = Date.now();
 var pingInterval;
-var mapAdjacency = {};
-var currentMapZoom = 1;
-var currentMapTranslateX = 0;
-var currentMapTranslateY = 0;
 
 //mobile detection
 window.onload = function() {
@@ -123,7 +119,6 @@ function resetAll() {
 
     mapdict = "";
     mapmoves = "";
-    mapAdjacency = {};
     possibleMoves = [];
 
     inGame = false;
@@ -158,9 +153,6 @@ function resetAll() {
 
     previoustouch = null;
     previousmobilezoom = null;
-    currentMapZoom = 1;
-    currentMapTranslateX = 0;
-    currentMapTranslateY = 0;
 
     p_startindex = 0;
 
@@ -244,10 +236,7 @@ function loadPosts(refresh) {
 function getOffset(el) {
     var rect = el.getBoundingClientRect();
     var boundingmap = document.getElementById("mapsvgbox").getBoundingClientRect();
-    var zoomlevel = currentMapZoom;
-    if(!zoomlevel) {
-        zoomlevel = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
-    }
+    var zoomlevel = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
     return {
         left: rect.left/zoomlevel - boundingmap.left/zoomlevel,
         top: rect.top/zoomlevel - boundingmap.top/zoomlevel,
@@ -274,72 +263,46 @@ function getColor(element, darken) {
     }
 }
 
-function buildMapAdjacency(moves) {
-    let adjacency = {};
-    for(let i=0; i<moves.length; i++) {
-        let pair = moves[i].split(" ");
-        let territoryA = pair[0];
-        let territoryB = pair[1];
-
-        if(!adjacency[territoryA]) {
-            adjacency[territoryA] = [];
-        }
-        if(!adjacency[territoryB]) {
-            adjacency[territoryB] = [];
-        }
-
-        adjacency[territoryA].push(territoryB);
-        adjacency[territoryB].push(territoryA);
-    }
-    return adjacency;
-}
-
 function initializeMap() {
     let isDragging = false;
-    var isMouseDown = 0;
     var mapelements = document.getElementsByClassName("map-region");
-    let gameScreenElement = document.getElementById("gamescreen");
-    let mapl2Element = document.getElementById("mapl2");
-    let zoomElement = document.getElementById("mapcontainer");
-    var mapElement = document.getElementById("map");
-    let territoryLabelsHTML = "";
     selectedRegion = "";
-
-    // Reset transform state before computing label offsets so positions stay stable across matches.
-    zoomElement.style.transform = "scale(1)";
-    mapElement.style.transform = "translate(0px, 0px)";
-    currentMapZoom = 1;
-    currentMapTranslateX = 0;
-    currentMapTranslateY = 0;
-
-    if(mapHighlights) {
-        gameScreenElement.classList.remove("map-highlights-disabled");
-    } else {
-        gameScreenElement.classList.add("map-highlights-disabled");
-    }
-
     for(let i=0; i<mapelements.length; i++) {
-        let mapElementRef = mapelements[i];
-        let territoryCode = mapElementRef.getAttribute("data-code");
-        let territoryCodeLower = territoryCode.toLowerCase().replace(/ /g, "");
-        mapElementRef.setAttribute("fill", getColor(mapElementRef, false));
-        mapElementRef.style.stroke = "#171717";
-        mapElementRef.style.strokeWidth = "2px";
-        mapElementRef.style.strokeLinejoin = "round";
-        mapElementRef.style.cursor = "pointer";
-
-        let labelpos = getOffset(mapElementRef);
-        let adjustamount = coordadjusts[territoryCode] || [0, 0];
-        territoryLabelsHTML += `
+        mapelements[i].setAttribute("fill", getColor(mapelements[i], false));
+        mapelements[i].style.stroke = "#171717";
+        mapelements[i].style.strokeWidth = "2px";
+        mapelements[i].style.strokeLinejoin = "round";
+        mapelements[i].style.cursor = "pointer";
+        let labelpos = getOffset(mapelements[i]);
+        if(coordadjusts[mapelements[i].getAttribute("data-code")]) {
+            let adjustamount = coordadjusts[mapelements[i].getAttribute("data-code")];
+            document.getElementById("mapl2").innerHTML += `
             <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35+adjustamount[1]}px; left: ${labelpos.left+25+adjustamount[0]}px">
-                <DIV CLASS="t_troop_change" ID="t_troops_change_${territoryCodeLower}">+0</DIV>
-                <DIV CLASS="t_name"><SPAN ID="t_boosts_${territoryCodeLower}"></SPAN>${mapdict[territoryCode]}</DIV>
-                <DIV CLASS="t_troops" ID="t_origin_${territoryCodeLower}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
-            </DIV>`;
+                <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
+                <DIV CLASS="t_name"><SPAN ID="t_boosts_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"></SPAN>${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
+                <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
+            </DIV>`
+        } else {
+            document.getElementById("mapl2").innerHTML += `
+            <DIV CLASS="territorylabel" STYLE="top: ${labelpos.top+35}px; left: ${labelpos.left+25}px">
+                <DIV CLASS="t_troop_change" ID="t_troops_change_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}">+0</DIV>
+                <DIV CLASS="t_name"><SPAN ID="t_boosts_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"></SPAN>${mapdict[mapelements[i].getAttribute("data-code")]}</DIV>
+                <DIV CLASS="t_troops" ID="t_origin_${mapelements[i].getAttribute("data-code").toLowerCase().replace(/ /g, "")}"><DIV CLASS="t_troops_value" STYLE="margin-top: -7px; font-weight: bold; margin-left: -45px; width: 100px;">1</DIV></DIV>
+            </DIV>`
+        }
+
+        if(!mapHighlights) {
+            let highlightareas = document.getElementsByClassName("region-shadow-container");
+            for(let i=0; i< highlightareas.length; i++) {
+                highlightareas[i].classList.remove("region-shadow-container");
+            }
+        }
 
         //show outline
-        mapElementRef.addEventListener("mouseover", function(d) {
-            mapElementRef.setAttribute("fill", getColor(mapElementRef, true));
+        mapelements[i].addEventListener("mouseover", function(d) {
+            let countryCode = mapelements[i].getAttribute("data-code");
+            //console.log(countryCode);
+            mapelements[i].setAttribute("fill", getColor(mapelements[i], true));
             let area = d.currentTarget;
             if(selectedRegion != area) {
                 area.style.stroke = "#ffffff";
@@ -349,23 +312,23 @@ function initializeMap() {
         });
         //hide outline
 
-        mapElementRef.addEventListener("mouseleave", function(d) {
-            mapElementRef.setAttribute("fill", getColor(mapElementRef, false));
+        mapelements[i].addEventListener("mouseleave", function(d) {
+            mapelements[i].setAttribute("fill", getColor(mapelements[i], false));
             let area = d.currentTarget;
             if(selectedRegion != area && !possibleMoves.includes(area.getAttribute("data-code"))) {
-                mapElementRef.style.stroke = "#171717";
-                mapElementRef.style.strokeWidth = "2px";
-                mapElementRef.style.strokeLinejoin = "round";
+                mapelements[i].style.stroke = "#171717";
+                mapelements[i].style.strokeWidth = "2px";
+                mapelements[i].style.strokeLinejoin = "round";
             } else if(possibleMoves.includes(area.getAttribute("data-code") && selectedRegion)) {
-                mapElementRef.style.strokeWidth = "2px";
+                mapelements[i].style.strokeWidth = "2px";
             } else if(area != selectedRegion) {
-                mapElementRef.style.strokeWidth = "2px";
-                mapElementRef.style.strokeLinejoin = "round";
+                mapelements[i].style.strokeWidth = "2px";
+                mapelements[i].style.strokeLinejoin = "round";
             }
         });
 
         //when clicked...
-        mapElementRef.addEventListener("click", function(d) {
+        mapelements[i].addEventListener("click", function(d) {
             //isDragging --> is the mouse moving? handled by "mousemove" event listener
             if(isDragging == false) {
                 if(attackPhase === "deploy") {
@@ -456,21 +419,27 @@ function initializeMap() {
                         return;
                     }
 
-                    let territoryCode = territory.getAttribute("data-code");
-                    let territoryCodeLower = territoryCode.toLowerCase();
-                    possibleMoves = mapAdjacency[territoryCode] ? mapAdjacency[territoryCode].slice() : [];
+                    possibleMoves = [];
 
-                    let territoryTroopsElement = document.getElementById("t_origin_" + territoryCodeLower).getElementsByClassName("t_troops_value")[0];
-                    let troopmoveamount = Math.round((Number(territoryTroopsElement.innerText) - 1) * Number(document.getElementById("troopslider").value) * 0.01);
+                    for(let i=0; i<mapmoves.length; i++) {
+                        if(mapmoves[i].includes(d.currentTarget.getAttribute("data-code"))) {
+                            let dest = mapmoves[i].split(" ").filter(function(item) {
+                                return item !== d.currentTarget.getAttribute("data-code");
+                            });
+                            possibleMoves.push(dest.toString());
+                        }
+                    }
+
+                    let troopmoveamount = Math.round((Number(document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) - 1) * Number(document.getElementById("troopslider").value) * 0.01);
                     if(troopmoveamount < 0) {
                         troopmoveamount = 0;
                     }
                     document.getElementById("sendamount").innerText = troopmoveamount + " troops";
 
-                    let originTerritoryElement = document.getElementById("t_origin_" + territoryCodeLower);
                     for(let i=0; i<possibleMoves.length; i++) {
                         let area = document.getElementById("t_origin_" + possibleMoves[i].toString().toLowerCase());
-                        connect(area, originTerritoryElement, "#e69420", 4);
+                        let d2 = document.getElementById("t_origin_" + d.currentTarget.getAttribute("data-code").toLowerCase());
+                        connect(area, d2, "#e69420", 4);
                         let t_targeted = document.querySelector("[data-code='" + possibleMoves[i].toString() + "']");
                         t_targeted.style.stroke = "#ffffff";
                         t_targeted.style.strokeWidth = "2px";
@@ -504,23 +473,19 @@ function initializeMap() {
         });
     }
 
-    if(territoryLabelsHTML) {
-        mapl2Element.insertAdjacentHTML("beforeend", territoryLabelsHTML);
-    }
-
     //manage zooming and panning
+    let zoomElement = document.getElementById("mapcontainer");
+    zoomElement.style.transform = "scale(1)";
+    var mapElement = document.getElementById("map");
+    var isMouseDown = 0;
+    mapElement.style.transform = "translate(0px, 0px)";
 
     if(!setEventListeners) {
         setEventListeners = true;
-        let gameScreen = document.getElementById("gamescreen");
-        let playerGui = document.getElementById("player_gui");
-        let quitConfirm = document.getElementById("quitconfirm");
-        let leaveGameButton = document.getElementById("leavegamebutton");
-
         document.addEventListener("wheel", function(e) {
-            if(zoomElement.contains(e.target) || e.target === gameScreen) {
-                if(playerGui.contains(e.target)) return;
-                let elementTransform = currentMapZoom;
+            if(zoomElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                if(document.getElementById("player_gui").contains(e.target)) return;
+                let elementTransform = Number(zoomElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
                 var zoomdelta = (e.deltaY)/-500;
                 if(zoomdelta > 0.3) {
                     zoomdelta = 0.3;
@@ -531,29 +496,22 @@ function initializeMap() {
                     if(zoomdelta > 0) {
                         zoomdelta = 0;
                     }
-                    elementTransform = 1.7;
+                    zoomElement.style.transform = "scale(1.7)";
                 } else if(elementTransform <= 0.5) {
                     if(zoomdelta < 0) {
                         zoomdelta = 0;
                     }
-                    elementTransform = 0.5;
+                    zoomElement.style.transform = "scale(0.5)";
                 }
 
-                elementTransform += zoomdelta;
-                if(elementTransform > 1.7) {
-                    elementTransform = 1.7;
-                } else if(elementTransform < 0.5) {
-                    elementTransform = 0.5;
-                }
-                currentMapZoom = elementTransform;
-                zoomElement.style.transform = `scale(${currentMapZoom})`;
+                zoomElement.style.transform = `scale(${elementTransform += zoomdelta})`;
             }
         });
 
         //panning
         document.addEventListener("pointerdown", function(e) {
-            if(quitConfirm.style.display === "block" && e.target !== quitConfirm && e.target !== leaveGameButton && !quitConfirm.contains(e.target) && !leaveGameButton.contains(e.target)) {
-                quitConfirm.style.display = "none";
+            if(document.getElementById("quitconfirm").style.display === "block" && e.target !== document.getElementById("quitconfirm") && e.target !== document.getElementById("leavegamebutton") && !document.getElementById("quitconfirm").contains(e.target) && !document.getElementById("leavegamebutton").contains(e.target)) {
+                document.getElementById("quitconfirm").style.display = "none";
             }
             isMouseDown = 1;
         });
@@ -646,31 +604,31 @@ function initializeMap() {
                     break;
                 default:
                     if(isMouseDown) {
-                        if(mapElement.contains(e.target) || e.target === gameScreen) {
-                            if(playerGui.contains(e.target)) return;
+                        if(mapElement.contains(e.target) || e.target === document.getElementById("gamescreen")) {
+                            if(document.getElementById("player_gui").contains(e.target)) return;
                             isDragging = true;
-                            let mapTranslateX = currentMapTranslateX;
-                            let mapTranslateY = currentMapTranslateY;
-                            let mapZoom = currentMapZoom;
+                            let mapTranslate = mapElement.style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/translate/g, "").replace(/px/g, "").replace(/ /g, "").split(",");
+                            let mapZoom = Number(document.getElementById("mapcontainer").style.transform.replace(/\(/g, "").replace(/\)/g, "").replace(/scale/g, ""));
 
                             let deltaX = e.movementX/1.3;
                             let deltaY = e.movementY/1.3;
 
                             //must check both x and y coords for scrolling
-                            if(mapTranslateX > mapboundsX[0] && deltaX > 0) {
+                            if(mapTranslate[0] > mapboundsX[0] && deltaX > 0) {
                                 deltaX = 0;
-                            } else if(mapTranslateX < mapboundsX[1] && deltaX < 0) {
+                            } else if(mapTranslate[0] < mapboundsX[1] && deltaX < 0) {
                                 deltaX = 0;
                             }
 
-                            if(mapTranslateY > mapboundsY[0] && deltaY > 0) {
+                            if(mapTranslate[1] > mapboundsY[0] && deltaY > 0) {
                                 deltaY = 0;
-                            } else if(mapTranslateY < mapboundsY[1] && deltaY < 0) {
+                            } else if(mapTranslate[1] < mapboundsY[1] && deltaY < 0) {
                                 deltaY = 0;
                             }
-                            currentMapTranslateX = Number(mapTranslateX) + deltaX/mapZoom;
-                            currentMapTranslateY = Number(mapTranslateY) + deltaY/mapZoom;
-                            mapElement.style.transform = `translate(${currentMapTranslateX}px, ${currentMapTranslateY}px)`;
+                            if(!mapTranslate[1]) {
+                                mapTranslate[1] = 0;
+                            }
+                            mapElement.style.transform = `translate(${Number(mapTranslate[0]) + deltaX/mapZoom}px, ${Number(mapTranslate[1]) + deltaY/mapZoom}px)`;
                         }
                     }
             }
@@ -679,9 +637,6 @@ function initializeMap() {
 }
 
 function connect(div1, div2, color, thickness) {
-    if(!div1 || !div2) {
-        return;
-    }
     var off1 = getOffset(div1);
     var off2 = getOffset(div2);
     var x1 = off1.left + off1.width+20;
@@ -693,7 +648,7 @@ function connect(div1, div2, color, thickness) {
     var cy = ((y1 + y2) / 2) - (thickness / 2);
     var angle = Math.atan2((y1 - y2), (x1 - x2)) * (180 / Math.PI);
     var htmlLine = "<div class='attack-line' style='background: linear-gradient(" + angle + "deg, #ffc000 0%, #ff0000 100%); pointer-events: none; z-index: -1; padding:0px; margin:0px; height:" + thickness + "px; background-color:" + color + "; line-height: 1px; position: absolute; left:" + cx + "px; top:" + cy + "px; width:" + length + "px; -moz-transform:rotate(" + angle + "deg); -webkit-transform:rotate(" + angle + "deg); -o-transform:rotate(" + angle + "deg); -ms-transform:rotate(" + angle + "deg); transform:rotate(" + angle + "deg);' />";
-    document.getElementById("mapl2").insertAdjacentHTML("beforeend", htmlLine);
+    document.getElementById("mapl2").innerHTML += htmlLine;
 }
 
 function attackTerritory(start, target) {
@@ -740,11 +695,9 @@ function downloadMap() {
             response.json().then(function(text) {
                 mapdict = JSON.parse(text.mapdict);
                 mapmoves = JSON.parse(text.moves);
-                mapAdjacency = buildMapAdjacency(mapmoves);
                 coordadjusts = JSON.parse(text.coordadjust);
-                let metadata = JSON.parse(text.metadata);
-                mapboundsX = metadata.boundsX;
-                mapboundsY = metadata.boundsY;
+                mapboundsX = JSON.parse(text.metadata).boundsX;
+                mapboundsY = JSON.parse(text.metadata).boundsY;
                 makemap(text.mapdata);
                 resolve("ok");
             });
@@ -787,13 +740,13 @@ function troopChangeAnimation(value, location) {
     troopschangecounter.style.top = "-15px";
     troopschangecounter.style.opacity = "0";
     setTimeout(function() {
-        troopschangecounter.style.top = "-30px";
-        troopschangecounter.style.opacity = "1";
+        document.getElementById("t_troops_change_" + location).style.top = "-30px";
+        document.getElementById("t_troops_change_" + location).style.opacity = "1";
         setTimeout(function() {
-            troopschangecounter.style.top = "-15px";
-            troopschangecounter.style.opacity = "0";
+            document.getElementById("t_troops_change_" + location).style.top = "-15px";
+            document.getElementById("t_troops_change_" + location).style.opacity = "0";
             setTimeout(function() {
-                troopschangecounter.style.display = "none";
+                document.getElementById("t_troops_change_" + location).style.display = "none";
             }, 200)
         }, 1200);
     }, 200);
@@ -1180,62 +1133,55 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                     } else if(response.updatemap) {
                         playeroccupied = 0;
                         let updatemapdata = response.updatemap;
-                        let territoryKeys = Object.keys(updatemapdata);
-                        let reslength = territoryKeys.length;
+                        let reslength = Object.keys(updatemapdata).length;
                         let playertotaltroops = 0;
                         let playerstats = {};
                         for(let i=0; i<reslength; i++) {
-                            let c_update_map_info = updatemapdata[territoryKeys[i]];
-                            let territoryCodeLower = c_update_map_info.territory.toLowerCase();
-                            let territoryStatsElement = document.getElementById("t_origin_" + territoryCodeLower);
-                            if(territoryStatsElement) {
+                            let c_update_map_info = updatemapdata[Object.keys(updatemapdata)[i]];
+                            if(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase())) {
                                 let selectterritory = document.querySelector("[data-code='" + c_update_map_info.territory + "']");
-                                let territoryTroopsValue = territoryStatsElement.getElementsByClassName("t_troops_value")[0];
-                                let initialtroops = Number(territoryTroopsValue.innerText);
+                                let initialtroops = document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText;
                                 let initialcolor = selectterritory.getAttribute("data-color");
-                                let updatedTroopCount = Number(c_update_map_info.troopcount);
-                                territoryTroopsValue.innerText = c_update_map_info.troopcount;
-
-                                let updatedColor = "default";
+                                document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText = c_update_map_info.troopcount;
                                 if(c_update_map_info.player != null) {
-                                    updatedColor = playerColors[c_update_map_info.player];
+                                    selectterritory.setAttribute("data-color", playerColors[c_update_map_info.player])
+                                    selectterritory.setAttribute("fill", getColor(selectterritory, false));
+                                } else {
+                                    selectterritory.setAttribute("data-color", "default");
+                                    selectterritory.setAttribute("fill", getColor(selectterritory, false));
                                 }
-                                if(selectterritory.getAttribute("data-color") !== updatedColor) {
-                                    selectterritory.setAttribute("data-color", updatedColor);
-                                }
-                                selectterritory.setAttribute("fill", getColor(selectterritory, false));
 
-                                if(updatedColor === myColor) {
-                                    playertotaltroops = playertotaltroops + updatedTroopCount;
+                                if(selectterritory.getAttribute("data-color") === myColor) {
+                                    playertotaltroops = playertotaltroops + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText);
                                     playeroccupied++;
-                                } else if(updatedColor !== "default"){
-                                    if(!playerstats.hasOwnProperty(updatedColor)) {
-                                        playerstats[updatedColor] = [updatedTroopCount, 1];
+                                } else if(selectterritory.getAttribute("data-color") !== "default"){
+                                    if(!playerstats.hasOwnProperty(selectterritory.getAttribute("data-color"))) {
+                                        playerstats[selectterritory.getAttribute("data-color")] = [Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), 1];
                                     } else {
-                                        playerstats[updatedColor] = [playerstats[updatedColor][0] + updatedTroopCount, playerstats[updatedColor][1] + 1];
+                                        playerstats[selectterritory.getAttribute("data-color")] = [playerstats[selectterritory.getAttribute("data-color")][0] + Number(document.getElementById("t_origin_" + c_update_map_info.territory.toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText), playerstats[selectterritory.getAttribute("data-color")][1] + 1];
                                     }
                                 }
 
                                 if(attackPhase === "attack") {
-                                    if(initialcolor === updatedColor) {
-                                        if(updatedTroopCount - initialtroops != 0) {
-                                            troopChangeAnimation(updatedTroopCount - initialtroops, territoryCodeLower);
+                                    if(initialcolor === selectterritory.getAttribute("data-color")) {
+                                        if(c_update_map_info.troopcount - initialtroops != 0) {
+                                            troopChangeAnimation(c_update_map_info.troopcount - initialtroops, c_update_map_info.territory.toLowerCase());
                                         }
                                     } else {
-                                        troopChangeAnimation(updatedTroopCount, territoryCodeLower);
+                                        troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                                     }
-                                } else if(attackPhase === "deploy" && updatedTroopCount - initialtroops != 0 && updatedColor !== "default") {
-                                    troopChangeAnimation(updatedTroopCount, territoryCodeLower);
+
+                                    if(selectedRegion) {
+                                        let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
+                                        if(troopmoveamount < 1) {
+                                            troopmoveamount = 1;
+                                        }
+                                        document.getElementById("sendamount").innerText = troopmoveamount + " troops";
+                                    }
+                                } else if(attackPhase === "deploy" && c_update_map_info.troopcount - initialtroops != 0 && selectterritory.getAttribute("data-color") !== "default") {
+                                    troopChangeAnimation(c_update_map_info.troopcount, c_update_map_info.territory.toLowerCase());
                                 }
                             }
-                        }
-
-                        if(attackPhase === "attack" && selectedRegion) {
-                            let troopmoveamount = Math.round(Number(document.getElementById("t_origin_" + selectedRegion.getAttribute("data-code").toLowerCase()).getElementsByClassName("t_troops_value")[0].innerText) * Number(document.getElementById("troopslider").value) * 0.01);
-                            if(troopmoveamount < 1) {
-                                troopmoveamount = 1;
-                            }
-                            document.getElementById("sendamount").innerText = troopmoveamount + " troops";
                         }
 
                         if(playertotaltroops > lifetimepeaktroops) {
@@ -1270,21 +1216,18 @@ function gameConnect(inputroomid, pmap, createnewroom) {
                         }
 
                         //for all the other players
-                        let colorToPlayerId = {};
-                        for(let key in playerColors) {
-                            colorToPlayerId[playerColors[key]] = key;
-                        }
+                        for(p_key in playerstats) {
+                            for(key in playerColors) {
+                                if(playerColors[key] === p_key) {
+                                    //update leaderboard
+                                    document.getElementById("troops-" + key).innerText = playerstats[p_key][0];
+                                    document.getElementById("territories-" + key).innerText = playerstats[p_key][1];
 
-                        for(let p_key in playerstats) {
-                            let playerId = colorToPlayerId[p_key];
-                            if(typeof playerId !== "undefined") {
-                                //update leaderboard
-                                document.getElementById("troops-" + playerId).innerText = playerstats[p_key][0];
-                                document.getElementById("territories-" + playerId).innerText = playerstats[p_key][1];
-
-                                //edit the player's bar in the overall territories bar
-                                if(playerId !== uid) {
-                                    document.getElementById("pbar-" + playerId).style.width = (playerstats[p_key][1]/totalterritories)*100 + "%";
+                                    //edit the player's bar in the overall territories bar
+                                    if(key !== uid) {
+                                        document.getElementById("pbar-" + key).style.width = (playerstats[p_key][1]/totalterritories)*100 + "%";
+                                    }
+                                    break;
                                 }
                             }
                         }
