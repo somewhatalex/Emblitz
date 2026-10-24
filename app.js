@@ -71,6 +71,10 @@ if(process.env.PRODUCTION === "yes") {
     }
 }
 
+if (typeof adminPasswd !== "string" || adminPasswd.length < 1) {
+    console.log("Configure a strong admin password in .env in order to use admin features!")
+}
+
 const badWordsFilter = new badwords();
 
 const game = new gamehandler();
@@ -163,6 +167,16 @@ function removeFromArray(arr, item) {
     for (var i = arr.length; i--;) {
       if (arr[i] === item) arr.splice(i, 1);
     }
+}
+
+function isAdmin(passwdAttempt) {
+    const adminPasswd = process.env.ADMINMASTERPASSWORD;
+
+    if (typeof adminPasswd !== "string" || adminPasswd.length < 1 || passwdAttempt !== adminPasswd) {
+        return false;
+    }
+
+    return true;
 }
 
 function requireHTTPS(req, res, next) {
@@ -753,7 +767,7 @@ app.post("/auth2", async (req, res) => {
             return;
         }
 
-        auth.checkUserConflicts(req.body.username, req.body.email).then(function(conflicts) {
+        return auth.checkUserConflicts(req.body.username, req.body.email).then(function(conflicts) {
             errors = errors.concat(conflicts);
             if(errors.length > 0) {
                 res.json({"errors": errors});
@@ -763,7 +777,7 @@ app.post("/auth2", async (req, res) => {
 
             //passed all checks...
             //add user to database
-            auth.registerUser(req.body.username, req.body.email, req.body.password).then(function(tokens) {
+            return auth.registerUser(req.body.username, req.body.email, req.body.password).then(function(tokens) {
                 var mail = {
                     from: "'Emblitz Team' <emblitz@emblitz.com>",
                     to: req.body.email,
@@ -777,18 +791,30 @@ app.post("/auth2", async (req, res) => {
                             `
                 };
                 
-                mailTransport.sendMail(mail);
-                dev_emails++;
-                res.cookie("uuid", tokens[0], { expires: new Date(Date.now() + (2*24*3600000))}); //2 days expiry bc temporary and account isn't verified yet
-                res.cookie("publickey", tokens[2], { expires: new Date(Date.now() + (2*24*3600000))});
-                res.json({"ok": true});
+                                mailTransport.sendMail(mail).then(function() {
+                    dev_emails++;
+                }).catch(function(error) {
+                    console.error("Registration verification email failed:", error);
+                });
+
+                res.cookie("uuid", tokens[0], {
+                    expires: new Date(Date.now() + (2 * 24 * 3600000))
+                });
+                res.cookie("publickey", tokens[2], {
+                    expires: new Date(Date.now() + (2 * 24 * 3600000))
+                });
+
+                return res.json({"ok": true});
             });
+        }).catch(function(error) {
+            console.error("Account registration failed:", error);
+            return res.status(500).json({"error": "server_1"});
         });
     } else if(req.body.action === "resendemail") {
         let uuid = req.cookies.uuid;
         
         if(uuid) {
-            auth.verifyUUID(uuid).then(function(data) {
+            return auth.verifyUUID(uuid).then(function(data) {
                 var mail = {
                     from: "'Emblitz Team' <emblitz@emblitz.com>",
                     to: data[0],
@@ -802,15 +828,19 @@ app.post("/auth2", async (req, res) => {
                             `
                 };
                 
-                mailTransport.sendMail(mail);
-                dev_emails++;
+                mailTransport.sendMail(mail).then(function() {
+                    dev_emails++;
+                }).catch(function(error) {
+                    console.error("Resent verification email failed:", error);
+                });
 
-                res.json({"email": data[0]});
+                return res.json({"email": data[0]});
             }).catch(function(error) {
-                res.json({"error": "lookup_1"});
+                console.error("Verification email lookup failed:", error);
+                return res.json({"error": "lookup_1"});
             });
         } else {
-            res.json({"error": "lookup_2"})
+            return res.json({"error": "lookup_2"});
         }
     } else if (req.body.action === "requestPasswordReset") {
         const errors = [];
@@ -1072,7 +1102,7 @@ app.post("/auth2", async (req, res) => {
 app.post("/authapi", async (req, res) => {
     //admin functions
     if(req.body.action === "createpost") {
-        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+        if(!isAdmin(req.body.auth)) {
             res.status(403);
             res.json({"error": "403", "message": "You are not authorized to make this call!"});
             return;
@@ -1081,7 +1111,7 @@ app.post("/authapi", async (req, res) => {
             res.json({"result": "post created successfully"});
         });
     } else if(req.body.action === "deletepost") {
-        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+        if(!isAdmin(req.body.auth)) {
             res.status(403);
             res.json({"error": "403", "message": "You are not authorized to make this call!"});
             return;
@@ -1096,7 +1126,7 @@ app.post("/authapi", async (req, res) => {
             res.json({"result": false});
         }
     } if(req.body.action === "runsqlquery") {
-        if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+        if(!isAdmin(req.body.auth)) {
             res.status(403);
             res.json({"error": "403", "message": "You are not authorized to make this call!"});
             return;
@@ -1184,7 +1214,7 @@ app.post("/authapi", async (req, res) => {
 app.post("/api", (req, res) => {
     try {
         if(req.body.action === "getdevstats") {
-            if(req.body.auth !== process.env.ADMINMASTERPASSWORD) {
+            if(!isAdmin(req.body.auth)) {
                 res.status(403);
                 res.json({"error": "403", "message": "You are not authorized to make this call!"});
                 return;

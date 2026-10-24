@@ -586,26 +586,33 @@ function genJWT(uuid) {
     });
 }
 
-function verifyUUID(key) {
-    return new Promise((resolve, reject) => {
-        app.db.query(`SELECT * FROM users WHERE token=$1 AND verified=$2`, [key, false], function (err, result) {
-            if(result.rows[0]) {
-                let u_info = [{publickey: result.rows[0].publickey, email: result.rows[0].email}];
-                let issuer = "dr. defario's grandson samuel" //issuer of token
+async function verifyUUID(key) {
+    const result = await app.db.query(
+        `SELECT * FROM users WHERE token=$1 AND verified=$2`,
+        [key, false]
+    );
 
-                let token = jwt.sign({
-                    data: u_info,
-                    iss: issuer,
-                    expiresIn: 60*10 //10 minutes (measure in seconds)
-                }, process.env.AUTHSECRET);
+    const user = result.rows[0];
+    if (!user) {
+        throw new Error("Unverified account not found");
+    }
 
-                let userinfo = [result.rows[0].email, result.rows[0].username, token]
-                resolve(userinfo);
-            } else {
-                reject();
-            }
-        });
-    });
+    const token = jwt.sign(
+        {
+            data: [{
+                publickey: user.publickey,
+                email: user.email
+            }]
+        },
+        process.env.AUTHSECRET,
+        {
+            algorithm: "HS256",
+            issuer: "dr. defario's grandson samuel",
+            expiresIn: "10m"
+        }
+    );
+
+    return [user.email, user.username, token];
 }
 
 function deleteUnusedAccounts() {
