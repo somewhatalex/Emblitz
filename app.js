@@ -1189,7 +1189,7 @@ app.post("/api", (req, res) => {
                 res.json({"error": "403", "message": "You are not authorized to make this call!"});
                 return;
             }
-            res.json({"starttime": dev_server_starttime, "startms": dev_server_abs_starttime, "emailssent": dev_emails});
+            res.json({"starttime": dev_server_starttime, "startms": dev_server_abs_starttime, "emailssent": dev_emails, "nodeversion": process.version});
         } else if (req.body.action === "editplayercolor") {
             let getuuid = req.cookies.uuid;
             let color = req.body.color;
