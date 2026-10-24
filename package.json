@@ -1,8 +1,11 @@
 {
   "name": "emblitz",
-  "version": "1.5.7a",
+  "version": "1.5.9a",
   "description": "Emblitz is an online real-time strategy game. Fight other players from around the world for control over a variety of maps!",
   "main": "app.js",
+  "engines": {
+    "node": "^26.12.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,20 +27,20 @@
   "homepage": "https://github.com/somewhatalex/emblitz#readme",
   "dependencies": {
     "bad-words": "^3.0.4",
-    "body-parser": "^1.20.0",
+    "body-parser": "^1.20.9",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.1",
     "ejs": "^3.1.8",
     "events": "^3.3.0",
-    "express": "^4.18.1",
+    "express": "^4.22.3",
     "express-rate-limit": "^6.5.1",
     "express-ws": "^5.0.2",
     "http": "^0.0.1-security",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.3",
     "mysql": "^2.18.1",
     "nocache": "^3.0.4",
-    "nodemailer": "^6.7.7",
+    "nodemailer": "^10.2.1",
     "password-hash": "^1.2.2",
     "path": "^0.12.7",
     "pg": "^8.7.3",

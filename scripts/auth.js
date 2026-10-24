@@ -571,11 +571,15 @@ function genJWT(uuid) {
             let u_info = [{publickey: uuid, email: email}];
             let issuer = "dr. defario's grandson samuel" //issuer of token
 
-            let token = jwt.sign({
-                data: u_info,
-                iss: issuer,
-                expiresIn: 60*10 //10 minutes (measure in seconds)
-            }, process.env.AUTHSECRET);
+            let token = jwt.sign(
+                { data: u_info },
+                process.env.AUTHSECRET,
+                {
+                    algorithm: "HS256",
+                    issuer: issuer,
+                    expiresIn: "10m"
+                }
+            );
 
             resolve(token);
         });
