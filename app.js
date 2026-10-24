@@ -724,6 +724,12 @@ function getroommap(id) {
 app.post("/auth2", async (req, res) => {
     if(req.body.action === "registeruser") {
         let errors = [];
+
+        const { username, email, password } = req.body ?? {};
+        if (typeof username !== "string" || typeof email !== "string" || typeof password !== "string") {
+            return res.status(400).json({ error: "invalid_input" });
+        }
+
         let emailformatted = req.body.email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         );
@@ -981,6 +987,12 @@ app.post("/auth2", async (req, res) => {
         return;
     } else if (req.body.action === "requestUsername") {
         let errors = [];
+
+        const { username, email, password } = req.body ?? {};
+        if (typeof username !== "string" || typeof email !== "string" || typeof password !== "string") {
+            return res.status(400).json({ error: "invalid_input" });
+        }
+        
         let emailformatted = req.body.email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
         );
