@@ -155,6 +155,7 @@
                         document.getElementById("server_upsince").innerText = text.starttime;
                         document.getElementById("server_upfor").innerText = ((Date.now() - text.startms)/(3600000)).toFixed(2) + " hrs";
                         document.getElementById("server_emails").innerText = text.emailssent;
+                        document.getElementById("server_nodeversion").textContent = text.nodeversion ?? "Unavailable";
                     });
                 });
             }
@@ -302,6 +303,7 @@
                             <TR><TD>Server up since</TD><TD ID="server_upsince">--</TD></TR>
                             <TR><TD>Server up for</TD><TD ID="server_upfor">--</TD></TR>
                             <TR><TD>Emails sent since server is up</TD><TD ID="server_emails">--</TD></TR>
+                            <TR><TD>Node.js runtime version</TD><TD ID="server_nodeversion">--</TD></TR>
                         </TBODY>
                     </TABLE>
                 </DIV>
